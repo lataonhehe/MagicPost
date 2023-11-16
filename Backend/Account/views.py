@@ -5,23 +5,33 @@ from rest_framework.permissions import AllowAny
 from .serializers import AccountSerializer  
 from .models import Account
 from django.shortcuts import render
-
+from django.contrib.auth import authenticate, login
 
 
 @api_view(["POST"])
 # @permission_classes([AllowAny])
 def login_view(request):
-    """Token login"""
-    auth_view = ObtainAuthToken.as_view()
-    response = auth_view(request._request)
+    """Authenticate user and respond with a token."""
+    username = request.data.get('username')
+    password = request.data.get('password')
+    print(username+' '+password)
+    try:
+        account = Account.objects.get(username=username)
+    except Account.DoesNotExist:
+        Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "Invalid credentials"})
+    
+    if account.password == password:
+        return Response(status=status.HTTP_200_OK, data={"message": "Login successful"})
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "Wrong password"})
 
-    # Customize the response if needed
-    if response.status_code == status.HTTP_200_OK:
-        user = response.data['user']
-        print(f"[SERVER] Login successfully from {user}\n")
-
-    return response
-
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return Response(status=status.HTTP_200_OK, data={"message": "Login successful"})
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={"error": "Invalid credentials"})
+    
 
 
 @api_view(["POST"])
@@ -40,6 +50,3 @@ def register_view(request):
 def list(request):
     accounts = Account.objects.all()
     return render(request, 'Account/list.html', {'accounts': accounts})
-
-def index(request):
-    return HttpResponse('Hello world. You are at the account index.')
