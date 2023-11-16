@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account List</title>
+</head>
+<body>
+    <h1>Account List</h1>
+    <ul>
+        {% for account in accounts %}
+            <li>{{ account.username }} - {{ account.role }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
