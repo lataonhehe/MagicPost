@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -19,8 +20,21 @@ class UserManager(BaseUserManager):
         
         user = self.model(username=username, department=department, role=role, **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)
-        return user
+
+        if self.requesting_user:
+            if self.requesting_user.is_manager() and role == '0':
+                # Only allow managers to create employees
+                user.department = self.requesting_user.department  # Set employee's department to the manager's department
+                user.save(using=self._db)
+                return user
+            elif self.requesting_user.is_leader() and role == '1':
+                # Only allow leaders to create managers
+                user.save(using=self._db)
+                return user
+
+        # If the conditions are not met, raise an exception or handle it as needed
+        raise PermissionError("You don't have permission to create this user.")
+    
 
     def create_superuser(self, username, password=None, department=None, role='2', **extra_fields):
         extra_fields.setdefault('is_staff', True)
