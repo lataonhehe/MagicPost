@@ -27,21 +27,12 @@ def login_api(request):
     )
 
 @api_view(["GET"])
-def display_leader_trasaction_page(request):
+@permission_classes([IsLeader])
+def display_leader_department_page(request):
     """Display transaction_page """
-
-    #check user role
-    is_leader = True
-    
-    #return 
-    if not is_leader:
-        return JsonResponse({"message": "You are not authorized to view this page"}, status=403)
-    html_content = render_to_string('leader/department_table.html', {'transaction_list': Department.objects.all.values()})
-
     json_data = {
-        'html_content': html_content
+        'transaction_list': Department.objects.all.values()
     }
-
     return JsonResponse(json_data)
 
 @api_view(["POST"])
@@ -122,3 +113,4 @@ def manager_list(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid request method."})
 
+#Giao dịch viên 
