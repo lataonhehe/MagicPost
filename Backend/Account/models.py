@@ -18,8 +18,10 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The Username field must be set')
         
-        user = self.model(username=username, department=department, role=role, **extra_fields)
+        user = self.model(username=username, role=role, **extra_fields)
         user.set_password(password)
+        user.save()
+        return user
 
         if self.requesting_user:
             if self.requesting_user.is_manager() and role == '0':
@@ -32,7 +34,7 @@ class UserManager(BaseUserManager):
                 user.save(using=self._db)
                 return user
 
-        # If the conditions are not met, raise an exception or handle it as needed
+        #If the conditions are not met, raise an exception or handle it as needed
         raise PermissionError("You don't have permission to create this user.")
     
 
@@ -51,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=50)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    # department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='0')
 
     is_active = models.BooleanField(default=True)
@@ -69,4 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_manager(self):
         return self.role == '1'
+    
+    def is_employee(self):
+        return self.role == '0'
     

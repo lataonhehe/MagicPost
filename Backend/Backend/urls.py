@@ -23,5 +23,13 @@ urlpatterns = [
     path("login", views.login_api),
     path("register", views.register_api),
     path('Account/', include('django.contrib.auth.urls')),
-    path("view_all_departments", views.display_leader_trasaction_page)
+    path('create_shipment', views.create_shipment),
+    path('create_transaction_to_consolidation_point', views.create_transaction_to_consolidation_point),
+    path('confirm_shipment_from_consolidation_department', views.confirm_shipment_from_consolidation_department),
+    path('confirm_shipment_to_receiver', views.confirm_shipment_to_receiver),
+    path('confirm_failed_shipment_and_create_transaction', views.confirm_failed_shipment_and_create_transaction),
+    path('confirm_transaction_from_transaction_department', views.confirm_transaction_from_transaction_department),
+    path('create_transaction_to_target_consolidation_point', views.create_transaction_to_target_consolidation_point),
+    path('confirm_transaction_from_other_consolidation_department', views.confirm_transaction_from_other_consolidation_department),
+    path('create_transaction_to_target_transaction_point', views.create_transaction_to_target_transaction_point)
 ]
