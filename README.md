@@ -2,6 +2,10 @@
   # MagicPost
 https://itest.com.vn/lects/webappdev/mockproj/magic-post.htm
 
+  # Superuser
+  username: admin
+  password: admin
+
   # web
 
   Note: Please ensure you have installed <code><a href="https://nodejs.org/en/download/">nodejs</a></code>

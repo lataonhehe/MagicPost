@@ -37,22 +37,22 @@ class Shipment(models.Model):
     special_service = models.CharField(max_length=50, default=None, null=True)
     weight = models.DecimalField(max_digits=4, decimal_places=2, default=None, null=True)
 
-#     def __str__(self):
-#         return f"{self.shipment_id} - {self.status}"
+    def __str__(self):
+        return f"{self.shipment_id} - {self.status}"
 
-# class Transaction(models.Model):
-#     STATUS_CHOICES = [
-#         ('Pending', 'Pending'),
-#         ('In Progress', 'In Progress'),
-#         ('Completed', 'Completed'),
-#         ('Failed', 'Failed')
-#     ]
+class Transaction(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed')
+    ]
 
-#     transaction_id = models.AutoField(primary_key=True)
-#     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
-#     pos = models.ForeignKey(Department, related_name='transactions_pos', on_delete=models.CASCADE)
-#     des = models.ForeignKey(Department, related_name='transactions_des', on_delete=models.CASCADE)
-#     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
+    transaction_id = models.AutoField(primary_key=True)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
+    pos = models.ForeignKey(Department, related_name='transactions_pos', on_delete=models.CASCADE)
+    des = models.ForeignKey(Department, related_name='transactions_des', on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
 
     def __str__(self):
         return f"{self.transaction_id} - {self.status}"
