@@ -1,78 +1,77 @@
+from typing import Any
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-# Create your models here.
+class Department(models.Model):
+    TYPE = [
+        ('0', 'TransactionPoint'),
+        ('1', 'ConsolidationPoint')
+    ]
+    
+    department_id = models.AutoField(primary_key=True)
+    manager = models.OneToOneField('User', on_delete=models.CASCADE, related_name='manager')
+    department_type = models.CharField(max_length=1, choices=TYPE, default='0')
+    consolidation_point = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)    
 
-class Account(models.Model):
+class UserManager(BaseUserManager):
+    def create_user(self, username, password=None, department=None, role='0', **extra_fields):
+        if not username:
+            raise ValueError('The Username field must be set')
+        
+        user = self.model(username=username, role=role, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+        if self.requesting_user:
+            if self.requesting_user.is_manager() and role == '0':
+                # Only allow managers to create employees
+                user.department = self.requesting_user.department  # Set employee's department to the manager's department
+                user.save(using=self._db)
+                return user
+            elif self.requesting_user.is_leader() and role == '1':
+                # Only allow leaders to create managers
+                user.save(using=self._db)
+                return user
+
+        #If the conditions are not met, raise an exception or handle it as needed
+        raise PermissionError("You don't have permission to create this user.")
+    
+
+    def create_superuser(self, username, password=None, department=None, role='2', **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(username, password, department, role, **extra_fields)
+
+class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
-        ('LD', 'lanh_dao'),
-        ('TTK', 'truong_tap_ket'),
-        ('TGD', 'truong_giao_dich'),
-        ('NV', 'nhan_vien'),
-        ('KH', 'khach_hang')
+        ('2', 'Leader'),
+        ('1', 'Manager'),
+        ('0', 'Employee')
     ]
 
-    username = models.IntegerField(primary_key=True)
-    password = models.CharField(max_length=255)
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='NV')
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=50)
+    # department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='0')
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
 
     def __str__(self):
-        return f"{self.username} - {self.role}"
+        return f"{self.username} - {self.get_role_display()}"
+
+    def is_leader(self):
+        return self.role == '2'
+
+    def is_manager(self):
+        return self.role == '1'
     
-class Tap_ket(models.Model):
-    department_id = models.AutoField(primary_key=True)
-    manager_id = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return f"{self.department_id} - {self.type}"
+    def is_employee(self):
+        return self.role == '0'
     
-class Giao_dich(models.Model):
-    department_id = models.AutoField(primary_key=True)
-    manager_id = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
-    tap_ket = models.ForeignKey(Tap_ket, on_delete=models.SET_NULL, null=True)
-
-    
-class Customer(models.Model):
-    name = models.CharField(max_length=30)
-    phone = models.CharField(max_length=15)
-    code = models.CharField(max_length=5)
-
-    def __str__(self):
-        pass
-
-class Good(models.Model):
-    status_list = [
-        ('0', 'Noi giao dich cua nguoi gui.'),
-        ('1', 'Noi tap ket.'),
-        ('2', 'Noi giao dich cua nguoi nhan.'),
-        ('3', 'Da den tay nguoi nhan.'),
-    ]
-    good_type_list = [
-        ('TL', 'tai lieu'),
-        ('HH', 'hang hoa')
-    ]
-
-    id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=50, choices=status_list, default='0')
-    
-    #sender info
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    sender_address = models.CharField(max_length=100)
-    sender_postal_code = models.CharField(max_length=10)
-    sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2)
-
-    #receiver info
-    receiver_address = models.CharField(max_length=100)
-    receiver_postal_code = models.CharField(max_length=10)
-    receiver_name = models.CharField(max_length=30)
-    receiver_phone = models.CharField(max_length=15)
-    receiver_total_payment = models.DecimalField(max_digits=12, decimal_places=2)
-    DHCode = models.CharField(max_length=5, null=True)
-    receiving_date = models.DateField(blank=True, null=True)
-
-    good_type = models.CharField(max_length=8, choices=good_type_list, default='HH')
-    special_service = models.CharField(max_length=50, null=True)
-    weight = models.DecimalField(max_digits=4, decimal_places=2)
-
-
-    def __str__(self):
-        pass

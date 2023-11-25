@@ -16,9 +16,22 @@ Including another URLconf
 """
 from  django.contrib import admin
 from django.urls import path, include
-
+from Account import views as views
+from Transaction import views as transaction_views
 urlpatterns = [
     path('Account/', include('Account.urls')),
     # path('Transaction/', include(''))
     path("admin/", admin.site.urls),
+    path("login", views.login_api),
+    path("register", views.register_api),
+    path('Account/', include('django.contrib.auth.urls')),
+    path('create_shipment', transaction_views.create_shipment),
+    path('create_transaction_to_consolidation_point', transaction_views.create_transaction_to_consolidation_point),
+    path('confirm_shipment_from_consolidation_department', transaction_views.confirm_shipment_from_consolidation_department),
+    path('confirm_shipment_to_receiver', transaction_views.confirm_shipment_to_receiver),
+    path('confirm_failed_shipment_and_create_transaction', transaction_views.confirm_failed_shipment_and_create_transaction),
+    path('confirm_transaction_from_transaction_department', transaction_views.confirm_transaction_from_transaction_department),
+    path('create_transaction_to_target_consolidation_point', transaction_views.create_transaction_to_target_consolidation_point),
+    path('confirm_transaction_from_other_consolidation_department', transaction_views.confirm_transaction_from_other_consolidation_department),
+    path('create_transaction_to_target_transaction_point', transaction_views.create_transaction_to_target_transaction_point)
 ]

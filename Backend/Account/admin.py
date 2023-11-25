@@ -1,9 +1,6 @@
 from django.contrib import admin
-from .models import *
-# Register your models here.
+from .models import User, UserManager, Department
 
-admin.site.register(Account)
-admin.site.register(Tap_ket)
-admin.site.register(Giao_dich)
-admin.site.register(Customer)
-admin.site.register(Good)
+# Register your models here.
+admin.site.register(User)
+admin.site.register(Department)

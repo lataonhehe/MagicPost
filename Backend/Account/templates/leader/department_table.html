@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+</head>
+
+<body>
+    <ul>
+    {% for trans in transaction_list %}
+        <li> {{trans.id_deparment}} {{trans.manager.username}} {{trans.department_type}} {{trans.consolidation_point}}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
