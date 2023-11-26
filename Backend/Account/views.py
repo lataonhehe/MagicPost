@@ -6,10 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from .serializers import UserSerializer
 from .permissions import IsLeader, IsManager, IsEmployee
-from .models import User, Department
-from Transaction.models import Shipment, Transaction
-from django import forms
-from django.http import JsonResponse
+from .models import User
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
@@ -20,6 +17,8 @@ def login_api(request):
     password = request.data.get('password', None)
     user = authenticate(request, username=username, password=password)
 
+    print(user)
+
     if user is not None:
         login(request, user)
         return Response(status=status.HTTP_200_OK, data={"message": "Login successful"})
@@ -28,6 +27,17 @@ def login_api(request):
         status=status.HTTP_400_BAD_REQUEST,
         data={"message": "Invalid username or password"},
     )
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+def logout_api(request):
+    """Log out user"""
+    if request.auth:
+        # If the request has a valid token, log out the user
+        logout(request)
+        return Response(status=status.HTTP_200_OK, data={"message": "Logout successful"})
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid token"})
 
 # @api_view(["GET"])
 # @permission_classes([IsLeader])

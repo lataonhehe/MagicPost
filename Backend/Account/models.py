@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=50)
-    # department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='0')
 
     is_active = models.BooleanField(default=True)

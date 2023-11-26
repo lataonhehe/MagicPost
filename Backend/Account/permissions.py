@@ -12,6 +12,7 @@ class IsManager(permissions.BasePermission):
 class IsLeader(permissions.BasePermission):
     def has_permission(self, request, view):
         # Check if the user making the request is a manager and in the same department
+        print(request.user)
         return (
             request.user.is_authenticated
             and request.user.is_leader()  # Assuming you have an is_manager method in your User model
