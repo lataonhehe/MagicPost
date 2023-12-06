@@ -50,7 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('1', 'Manager'),
         ('0', 'Employee')
     ]
-
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=50)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
@@ -75,3 +74,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_employee(self):
         return self.role == '0'
     
+    def check_password(self, password):
+        return self.password == password

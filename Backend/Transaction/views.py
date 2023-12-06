@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from Account.serializers import UserSerializer
@@ -10,6 +10,7 @@ from Account.models import User, Department
 from Transaction.models import Shipment, Transaction
 from django import forms
 from django.http import JsonResponse
+from .serializers import ShipmentSerializer, TransactionSerializer
 
 # Create your views here.
 
@@ -21,37 +22,49 @@ class ShipmentForm(forms.ModelForm):
         fields = ['pos', 'current_pos']
 
 @api_view(['POST'])
-# @permission_classes([IsEmployee]) 
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated, IsEmployee]) 
 def create_shipment(request):
     """
     Create shipment for customer from Transaction Department
     """
-    data = request.data
-    if request.method == 'POST':
-        #Page have a 'save' button
-        try:
-            data['pos'] = Department.objects.get(department_id=data['pos'])
-            data['current_pos'] = data['pos']
-        except Exception:
-            response_data = {'status': 'error', 'message': 'Invalid pos id'}
-            return JsonResponse(response_data)
+    pos = request.user.department
+    # request.data['pos'] = pos
+    # request.data['current_pos'] = pos
+    serializer = ShipmentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data={"message": "Shipment is created successfully."}
+        )
+    return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
+
+    # if request.method == 'POST':
+    #     #Page have a 'save' button
+    #     try:
+    #         data['pos'] = Department.objects.get(department_id=data['pos'])
+    #         data['current_pos'] = data['pos']
+    #     except Exception:
+    #         response_data = {'status': 'error', 'message': 'Invalid pos id'}
+    #         return JsonResponse(response_data)
         
-        #Check position is transaction point
-        if data['pos'].department_type == '1':
-            response_data = {'status': 'errror', 'message': 'Position is not transaction point.'}
-            return JsonResponse(response_data)
+    #     #Check position is transaction point
+    #     if data['pos'].department_type == '1':
+    #         response_data = {'status': 'errror', 'message': 'Position is not transaction point.'}
+    #         return JsonResponse(response_data)
         
         # Check position is a transaction point
-        form = ShipmentForm(request.data)
-        if form.is_valid():
-            new_shipment = Shipment(**request.data)
-            new_shipment.status = 'In Progress'
-            new_shipment.save()
-            response_data = {'status': 'success', 'message': 'Shipment saved successfully'}
-            return JsonResponse(response_data)
-        else:
-            response_data = {'status': 'error', 'message': 'Error: Invalid data for creating a Shipment'}
-            return JsonResponse(response_data)
+    form = ShipmentForm(request.data)
+    if form.is_valid():
+        new_shipment = Shipment(**request.data)
+        new_shipment.status = 'In Progress'
+        new_shipment.save()
+        response_data = {'status': 'success', 'message': 'Shipment saved successfully'}
+        return JsonResponse(response_data)
+    else:
+        response_data = {'status': 'error', 'message': 'Error: Invalid data for creating a Shipment'}
+        return JsonResponse(response_data)
         
 
 @api_view(['POST'])

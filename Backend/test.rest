@@ -1,0 +1,47 @@
+### Register
+
+POST http://127.0.0.1:8000/register
+Content-Type: application/json
+
+{
+    "username": "employee10", 
+    "password": "123456", 
+    "department": 1, 
+    "role": "0"
+}
+### Login
+
+POST http://127.0.0.1:8000/login
+Content-Type: application/json
+
+{"username": "employee10", "password": "123456", ""}
+
+### Logout
+
+POST http://127.0.0.1:8000/logout
+Content-Type: application/json
+Authorization: Token c656ac90ccd658b6004cfed4063f49222253860e
+
+{}
+
+### create shipment
+
+POST http://127.0.0.1:8000/Transaction/create_shipment
+Content-Type: application/json
+Authorization: Token e2a6ee7763f2866bd266b9afde91d2c321f44a97
+
+{
+    "sender_address": "jfdi",
+    "sender_postal_code": "fewfw",
+    "sender_total_payment": 0,
+    "receiver_address": "fwefw",
+    "receiver_postal_code": "fef",
+    "receiver_name": "fef",
+    "receiver_phone": "543453",
+    "receiver_total_payment": 0,
+    "DHCode": "34534",
+    "receiving_date": "2023-12-04",
+    "good_type": "HH",
+    "special_service": "rèwe",
+    "weight": 0
+}

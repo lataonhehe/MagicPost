@@ -1,12 +1,15 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.hashers import check_password
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from .serializers import UserSerializer
 from .permissions import IsLeader, IsManager, IsEmployee
 from .models import User
+from django.shortcuts import get_object_or_404
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
@@ -15,9 +18,19 @@ def login_api(request):
     """Log in and response token"""
     username = request.data.get('username', None)
     password = request.data.get('password', None)
-    user = authenticate(request, username=username, password=password)
-
+    user = get_object_or_404(User, username=username)
     print(user)
+    print(password)
+    print(user.password)
+    print(user.password == password)
+    if not check_password(password, user.password):
+        return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+    token, created = Token.objects.get_or_create(user=user)
+    serializer = UserSerializer(instance=user)
+    return Response({
+        "Token": token.key,
+        "user": serializer.data
+    })
 
     if user is not None:
         login(request, user)
@@ -29,15 +42,12 @@ def login_api(request):
     )
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def logout_api(request):
     """Log out user"""
-    if request.auth:
-        # If the request has a valid token, log out the user
-        logout(request)
-        return Response(status=status.HTTP_200_OK, data={"message": "Logout successful"})
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid token"})
+    request.auth.delete()
+    return Response(status=status.HTTP_200_OK, data={"message": "Logout successful"})
 
 # @api_view(["GET"])
 # @permission_classes([IsLeader])
