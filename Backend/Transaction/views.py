@@ -28,9 +28,9 @@ def create_shipment(request):
     """
     Create shipment for customer from Transaction Department
     """
-    pos = request.user.department
-    # request.data['pos'] = pos
-    # request.data['current_pos'] = pos
+    pos = request.user.department.pk
+    request.data['pos'] = pos
+    request.data['current_pos'] = pos
     serializer = ShipmentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -39,63 +39,38 @@ def create_shipment(request):
             data={"message": "Shipment is created successfully."}
         )
     return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
-
-    # if request.method == 'POST':
-    #     #Page have a 'save' button
-    #     try:
-    #         data['pos'] = Department.objects.get(department_id=data['pos'])
-    #         data['current_pos'] = data['pos']
-    #     except Exception:
-    #         response_data = {'status': 'error', 'message': 'Invalid pos id'}
-    #         return JsonResponse(response_data)
-        
-    #     #Check position is transaction point
-    #     if data['pos'].department_type == '1':
-    #         response_data = {'status': 'errror', 'message': 'Position is not transaction point.'}
-    #         return JsonResponse(response_data)
-        
-        # Check position is a transaction point
-    form = ShipmentForm(request.data)
-    if form.is_valid():
-        new_shipment = Shipment(**request.data)
-        new_shipment.status = 'In Progress'
-        new_shipment.save()
-        response_data = {'status': 'success', 'message': 'Shipment saved successfully'}
-        return JsonResponse(response_data)
-    else:
-        response_data = {'status': 'error', 'message': 'Error: Invalid data for creating a Shipment'}
-        return JsonResponse(response_data)
         
 
 @api_view(['POST'])
-# @permission_classes([IsEmployee])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsEmployee])
 def create_transaction_to_consolidation_point(request):
     """
     Create transaction when shipment is delivered.
     """
 
-    #Check shipment exist
+    # Check shipment exist
     data = request.data
     try:
         shipment = Shipment.objects.get(shipment_id=data['shipment_id']) 
     except Exception:
         response_data = {'status': 'errror', 'message': 'Shipment does not exist'}
         return JsonResponse(response_data)
-    
+
+
     #Check shipment are being delivered
     if Transaction.objects.filter(shipment=shipment, status='In Progress').exists():
         response_data = {'status': 'errror', 'message': 'Shipment has been in progress already.'}
         return JsonResponse(response_data)
     
     #Check position is transaction point
-    print(shipment.current_pos.department_type)
     try:
         pos = Department.objects.get(department_id=shipment.current_pos.department_id, department_type='0') 
     except Exception:
         response_data = {'status': 'errror', 'message': 'Position is not transaction point.'}
         return JsonResponse(response_data)
     
-    #Check destination is transaction point and exits
+    #Check destination is consolidation point and exits
     try:
         des = Department.objects.get(department_id=data['des_id'], department_type='1') 
     except Exception:

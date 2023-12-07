@@ -7,7 +7,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        shipment = Shipment.objects.create_user(**validated_data)
+        shipment = Shipment.objects.create(**validated_data)
         return shipment
     
 class TransactionSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        transaction = Transaction.objects.create_user(**validated_data)
+        transaction = Transaction.objects.create(**validated_data)
         return transaction
     
 

@@ -1,12 +1,17 @@
+# ----------------------------------------------------------------------------------------------------
+# NHÂN VIÊN GIAO DỊCH
+# ----------------------------------------------------------------------------------------------------
+
+
 ### Register
 
 POST http://127.0.0.1:8000/register
 Content-Type: application/json
 
 {
-    "username": "employee10", 
+    "username": "employee07", 
     "password": "123456", 
-    "department": 1, 
+    "department_id": 1,
     "role": "0"
 }
 ### Login
@@ -14,13 +19,13 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/login
 Content-Type: application/json
 
-{"username": "employee10", "password": "123456", ""}
+{"username": "employee08", "password": "123456"}
 
 ### Logout
 
 POST http://127.0.0.1:8000/logout
 Content-Type: application/json
-Authorization: Token c656ac90ccd658b6004cfed4063f49222253860e
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 
 {}
 
@@ -28,7 +33,7 @@ Authorization: Token c656ac90ccd658b6004cfed4063f49222253860e
 
 POST http://127.0.0.1:8000/Transaction/create_shipment
 Content-Type: application/json
-Authorization: Token e2a6ee7763f2866bd266b9afde91d2c321f44a97
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 
 {
     "sender_address": "jfdi",
@@ -44,4 +49,88 @@ Authorization: Token e2a6ee7763f2866bd266b9afde91d2c321f44a97
     "good_type": "HH",
     "special_service": "rèwe",
     "weight": 0
+}
+
+
+### create_transaction_to_consolidation_point
+
+POST http://127.0.0.1:8000/Transaction/create_transaction_to_consolidation_point
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "shipment_id": 1,
+    "des_id": 1  
+}
+
+### confirm_shipment_from_consolidation_department
+POST http://127.0.0.1:8000/confirm_shipment_from_consolidation_department
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "transaction_id": 2
+}
+
+### Create transaction from transaction point to receiver
+
+### Confirm shipment to receiver
+POST http://127.0.0.1:8000/confirm_shipment_to_receiver
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "transaction_id": 1
+}
+
+### confirm_failed_shipment_and_create_transaction
+
+POST http://127.0.0.1:8000/confirm_failed_shipment_and_create_transaction
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "transaction_id": 2
+}
+
+
+# ----------------------------------------------------------------------------------------------------
+# NHÂN VIÊN TẬP KẾT
+# ----------------------------------------------------------------------------------------------------
+
+### confirm_shipment_from_transaction_department
+POST http://127.0.0.1:8000/confirm_transaction_from_transaction_department
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "transaction_id": 2
+}
+
+### create_transaction_to_target_consolidation_point
+POST http://127.0.0.1:8000/create_transaction_to_target_consolidation_point
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "shipment_id": 1,
+    "des_id": 1
+}
+
+### confirm_transaction_from_other_consolidation_department(request)
+POST http://127.0.0.1:8000/confirm_shipment_from_other_consolidation_department
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "transaction_id": 2
+}
+
+### create_transaction_to_target_transaction_point
+POST http://127.0.0.1:8000/create_transaction_to_target_transaction_point
+Content-Type: application/json
+Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+
+{
+    "shipment_id": 2
 }
