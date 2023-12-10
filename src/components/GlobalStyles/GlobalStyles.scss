@@ -6,6 +6,8 @@
 }
 
 *{
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -16,6 +18,6 @@ html {
 body {
     font-family: 'Poppins', sans-serif;
     font-size: 1.6rem;
-    line-height: 24px;
+    line-height: 83px;
     text-rendering: optimizeSpeed;
 }
