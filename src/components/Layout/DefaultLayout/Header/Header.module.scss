@@ -1,5 +1,5 @@
 .wrapper {
-    height: 69px;
+    height: var(--default-layout-header-height);
     box-shadow: 0px 1px 1px rgb(0 0 0 / 12%);
     font-size: 16px;
     display: flex;
@@ -8,5 +8,5 @@
 
 .innerHeader {
     height: 100%;
-    width: 1250px;
+    width: var(--default-layout-header-width);
 }
