@@ -1,4 +1,5 @@
 import Home from "../pages/Home"; 
+import Login from "../pages/Login"
 import Transaction from "../pages/Transaction";
 import Manager from "../pages/Manager";
 import Leader from "../pages/Leader";
@@ -10,7 +11,7 @@ const publicRoutes = [
     {path: '/', component: Home},
     {path: '/transaction', component: Transaction},
     {path: '/bill', component: Bill, layout: null },
-
+    {path: '/login', component: Login, layout: null}
 ];
    
 
