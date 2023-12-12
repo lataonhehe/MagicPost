@@ -5,7 +5,7 @@ import logo from '~/assets/logo-1@2x - Copy.png'
 const cx = classNames.bind(styles);
 
 function Header() {
-    return (<header className= {cx('wrapper')}>
+    return (<header className= {cx('wrapper')} style={{background: '#001B42'}}>
         <nav className = {cx('inner-header')}>
             <ul>
                 <li className = {cx('logo')}>
