@@ -18,19 +18,19 @@ def login_api(request):
     """Log in and response token"""
     username = request.data.get('username', None)
     password = request.data.get('password', None)
-    user = get_object_or_404(User, username=username)
-    print(user)
-    print(password)
-    print(user.password)
-    print(user.password == password)
-    if not check_password(password, user.password):
-        return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
-    token, created = Token.objects.get_or_create(user=user)
-    serializer = UserSerializer(instance=user)
-    return Response({
-        "Token": token.key,
-        "user": serializer.data
-    })
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        # Authentication successful
+        token, created = Token.objects.get_or_create(user=user)
+        serializer = UserSerializer(instance=user)
+        return Response({
+            "Token": token.key,
+            "user": serializer.data
+        }, status= status.HTTP_200_OK)
+    else:
+        # Authentication failed
+        return Response({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if user is not None:
         login(request, user)

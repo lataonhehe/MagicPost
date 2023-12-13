@@ -10,92 +10,65 @@ import DefaultLayout from "./HeaderOnly";
 const cx = classNames.bind(styles);
 
 const Login = (props) => {
-    const [Username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const [UsernameError, setUsernameError] = useState("")
-    const [passwordError, setPasswordError] = useState("")
-    
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
 
-    // Gọi server API xem ổn Username tồn tại không
-    const checkAccountExists = (callback) => {
+    const logIn = () => {
         fetch("http://localhost:8000/login", {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
-              },
-            body: JSON.stringify({Username})
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
         })
-        .then(r => r.json())
-        .then(r => {
-            callback(r?.userExists)
-        })
-    }
+            .then(r => r.json())
+            .then((r) => {
+                if (r.success) {
+                    localStorage.setItem("user", JSON.stringify({ username, token: r.token }));
+                    props.setLoggedIn(true);
+                    props.setUsername(username);
+                    navigate("/");
+                } else {
+                    console.log(r)
+                    window.alert("Wrong username or password");
+                }
+            })
+            .catch((error) => {
+                console.error("Error logging in:", error);
+            });
+    };
 
-    // Log in 
-    const logIn = () => {
-        fetch("http://localhost:8000/auth", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-              },
-            body: JSON.stringify({Username, password})
-        })
-        .then(r => r.json())
-        .then(r => {
-            if ('success' === r.message) {
-                localStorage.setItem("user", JSON.stringify({Username, token: r.token}))
-                props.setLoggedIn(true)
-                props.setUsername(Username)
-                navigate("/")
-            } else {
-                window.alert("Wrong Username or password")
-            }
-        })
-    }
-        
     const onButtonClick = () => {
+        setUsernameError("");
+        setPasswordError("");
 
-        
-        setUsernameError("")
-        setPasswordError("")
-
-        // Kiểm tra validate :v
-        if ("" === Username) {
-            setUsernameError("Hãy nhập Username")
-            return
+        if (username.trim() === "") {
+            setUsernameError("Hãy nhập username");
+            return;
         }
 
-        if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(Username)) {
-            setUsernameError("Username không hợp lệ!")
-            return
+        if (!/^[a-zA-Z0-9_-]+$/.test(username.trim())) {
+            setUsernameError("Username không hợp lệ!");
+            return;
         }
 
-        if ("" === password) {
-            setPasswordError("Hãy nhập mật khẩu!")
-            return
+        if (password.trim() === "") {
+            setPasswordError("Hãy nhập mật khẩu!");
+            return;
         }
 
         if (password.length < 5) {
-            setPasswordError("Mật khẩu phải dài hơn 5 kí tự!")
-            return
+            setPasswordError("Mật khẩu phải dài hơn 5 kí tự!");
+            return;
         }
 
-        // Authentication từ bên be
-
-        checkAccountExists(accountExists => {
-            // If yes, log in 
-            if (accountExists)
-                logIn()
-            else
-            // Else, ask user if they want to create a new account and if yes, then log in
-                if (window.confirm("Username không tồn tại: " + Username + ". Tạo account mới?")) {
-                    logIn()
-                }
-        })        
-
-
-    }
+        console.log(username, password)
+        // Authenticate user
+        logIn();
+    };
 
     return <DefaultLayout>
          <Grid container spacing={0} direction="row" className={cx('container')}>
@@ -108,11 +81,11 @@ const Login = (props) => {
                 <br />
                 <div className={cx("inputContainer")}>
                     <input
-                        value={Username}
-                        placeholder="Nhập Username"
+                        value={username}
+                        placeholder="Nhập username"
                         onChange={ev => setUsername(ev.target.value)}
                         className={cx("inputBox")} />
-                    <label className={cx("errorLabel")}>{UsernameError}</label>
+                    <label className={cx("errorLabel")}>{usernameError}</label>
                 </div>
                 <br />
                 <div className={cx("inputContainer")}>
