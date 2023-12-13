@@ -20,6 +20,7 @@ https://itest.com.vn/lects/webappdev/mockproj/magic-post.htm
   // Chay server:
   pip install django
   pip install pipenv
+  pipenv shell
   pip install djangorestframework
   cd ./backend
   python manage.py runserver

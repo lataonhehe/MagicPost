@@ -10,21 +10,21 @@ import DefaultLayout from "./HeaderOnly";
 const cx = classNames.bind(styles);
 
 const Login = (props) => {
-    const [email, setEmail] = useState("")
+    const [Username, setUsername] = useState("")
     const [password, setPassword] = useState("")
-    const [emailError, setEmailError] = useState("")
+    const [UsernameError, setUsernameError] = useState("")
     const [passwordError, setPasswordError] = useState("")
     
     const navigate = useNavigate();
 
-    // Call the server API to check if the given email ID already exists
+    // Gọi server API xem ổn Username tồn tại không
     const checkAccountExists = (callback) => {
         fetch("http://localhost:8000/login", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
               },
-            body: JSON.stringify({email})
+            body: JSON.stringify({Username})
         })
         .then(r => r.json())
         .then(r => {
@@ -32,24 +32,24 @@ const Login = (props) => {
         })
     }
 
-    // Log in a user using email and password
+    // Log in 
     const logIn = () => {
         fetch("http://localhost:8000/auth", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
               },
-            body: JSON.stringify({email, password})
+            body: JSON.stringify({Username, password})
         })
         .then(r => r.json())
         .then(r => {
             if ('success' === r.message) {
-                localStorage.setItem("user", JSON.stringify({email, token: r.token}))
+                localStorage.setItem("user", JSON.stringify({Username, token: r.token}))
                 props.setLoggedIn(true)
-                props.setEmail(email)
+                props.setUsername(Username)
                 navigate("/")
             } else {
-                window.alert("Wrong email or password")
+                window.alert("Wrong Username or password")
             }
         })
     }
@@ -57,17 +57,17 @@ const Login = (props) => {
     const onButtonClick = () => {
 
         
-        setEmailError("")
+        setUsernameError("")
         setPasswordError("")
 
         // Kiểm tra validate :v
-        if ("" === email) {
-            setEmailError("Hãy nhập Email")
+        if ("" === Username) {
+            setUsernameError("Hãy nhập Username")
             return
         }
 
-        if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-            setEmailError("Email không hợp lệ!")
+        if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(Username)) {
+            setUsernameError("Username không hợp lệ!")
             return
         }
 
@@ -89,7 +89,7 @@ const Login = (props) => {
                 logIn()
             else
             // Else, ask user if they want to create a new account and if yes, then log in
-                if (window.confirm("Email không tồn tại: " + email + ". Tạo account mới?")) {
+                if (window.confirm("Username không tồn tại: " + Username + ". Tạo account mới?")) {
                     logIn()
                 }
         })        
@@ -108,11 +108,11 @@ const Login = (props) => {
                 <br />
                 <div className={cx("inputContainer")}>
                     <input
-                        value={email}
-                        placeholder="Nhập Email"
-                        onChange={ev => setEmail(ev.target.value)}
+                        value={Username}
+                        placeholder="Nhập Username"
+                        onChange={ev => setUsername(ev.target.value)}
                         className={cx("inputBox")} />
-                    <label className={cx("errorLabel")}>{emailError}</label>
+                    <label className={cx("errorLabel")}>{UsernameError}</label>
                 </div>
                 <br />
                 <div className={cx("inputContainer")}>
