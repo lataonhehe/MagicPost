@@ -16,34 +16,38 @@ from django.shortcuts import get_object_or_404
 # @permission_classes([IsAuthenticated])
 def login_api(request):
     """Log in and response token"""
+
+    #Get usename and password from request
     username = request.data.get('username', None)
     password = request.data.get('password', None)
-    print(username, password)
-    user = None
     try:
-        user = User.objects.get(username=username, password=password)
+        #Get User info by username
+        user = User.objects.get(username=username)
+
+        #Run when username exists
         if user is not None:
-        # Authentication successful
-            token, created = Token.objects.get_or_create(user=user)
-            serializer = UserSerializer(instance=user)
-            return Response({
-                "Token": token.key,
-                "user": serializer.data
-            }, status= status.HTTP_200_OK)
+
+            #Check if password is correct by hashing request password
+            #Successful
+            if check_password(password, user.password):
+                #create token
+                token, created = Token.objects.get_or_create(user=user)
+                serializer = UserSerializer(instance=user)
+                #return response
+                return Response({
+                    "Token": token.key,
+                    "user": serializer.data
+                }, status= status.HTTP_200_OK)
+            else:
+                # Authentication failed
+                return Response({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             # Authentication failed
             return Response({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
-    except:
-        return Response({"detail": "Data is invalid"}, status=status.HTTP_402_PAYMENT_REQUIRED)
-
-    if user is not None:
-        login(request, user)
-        return Response(status=status.HTTP_200_OK, data={"message": "Login successful"})
-
-    return Response(
-        status=status.HTTP_400_BAD_REQUEST,
-        data={"message": "Invalid username or password"},
-    )
+    except Exception as e:
+        print(e) 
+        #Return this if the data from request is now what the server expected
+        return Response({"detail": "Data is invalid"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
