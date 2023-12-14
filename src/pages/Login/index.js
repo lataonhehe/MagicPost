@@ -24,16 +24,19 @@ const Login = (props) => {
             },
             body: JSON.stringify({ username, password }),
         })
-            .then(r => r.json())
+            .then(r => {
+                if (r.ok) return r.json()
+                else {
+                    return NaN
+                }
+            })
             .then((r) => {
-                if (r.success) {
+                if (r.isNaN) window.alert("Wrong username or password");
+                else {
                     localStorage.setItem("user", JSON.stringify({ username, token: r.token }));
-                    props.setLoggedIn(true);
-                    props.setUsername(username);
+                    // props.setLoggedIn(true);
+                    // props.setUsername(username);
                     navigate("/");
-                } else {
-                    console.log(r)
-                    window.alert("Wrong username or password");
                 }
             })
             .catch((error) => {
