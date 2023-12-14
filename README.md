@@ -16,3 +16,11 @@ https://itest.com.vn/lects/webappdev/mockproj/magic-post.htm
   2) In the terminal, run `npm install`
   3) Run `npm start` to view project in browser
   
+
+  // Chay server:
+  pip install django
+  pip install pipenv
+  pipenv shell
+  pip install djangorestframework
+  cd ./backend
+  python manage.py runserver
