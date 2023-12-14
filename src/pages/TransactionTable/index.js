@@ -1,14 +1,15 @@
 import classNames from 'classnames/bind';
 import styles from './TransactionTable.module.scss';
-import { TableContainer,Table, TableBody,TableRow,TableCell,Paper, TableHead, } from '@mui/material';
+import { TableContainer,Table, TableBody,TableRow,TableCell,Paper, TableHead, Box, } from '@mui/material';
 import { alpha, styled, InputBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useState } from 'react';
 
 const cx = classNames.bind(styles);
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
-    margin:0,
+    margin:'64px',
     padding:0,
     borderRadius: theme.shape.borderRadius,
     borderRadius: '4px',
@@ -23,10 +24,10 @@ const Search = styled('div')(({ theme }) => ({
   }));
   
   const SearchIconWrapper = styled('div')(({ theme }) => ({
+    position: 'absolute',
     padding: theme.spacing(0, 2),
     
     height: '100%',
-    position: 'absolute',
     pointerEvents: 'none',
     display: 'flex',
     alignItems: 'center',
@@ -50,6 +51,16 @@ const Search = styled('div')(({ theme }) => ({
     }
     ));
 
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+      // hide last border
+      '&:last-child td, &:last-child th': {
+        border: 0,
+      },
+    }));
+
 // const [data, setData] = useState([]); // Dữ liệu của bạn (mảng các dòng)
 //   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
 
@@ -69,6 +80,15 @@ const Search = styled('div')(({ theme }) => ({
 //   };
 
 function TransactionTable() {
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('calories');
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
     return (
     <div className={cx('container')}>
         <div className= {cx('btn-page')}>
@@ -77,27 +97,75 @@ function TransactionTable() {
                     <SearchIcon fontSize='large' />
                 </SearchIconWrapper>
                 <StyledInputBase
-                placeholder="Tìm kiếm đơn hàng..."
+                placeholder="Nhập mã bưu gửi..."
                 inputProps={{ 'aria-label': 'search' }}
                 />
             </Search>
+        </div>
+        <div className={cx('information')}>
+          <h2 style={{color:'#0072BC'}}>Thông tin kiện hàng</h2>
+          <Box sx={{
+            borderTopLeftRadius:'8px', 
+            borderTopRightRadius:'8px', 
+            color: 'white', 
+            display:'flex',
+            alignItems:'stretch',
+            flexWrap:'wrap',
+            padding:'10px 30px',
+            backgroundColor: 'primary.main', '&:hover' : {
+            backgroundColor:'primary.light'
+          }}}>
+            <div className={cx('infor-container')}>
+              <div className= {cx('header-i-container')}>Mã bưu gửi</div>
+              <p className={cx('infor-p')}>abcd</p>
+            </div>
+            <div className={cx('infor-container')}>
+              <div className= {cx('header-i-container')}>Trạng thái</div>
+              <p className={cx('infor-p')}>abcd</p>
+            </div>
+            <div className={cx('infor-container-right')}>
+              <div className= {cx('header-i-container')}>Khối lượng</div>
+              <p className={cx('infor-p')}>abcd</p>
+            </div>           
+          </Box>
+          <Box sx={{
+            '&:nth-of-type(odd)': {
+              backgroundColor: alpha('#6495ed', 0.15),
+              '&:hover': {
+                backgroundColor: alpha('#6495ed', 0.25),
+              }
+            },}}>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Trạng thái:</div>
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Nơi gửi:</div>
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Nơi nhận:</div> 
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+          </Box>
+
         </div>  
         <div className= {cx('content')}><TableContainer component={Paper}>
             <Table aria-label = 'simple table' className={cx('table')}>
                 <TableHead className= {cx('thead')}>
-                    <TableCell className= {cx('head-cell')}>Id</TableCell>
-                    <TableCell className= {cx('head-cell')}>First Name</TableCell>
-                    <TableCell className= {cx('head-cell')}>Last Name</TableCell>
-                    <TableCell className= {cx('head-cell')}>Email</TableCell>
+                    <TableCell className= {cx('head-cell')}>STT</TableCell>
+                    <TableCell className= {cx('head-cell')}>Ngày</TableCell>
+                    <TableCell className= {cx('head-cell')}>Trạng thái</TableCell>
+                    <TableCell className= {cx('head-cell')}>Vị trí</TableCell>
                 </TableHead>
                 <TableBody className= {cx('tbody')}>
                     {   tableData.map((row) => (
-                            <TableRow key = {row.id} className={cx('row')}>
-                                <TableCell className= {cx('cell')}>{row.id}</TableCell>
-                                <TableCell className= {cx('cell')}>{row.first_name}</TableCell>
-                                <TableCell className= {cx('cell')}>{row.last_name}</TableCell>
-                                <TableCell className= {cx('cell')}>{row.email}</TableCell>
-                            </TableRow>
+                            <StyledTableRow className= {cx('row')}>
+                                  <TableCell className= {cx('cell')}>{row.id}</TableCell>
+                                  <TableCell className= {cx('cell')}>{row.first_name}</TableCell>
+                                  <TableCell className= {cx('cell')}>{row.last_name}</TableCell>
+                                  <TableCell className= {cx('cell')}>{row.email}</TableCell>
+                            </StyledTableRow>
                     ))
                     }
                 </TableBody>
