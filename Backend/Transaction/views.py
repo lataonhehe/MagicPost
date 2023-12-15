@@ -483,9 +483,12 @@ def search_shipment(request):
                     'date': x.created_at
                 } for x in transactions
                 ],
-                'shipment_status': shipment.status
+                'shipment_status': shipment.status,
+                'shipment_pos': shipment.sender_address,
+                'shipment_des': shipment.receiver_address,
+                'shipment_type': shipment.good_type,
+                'shipment_weight': shipment.weight
             }
-            print(response_data)
             return JsonResponse(response_data, status = status.HTTP_200_OK) 
         except Exception as e: 
             response_data = {'message': 'Shipment code does not exist.'}
