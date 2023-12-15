@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from Account.serializers import UserSerializer
 from Account.permissions import IsLeader, IsManager, IsConsolidationEmployee, IsTransactionEmployee
 from Account.models import User, Department
-from Transaction.models import Shipment, Transaction
+from Transaction.models import Shipment, Transaction, CustomerTransaction
 from django import forms
 from django.http import JsonResponse
 from .serializers import ShipmentSerializer, TransactionSerializer
@@ -160,78 +160,55 @@ def confirm_shipment_from_correspond_consolidation_department(request):
         return JsonResponse(response_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
-def confirm_shipment_to_receiver(request):
-    """
-    Confirm shipment is delivered successfully to receiver. 
-    """
+def create_transaction_to_receiver(request):
+    '''
+    Create transaction to send shipment from transaction point to receiver address
+    '''
 
     data = request.data
 
-    #Check transaction id
+    # Check shipment
     try:
-        transaction = Transaction.objects.get(transaction_id=data['transaction_id'])
-    except:
-        response_data = {'status': 'error', 'message': 'Transaction does not exist.'}
-        return JsonResponse(response_data)
+        shipment = Shipment.objects.get(transaction_id=data['shipment_id'])
+    except Exception:
+        response_data = {'message': 'Shipment does not exist.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Check that shipment des have to be the same as employess department
+    shipment_des = shipment.des
+    employee_department = data.user.department
+    if shipment_des != employee_department:
+        response_data = {'message': 'Your department is not match with shipmet target transaction point.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
     
-    #Check position is transaction point
-    if transaction.pos.department_type != '0':
-        response_data = {'status': 'error', 'message': 'Position is not transaction point.'}
-        return JsonResponse(response_data) 
-    
-    #Check status
-    if transaction.status != 'In Progress':
-        response_data = {'status': 'error', 'message': 'Transaction is not in progress.'}
-        return JsonResponse(response_data)
-    
-    if request.method == 'POST':
-
-        # Update shipment status
-        shipment = transaction.shipment
-        shipment.status = 'Completed'
-        shipment.save()
-
-        # Update transaction status
-        transaction.status = 'Completed'
-        transaction.save()
-
-        response_data = {'status': 'success', 'message': 'Confirm shipment successfully.'}
-        return JsonResponse(response_data)
-
-@api_view(['POST'])
-@permission_classes([IsTransactionEmployee])
-def confirm_failed_shipment_and_create_transaction(request):
-    data = request.data
-
-    #Check transaction id
+    # Check that shipment are not in sending process to customer
     try:
-        transaction = Transaction.objects.get(transaction_id=data['transaction_id'])
-    except:
-        response_data = {'status': 'error', 'message': 'Transaction does not exist.'}
-        return JsonResponse(response_data)
-    
-    #Check status
-    if transaction.status != 'In Progress':
-        response_data = {'status': 'error', 'message': 'Transaction is not in progress.'}
-        return JsonResponse(response_data)
-    
-    if request.method == 'POST':
-
-        # Update shipment status
-        shipment = transaction.shipment
-        shipment.status = 'Failed'
-        shipment.save()
-
-        # Update transaction status
-        transaction.status = 'Failed'
+        customer_transaction = CustomerTransaction.objects.get(shipment=shipment)
+        response_data = {'message': 'Shipment is already delivering to receiver.'}
+        return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
+    except Exception:
+        pass
+    finally:
+        transaction = CustomerTransaction(shipment)
         transaction.save()
+        response_data = {'message': 'Customer transaction is created succesfully.'}
+        return JsonResponse(response_data, status=status.HTTP_201_CREATED)
 
-        # Create transaction to transaction point of sender
-        transaction = Transaction(shipment=shipment, pos=transaction.pos, des=shipment.pos, status='In Progress')
-        transaction.save()
-        response_data = {'status': 'success', 'message': 'Confirm failed shipment successfully.'}
-        return JsonResponse(response_data)
+# @api_view(['POST'])
+# @authentication_classes([SessionAuthentication, TokenAuthentication])
+# @permission_classes([IsTransactionEmployee])
+# def confirm_complete_shipment(request):
+#     pass
+
+# @api_view(['POST'])
+# @authentication_classes([SessionAuthentication, TokenAuthentication])
+# @permission_classes([IsTransactionEmployee])
+# def confirm_failed_shipment(request):
+#     pass
+
+
     
 """
 Nhan vien tap ket
@@ -418,7 +395,7 @@ def create_transaction_to_target_transaction_point(request):
         response_data = {'status': 'success', 'message': 'Transaction is created succcessfully.'}
         return JsonResponse(response_data)
     
-### Khách hành
+### Khách hàng
     
 @api_view(['GET'])
 def search_shipment(request):

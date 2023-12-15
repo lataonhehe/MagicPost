@@ -28,7 +28,7 @@ class Shipment(models.Model):
     sender_address = models.CharField(max_length=100, default=None, null=True)
     sender_postal_code = models.CharField(max_length=10, default=None, null=True)
     sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
-    sender_phone = models.CharField(max_length=15, default=None, null=True)
+    sender_phone = models.CharField(max_length=15, default=None, null=True, blank=True)
 
     #receiver info
     receiver_address = models.CharField(max_length=100, default=None, null=True)
@@ -91,3 +91,29 @@ def update_created_at(sender, instance, **kwargs):
 # Connect the signal
 pre_save.connect(update_created_at, sender=Transaction)
     
+class CustomerTransaction(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed')
+    ]
+
+    shipment = models.ForeignKey(Shipment, related_name='shipment', on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
+    created_at = models.DateTimeField(default=timezone.now)
+
+
+# Signal receiver to update created_at when status is changed
+@receiver(pre_save, sender=CustomerTransaction)
+def update_created_at(sender, instance, **kwargs):
+    # Check if the instance is being updated (already exists in the database)
+    if instance.pk:
+        old_instance = CustomerTransaction.objects.get(pk=instance.pk)
+        # Check if the status field has changed
+        if old_instance.status != instance.status:
+            # Update created_at to the current date and time
+            instance.created_at = timezone.now()
+
+# Connect the signal
+pre_save.connect(update_created_at, sender=CustomerTransaction)
