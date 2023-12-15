@@ -13,6 +13,9 @@ class Department(models.Model):
     department_type = models.CharField(max_length=1, choices=TYPE, default='0')
     consolidation_point = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)    
 
+    def call_name(self):
+        return f"Deparment{self.department_id}"
+
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, department=None, role='0', **extra_fields):
         if not username:
@@ -22,20 +25,6 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
-
-        if self.requesting_user:
-            if self.requesting_user.is_manager() and role == '0':
-                # Only allow managers to create employees
-                user.department = self.requesting_user.department  # Set employee's department to the manager's department
-                user.save(using=self._db)
-                return user
-            elif self.requesting_user.is_leader() and role == '1':
-                # Only allow leaders to create managers
-                user.save(using=self._db)
-                return user
-
-        #If the conditions are not met, raise an exception or handle it as needed
-        raise PermissionError("You don't have permission to create this user.")
     
 
     def create_superuser(self, username, password=None, department=None, role='2', **extra_fields):
@@ -51,8 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('0', 'Employee')
     ]
     username = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=50)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
+    password = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True, default=None)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='0')
 
     is_active = models.BooleanField(default=True)
@@ -74,5 +63,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_employee(self):
         return self.role == '0'
     
-    def check_password(self, password):
-        return self.password == password
+    def is_transaction_employee(self):
+        return self.is_employee() and self.department.department_type == '0'
+    
+    def is_consolidation_employee(self):
+        return self.is_employee() and self.department.department_type == '1'
+    
+    def is_transaction_manager(self):
+        return self.is_manager() and self.department.department_type == '0'
+    
+    def is_consolidation_manager(self):
+        return self.is_leader() and self.department.department_type == '1'

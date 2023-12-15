@@ -47,7 +47,7 @@ def login_api(request):
     except Exception as e:
         print(e) 
         #Return this if the data from request is now what the server expected
-        return Response({"detail": "Data is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Wrong username or password."}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(["POST"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
