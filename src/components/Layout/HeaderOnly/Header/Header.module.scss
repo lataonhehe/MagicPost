@@ -9,7 +9,7 @@
     justify-content: center;
     background-color: #001B42;
     color: white;
-    
+    z-index: 100;
 }
 
 .inner-header {
@@ -40,7 +40,7 @@
     font-size: 22px;
 }
 .inner-header ul li a:hover{
-    color: #f7941e;
+    color: #f38600;
     
 }
 
@@ -51,7 +51,6 @@
 
 .logo img {
     cursor: pointer;
-    opacity: 1;
    width: 110px;
    height: var(--default-layout-header-height);
   background-repeat: no-repeat; /* Ngăn lặp lại ảnh nền */
@@ -92,6 +91,5 @@
     justify-content: center;
 }
 .inputButton:hover {
-    background-color:#f7941e ;
-    opacity:1 ;
+    background-color:#f38600 ;
 }

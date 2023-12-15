@@ -32,6 +32,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   justifyContent: "center",
 }));
 
+
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: "100%",
   fontSize: "19px",
