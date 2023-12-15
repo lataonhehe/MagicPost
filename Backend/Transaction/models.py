@@ -49,6 +49,7 @@ class Shipment(models.Model):
     def generate_dhcode(self):
         # Use UUID to generate a unique DHCode
         return str(uuid.uuid4().hex)[:15]
+    
      
     
 @receiver(pre_save, sender=Shipment)

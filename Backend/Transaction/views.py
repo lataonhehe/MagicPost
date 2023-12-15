@@ -196,17 +196,86 @@ def create_transaction_to_receiver(request):
         response_data = {'message': 'Customer transaction is created succesfully.'}
         return JsonResponse(response_data, status=status.HTTP_201_CREATED)
 
-# @api_view(['POST'])
-# @authentication_classes([SessionAuthentication, TokenAuthentication])
-# @permission_classes([IsTransactionEmployee])
-# def confirm_complete_shipment(request):
-#     pass
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsTransactionEmployee])
+def confirm_complete_shipment(request):
+    """
+    Confirm complete customer transaction and shipment status
+    """
 
-# @api_view(['POST'])
-# @authentication_classes([SessionAuthentication, TokenAuthentication])
-# @permission_classes([IsTransactionEmployee])
-# def confirm_failed_shipment(request):
-#     pass
+    data = request.data
+
+    # Check customer transaction exist
+    try:
+        customer_transaction = CustomerTransaction.objects.get(pk=data['customer_transaction_id'])
+    except Exception:
+        response_data = {'message': 'Customer transaction does not exist.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Customer transaction status have to be In Progress
+    if customer_transaction.status != 'In Progress':
+        response_data = {'message': 'Customer transaction status is not in progress.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Change transaction and shipment status
+    customer_transaction.status = 'Completed'
+    customer_transaction.save()
+    shipment = customer_transaction.shipment
+    shipment.status = 'Completed'
+    shipment.save()
+
+    response_data = {'message': 'Confirm completed shipment successfully.'}
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsTransactionEmployee])
+def confirm_failed_shipment_and_send_back(request):
+    data = request.data
+
+    # Check customer transaction exist
+    try:
+        customer_transaction = CustomerTransaction.objects.get(pk=data['customer_transaction_id'])
+    except Exception:
+        response_data = {'message': 'Customer transaction does not exist.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Customer transaction status have to be In Progress
+    if customer_transaction.status != 'In Progress':
+        response_data = {'message': 'Customer transaction status is not in progress.'}
+        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Change transaction and shipment status
+    customer_transaction.status = 'Failed'
+    customer_transaction.save()
+    shipment = customer_transaction.shipment
+    shipment.status = 'Failed'
+    shipment.save()
+
+    # Create transaction to send back
+
+    response_data = {'message': 'Confirm failed shipment successfully.'}
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsTransactionEmployee])
+def list_complete_and_fail_shipment(request):
+    department = request.user.department
+
+    # Get customer transaction that completed and failed
+    completed_shipment = list(Shipment.objects.filter(des=department, status='Completed'))
+    failed_shipment = list(Shipment.objects.filter(des=department, status='Failed'))
+
+    response_data = {
+        'Completed_shipment': completed_shipment,
+        'Failed_shipment': failed_shipment
+    }
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+
+
 
 
     
@@ -414,9 +483,12 @@ def search_shipment(request):
                     'date': x.created_at
                 } for x in transactions
                 ],
-                'shipment_status': shipment.status
+                'shipment_status': shipment.status,
+                'shipment_pos': shipment.sender_address,
+                'shipment_des': shipment.receiver_address,
+                'shipment_type': shipment.good_type,
+                'shipment_weight': shipment.weight
             }
-            print(response_data)
             return JsonResponse(response_data, status = status.HTTP_200_OK) 
         except Exception as e: 
             response_data = {'message': 'Shipment code does not exist.'}
