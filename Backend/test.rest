@@ -9,23 +9,22 @@ POST http://127.0.0.1:8000/register
 Content-Type: application/json
 
 {
-    "username": "employee07", 
-    "password": "123456", 
-    "department_id": 1,
-    "role": "0"
+    "username": "manager01",
+    "password": "123456",
+    "role": "1"
 }
 ### Login
 
 POST http://127.0.0.1:8000/login
 Content-Type: application/json
 
-{"username": "employee08", "password": "123456"}
+{"username": "employee50", "password": "123456"}
 
 ### Logout
 
 POST http://127.0.0.1:8000/logout
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {}
 
@@ -33,7 +32,7 @@ Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 
 POST http://127.0.0.1:8000/Transaction/create_shipment
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
     "sender_address": "jfdi",
@@ -44,10 +43,8 @@ Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
     "receiver_name": "fef",
     "receiver_phone": "543453",
     "receiver_total_payment": 0,
-    "DHCode": "34534",
     "receiving_date": "2023-12-04",
     "good_type": "HH",
-    "special_service": "rèwe",
     "weight": 0
 }
 
@@ -56,17 +53,17 @@ Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 
 POST http://127.0.0.1:8000/Transaction/create_transaction_to_consolidation_point
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
-    "shipment_id": 1,
-    "des_id": 1  
+    "shipment_id": 2,
+    "des_id": 3  
 }
 
 ### confirm_shipment_from_consolidation_department
 POST http://127.0.0.1:8000/confirm_shipment_from_consolidation_department
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
     "transaction_id": 2
@@ -133,4 +130,14 @@ Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 
 {
     "shipment_id": 2
+}
+
+## Khách hàng
+
+### search_shipment
+GET http://127.0.0.1:8000/Transaction/search_shipment
+Content-Type: application/json
+
+{
+    "code": "662be96f9aa34d1"
 }
