@@ -21,7 +21,12 @@ function App() {
           })}
           {privateRoutes.map((route, index) => {
             const Page = route.component
-            const Layout = route.layout === null ? Fragment : DefaultLayout;
+            let Layout = DefaultLayout;
+            if (route.layout) {
+              Layout = route.layout;
+            } else if (route.layout === null) {
+              Layout = Fragment;
+            }
             // const Layout = route.layout === null ? Fragment : Staff;
             return (<Route key={index} path={route.path} element ={
               <Layout>

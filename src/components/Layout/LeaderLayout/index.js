@@ -1,4 +1,4 @@
-import styles from './TransManager.module.scss';
+import styles from './Leader.module.scss';
 import classNames from 'classnames/bind';
 import Header from './Header';
 import FunctionBar from './FunctionBar';
@@ -7,11 +7,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 
 
-
 const cx = classNames.bind(styles);
 
-function TransManagerLayout({children})
- {
+
+function LeaderLayout({children})
+ {  
     const [open, setOpen] = useState(true);
     
     const handleToggle = () => {
@@ -28,14 +28,16 @@ function TransManagerLayout({children})
                     <MenuIcon fontSize='large' />
                 </Button>
                 <div className= {cx(`${open ? 'Open' : 'Closed'}`)}>
-                    <Collapse orientation="horizontal" in ={open} timeout={250}  >
+                    <Collapse orientation="horizontal" in ={open} timeout="auto"  >
                     </Collapse>
                 </div>
-                <Collapse orientation="horizontal" in ={open} timeout={250} className= {cx(`functionBar${open ? 'Open' : 'Closed'}`)}>{open && (<FunctionBar open = {open}/>)}</Collapse>
+                <Collapse orientation="horizontal" in ={open} timeout="auto" 
+                    className= {cx(`functionBar${open ? 'Open' : 'Closed'}`)}>{open && (<FunctionBar open = {open}/>)}
+                </Collapse>
                 <div className= {cx(`content${open ? 'Open' : 'Closed'}`)}>{children}</div>
             </div>
         </div>
     </div> );
 }
 
-export default TransManagerLayout;
+export default LeaderLayout;
