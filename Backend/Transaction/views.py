@@ -496,3 +496,32 @@ def search_shipment(request):
     else:
         response_data = {'message': 'Your DHCode is not correct.'}
         return JsonResponse(response_data, status = status.HTTP_400_BAD_REQUEST)
+
+
+### Truong diem giao dich, tap ket
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsManager])
+def list_shipment(request):
+
+    manager = request.user
+    department = manager.department
+
+    # Take shipment of transaction that have des = manager.department and in progress
+    coming_transaction = list(Transaction.objects.filter(des=department, status='In Progress'))    
+    sending_transaction = list(Transaction.objects.filter(pos=department, status='In Progress'))
+    sending_customer_transaction = list(CustomerTransaction.objects.filter(shipment__des=department, status='In Progress'))
+
+    coming_shipment = [x.shipment for x in coming_transaction]
+    sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
+    completed_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
+
+    response_data = {
+        'coming_shipment': coming_shipment, 
+        'sending_shipment': sending_shipment,
+        'pending_shipment': completed_shipment
+    }
+    return JsonResponse (
+        response_data,
+        status = status.HTTP_200_OK
+    )
