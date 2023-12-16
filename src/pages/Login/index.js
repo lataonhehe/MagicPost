@@ -1,21 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './Login.module.scss'
 import classNames from "classnames/bind";
 import img from '~/assets/delivery-services-poster-flyer--made-with-postermywall-1@2x.png'
 import Grid from '@mui/material/Grid';
-import { Paper } from "@mui/material";
+import { Fade, Paper } from "@mui/material";
 import DefaultLayout from "./HeaderOnly";
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+
 
 const cx = classNames.bind(styles);
 
-const Login = (props) => {
+const Login = () => {
+    const [chora, setChora] = useState(false)
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [isClick, setClick] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [usernameError, setUsernameError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+        if(chora) {
+            console.log('chora true');
+            setTimeout(() => {
+                console.log('chora false');
+                setChora(false);
+            },1500)
+            setTimeout(() => {
+                navigate('/');
+            },3000)
+        }
+    },[loggedIn])
+    
     const logIn = () => {
         fetch("http://localhost:8000/login", {
             method: "POST",
@@ -27,16 +47,22 @@ const Login = (props) => {
             .then(r => {
                 if (r.ok) return r.json()
                 else {
+                    if (username === '')
+                    setLoggedIn(false);
+                    window.alert("Sai tài khoản hoặc mật khẩu");
                     return NaN
                 }
             })
             .then((r) => {
-                if (r.isNaN) window.alert("Wrong username or password");
-                else {
+                if(r.user.username === username) {
+                    setChora(true);
+                    setLoggedIn(true);
+                   // console.log(loggedIn);
                     localStorage.setItem("user", JSON.stringify({ username, token: r.token }));
                     // props.setLoggedIn(true);
                     // props.setUsername(username);
-                    navigate("/");
+                    // navigate("/");
+                    
                 }
             })
             .catch((error) => {
@@ -45,9 +71,10 @@ const Login = (props) => {
     };
 
     const onButtonClick = () => {
+        setClick(!isClick);
         setUsernameError("");
         setPasswordError("");
-
+        //setLoggedIn(false);
         if (username.trim() === "") {
             setUsernameError("Hãy nhập username");
             return;
@@ -68,9 +95,10 @@ const Login = (props) => {
             return;
         }
 
+        logIn();
+
         console.log(username, password)
         // Authenticate user
-        logIn();
     };
 
     return <DefaultLayout>
@@ -110,6 +138,15 @@ const Login = (props) => {
                 </div>
             </Paper>
         </Grid>
+        { 
+        <Fade in={chora} timeout={1000}>
+            <Alert severity="success" sx={{transition: 'ease', opacity:0.9 ,position:'fixed',fontSize:'2.0rem', left:'48px', bottom:'48px', zIndex:100,width:'45%'}}>
+                <AlertTitle sx={{fontSize:'2.0rem',fontWeight:'Bold'}}>Success</AlertTitle>
+                Đăng nhập thành công!
+            </Alert>
+        </Fade>
+        
+        }
      </DefaultLayout>
 }
 

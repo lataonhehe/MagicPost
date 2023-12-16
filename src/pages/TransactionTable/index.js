@@ -4,6 +4,8 @@ import styles from "./TransactionTable.module.scss";
 import { TableContainer, Table, TableBody, TableRow, TableCell, Paper, TableHead, Button } from "@mui/material";
 import { alpha, styled, InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import {Box} from "@mui/material"
+
 
 const cx = classNames.bind(styles);
 
@@ -64,10 +66,12 @@ function getStatus(status) {
 }
 
 const formatDateTime = (dateTimeString) => {
-  const options = { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false };
-  const formattedDateTime = new Date(dateTimeString).toLocaleDateString("en-US", options);
+  const options = { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: false, timeZone: "Asia/Ho_Chi_Minh" };
+  const formattedDateTime = new Date(dateTimeString).toLocaleDateString("vi-VN", options);
   return formattedDateTime;
 };
+
+
 
 function TransactionTable() {
   const [tableData, setTableData] = useState([]);
@@ -138,6 +142,53 @@ function TransactionTable() {
           </Button>
         )}
       </div>
+        <div className={cx('information')}>
+          <h2 style={{color:'#0072BC'}}>Thông tin kiện hàng</h2>
+          <Box sx={{
+            borderTopLeftRadius:'8px', 
+            borderTopRightRadius:'8px', 
+            color: 'white', 
+            display:'flex',
+            alignItems:'stretch',
+            flexWrap:'wrap',
+            padding:'10px 30px',
+            backgroundColor: 'primary.main', 
+            }}>
+            <div className={cx('infor-container')}>
+              <div className= {cx('header-i-container')}>Mã bưu gửi</div>
+              <p className={cx('infor-p')}>{isDataFetched && (code)}</p>
+            </div>
+            <div className={cx('infor-container')}>
+              <div className= {cx('header-i-container')}>Trạng thái</div>
+              <p className={cx('infor-p')}>{(getStatus(shipmentStatus))}</p>
+            </div>
+            <div className={cx('infor-container-right')}>
+              <div className= {cx('header-i-container')}>Khối lượng</div>
+              <p className={cx('infor-p')}>abcd</p>
+            </div>           
+          </Box>
+          <Box sx={{
+            '&:nth-of-type(odd)': {
+              backgroundColor: alpha('#6495ed', 0.15),
+              '&:hover': {
+                backgroundColor: alpha('#6495ed', 0.25),
+              }
+            },}}>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Trạng thái:</div>
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Nơi gửi:</div>
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+            <div className={cx('infor-container-inside')}>
+              <div className= {cx('header-i-inside')}>Nơi nhận:</div> 
+              <p className={cx('infor-p-inside')}>abcd</p>
+            </div>
+          </Box>
+
+        </div>
       {isDataFetched && isTableOpen && (
         <div className={cx("content")}>
           <div>Mã vận đơn: {code}</div>
@@ -153,7 +204,7 @@ function TransactionTable() {
                 {tableData.map((row) => (
                   <StyledTableRow className={cx("row")} key={row.date}>
                     <TableCell className={cx("cell")}>{formatDateTime(row.date)}</TableCell>
-                    <TableCell className={cx("cell")}>{row.des}</TableCell>
+                    <TableCell className={cx("cell")}>{row.pos}</TableCell>
                     <TableCell className={cx("cell")}>{getStatus(row.status)}</TableCell>
                   </StyledTableRow>
                 ))}
