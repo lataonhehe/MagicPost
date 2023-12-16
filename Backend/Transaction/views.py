@@ -469,7 +469,7 @@ def create_transaction_to_target_transaction_point(request):
 @api_view(['GET'])
 def search_shipment(request):
 
-    shipment_code = request.data.get('code', None)
+    shipment_code = request.GET.get('code', '')
     print(shipment_code)
     if shipment_code is not None:
         try:
