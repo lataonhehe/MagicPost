@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './Login.module.scss'
 import classNames from "classnames/bind";
@@ -15,6 +15,8 @@ const cx = classNames.bind(styles);
 const Login = () => {
     const [chora, setChora] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false);
+    const [departmentType, setDepartmentType] = useState();
+    const [role, setRole] = useState();
     const [isClick, setClick] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -25,14 +27,19 @@ const Login = () => {
 
     useEffect(() => {
         if(chora) {
-            console.log('chora true');
+            // console.log('chora true');
             setTimeout(() => {
-                console.log('chora false');
+                // console.log('chora false');
                 setChora(false);
             },1500)
+            if(role === '2')
             setTimeout(() => {
-                navigate('/');
-            },3000)
+                navigate(`/leader`)
+            },2000)
+            else 
+            setTimeout(() => {
+                navigate(`/${departmentType == 0 ? 'trans' : 'consol'}${role == 0 ? 'staff' : 'manager'}`)
+            },2000)
         }
     },[loggedIn])
     
@@ -54,15 +61,18 @@ const Login = () => {
                 }
             })
             .then((r) => {
-                if(r.user.username === username) {
+                if(r.username === username) {
+                    console.log(r);
+                    console.log(r.user);
+                    setDepartmentType(r.department);
+                    setRole(r.role);
                     setChora(true);
                     setLoggedIn(true);
-                   // console.log(loggedIn);
-                    localStorage.setItem("user", JSON.stringify({ username, token: r.token }));
-                    // props.setLoggedIn(true);
-                    // props.setUsername(username);
-                    // navigate("/");
                     
+                    localStorage.setItem("username", JSON.stringify({ username, token: r.token }));
+                    localStorage.setItem("role", JSON.stringify({ role: r.role }))
+                    localStorage.setItem("department", JSON.stringify({ department: r.department }))
+                    localStorage.setItem("isLogged", JSON.stringify({ Login: true }))
                 }
             })
             .catch((error) => {
@@ -97,7 +107,7 @@ const Login = () => {
 
         logIn();
 
-        console.log(username, password)
+        // console.log(username, password)
         // Authenticate user
     };
 
@@ -139,7 +149,7 @@ const Login = () => {
             </Paper>
         </Grid>
         { 
-        <Fade in={chora} timeout={1000}>
+        <Fade in={chora} timeout="auto">
             <Alert severity="success" sx={{transition: 'ease', opacity:0.9 ,position:'fixed',fontSize:'2.0rem', left:'48px', bottom:'48px', zIndex:100,width:'45%'}}>
                 <AlertTitle sx={{fontSize:'2.0rem',fontWeight:'Bold'}}>Success</AlertTitle>
                 Đăng nhập thành công!

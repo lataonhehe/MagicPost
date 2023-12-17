@@ -19,15 +19,13 @@
     display: flex;
     height: var(--default-layout-header-height);
     align-items: stretch;
-    width: var(--default-layout-header-width);
+    width: var(--default-layout-header-width + 400);
 }
 
 .inner-header ul li {
     position: static;
     display: flex;
     align-items: center;
-    
-    cursor: pointer;
     
 }
 
@@ -78,10 +76,14 @@
 
 }
 
-.login {
+.logout {
     flex: 1;
-    justify-content: flex-end;
+    justify-content: center;
 
+}
+
+.canhan {
+    padding: 32px;
 }
 
 .user {
@@ -89,6 +91,5 @@
     justify-content: center;
 }
 .inputButton:hover {
-    background-color:#f7941e ;
     opacity:1 ;
 }

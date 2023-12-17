@@ -15,11 +15,12 @@ function Header() {
                 <li className = {cx('tra-cuu')}><a href='/tracuu'>Tra cứu</a></li>
                 <li className = {cx('dich-vu')}><a href='/dichvu'>Dịch vụ</a></li>
                 <li className = {cx('tin-tuc')}><a href='/tintuc'>Tin tức</a></li>
-                <li className= {cx('login')}><a href='/login'>
+                <li className = {cx('canhan')}><p >Xin chào, Lãnh đạo abc</p></li>
+                <li className= {cx('logout')}><a href='/'>
                     <input
                     className={cx("inputButton")}
                     type="button"
-                    value={"Đăng nhập"} />
+                    value={"Đăng xuất"} />
                     </a></li>
             </ul>
         </nav>

@@ -5,6 +5,16 @@ import DefaultLayout from './components/Layout/HeaderOnly';
 // import Staff from './components/Layout/Staff'
 
 function App() {
+  const username = JSON.parse(localStorage.getItem("username"));
+  const role = JSON.parse(localStorage.getItem("role"));
+  const department = JSON.parse(localStorage.getItem("department"));
+  const isLogged = JSON.parse(localStorage.getItem("isLogged"));
+
+
+  // function resetUser() {
+    
+  // }
+
   return (
     <Router>
       <div className="App">
@@ -16,10 +26,12 @@ function App() {
             return (<Route key={index} path={route.path} element ={
                     <Layout>
                       <Page/>
+
                     </Layout>} 
                    />);
           })}
-          {privateRoutes.map((route, index) => {
+          
+          {isLogged && (privateRoutes.map((route, index) => {
             const Page = route.component
             let Layout = DefaultLayout;
             if (route.layout) {
@@ -29,11 +41,11 @@ function App() {
             }
             // const Layout = route.layout === null ? Fragment : Staff;
             return (<Route key={index} path={route.path} element ={
-              <Layout>
+              <Layout reset>
                 <Page/>
               </Layout>} 
              />);
-          })}
+          }))}
         </Routes>
       </div>
     </Router>
