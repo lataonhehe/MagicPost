@@ -34,7 +34,7 @@ def login_api(request):
                 #return response
                 return JsonResponse({
                     "Token": token.key,
-                    "user": serializer.data
+                    "user": user
                 }, status= status.HTTP_200_OK)
             else:
                 # Authentication failed
