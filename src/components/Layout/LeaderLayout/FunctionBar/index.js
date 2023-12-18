@@ -34,7 +34,6 @@ function FunctionBar() {
                 </ListItemIcon>
                 <ListItemText primary="Quản lí điểm" primaryTypographyProps={{fontSize: 'medium'}}  />
             </ListItemButton>
-            <Divider/>
             <ListItemButton
                 
                 component="a" href="/leader/manageaccount"
@@ -46,7 +45,6 @@ function FunctionBar() {
                 </ListItemIcon>
                 <ListItemText primary="Quản lí tài khoản" primaryTypographyProps={{fontSize: 'medium'}}  />
             </ListItemButton>
-            <Divider/>
             <ListItemButton
                 
                 component="a" href="/leader/statistic"
@@ -58,7 +56,6 @@ function FunctionBar() {
                 </ListItemIcon>
                 <ListItemText primary="Thống kê" primaryTypographyProps={{fontSize: 'medium'}}  />
             </ListItemButton>
-            <Divider/>
         </List>
     </Box> );
 }

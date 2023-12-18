@@ -8,7 +8,8 @@ import { Fade, Paper } from "@mui/material";
 import DefaultLayout from "./HeaderOnly";
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-
+import { LayoutContext } from '~/App';
+import { useContext } from "react";
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +25,7 @@ const Login = () => {
     const [passwordError, setPasswordError] = useState("");
     const navigate = useNavigate();
 
+    const setLogged = useContext(LayoutContext)
 
     useEffect(() => {
         if(chora) {
@@ -56,6 +58,7 @@ const Login = () => {
                 else {
                     if (username === '')
                     setLoggedIn(false);
+                    setLogged(false);
                     window.alert("Sai tài khoản hoặc mật khẩu");
                     return NaN
                 }
@@ -68,11 +71,11 @@ const Login = () => {
                     setRole(r.role);
                     setChora(true);
                     setLoggedIn(true);
-                    
+                    setLogged(true);
                     localStorage.setItem("username", JSON.stringify({ username, token: r.token }));
                     localStorage.setItem("role", JSON.stringify({ role: r.role }))
                     localStorage.setItem("department", JSON.stringify({ department: r.department }))
-                    localStorage.setItem("isLogged", JSON.stringify({ Login: true }))
+                    localStorage.setItem("isLogged", JSON.stringify({ login: true }))
                 }
             })
             .catch((error) => {
@@ -149,7 +152,7 @@ const Login = () => {
             </Paper>
         </Grid>
         { 
-        <Fade in={chora} timeout="auto">
+        <Fade in={chora} timeout={1000}>
             <Alert severity="success" sx={{transition: 'ease', opacity:0.9 ,position:'fixed',fontSize:'2.0rem', left:'48px', bottom:'48px', zIndex:100,width:'45%'}}>
                 <AlertTitle sx={{fontSize:'2.0rem',fontWeight:'Bold'}}>Success</AlertTitle>
                 Đăng nhập thành công!
