@@ -269,8 +269,8 @@ def list_complete_and_fail_shipment(request):
     failed_shipment = list(Shipment.objects.filter(des=department, status='Failed'))
 
     response_data = {
-        'Completed_shipment': completed_shipment,
-        'Failed_shipment': failed_shipment
+        'Completed_shipment': [x.to_json('completed') for x in completed_shipment],
+        'Failed_shipment': [x.to_json('failed') for x in failed_shipment]
     }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
@@ -514,12 +514,12 @@ def list_shipment(request):
 
     coming_shipment = [x.shipment for x in coming_transaction]
     sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
-    completed_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
+    pending_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
 
     response_data = {
-        'coming_shipment': coming_shipment, 
-        'sending_shipment': sending_shipment,
-        'pending_shipment': completed_shipment
+        'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
+        'outgoing_shipment': [x.to_json('outgoing') for x in sending_shipment],
+        'pending_shipment': [x.to_json('pending') for x in pending_shipment]
     }
     return JsonResponse (
         response_data,

@@ -32,9 +32,16 @@ def login_api(request):
                 token, created = Token.objects.get_or_create(user=user)
                 serializer = UserSerializer(instance=user)
                 #return response
+
+                department_type = 3
+                if(user.role != '2'): 
+                    department_type = user.department.department_type
+                #return response
                 return JsonResponse({
                     "Token": token.key,
-                    "user": user
+                    "username": user.username,
+                    "role": user.role,
+                    "department": department_type
                 }, status= status.HTTP_200_OK)
             else:
                 # Authentication failed
@@ -181,9 +188,15 @@ def list_employee(request):
     employee_list = list(User.objects.filter(department=department, role='0'))
 
     response_data = {
-        'employee_list': employee_list
+        'employee_list': [
+        {
+            'id': x.pk,
+            'username': x.username,
+            'role': 'Transaction Employee' if department.department_type == '0' else 'Consolidation Employee',
+            'department': department.call_name(),
+        } for x in employee_list]
     }
     return JsonResponse (
         response_data,
         status = status.HTTP_200_OK
-)
+    )
