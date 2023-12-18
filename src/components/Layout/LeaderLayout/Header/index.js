@@ -14,7 +14,7 @@ function Header() {
                     <img src = {logo} alt = 'MagicPost' href = '/' /></li>
                 
                 <li className = {cx('gioi-thieu')}><a href = '/'>Giới thiệu</a></li>
-                <li className = {cx('tra-cuu')}><a href='/tracuu'>Tra cứu</a></li>
+                <li className = {cx('tra-cuu')}><a href='/transactiontable'>Tra cứu</a></li>
                 <li className = {cx('dich-vu')}><a href='/dichvu'>Dịch vụ</a></li>
                 <li className = {cx('tin-tuc')}><a href='/tintuc'>Tin tức</a></li>
                 <li className = {cx('canhan')}><p >Xin chào, lãnh đạo {username.username}</p></li>

@@ -48,6 +48,7 @@ import TransStaffFinishedSuccess from "~/pages/TransactionPointStaff/Accept/Fini
 const publicRoutes = [ 
     {path: '/', component: Home},
     {path: '/login', component: Login, layout: null},
+    {path: '/bill', component: Bill, layout: null },
     {path: '/transactiontable', component: TransactionTable}
 ];
    
@@ -76,7 +77,6 @@ const privateRoutes = [
     {path: '/consolmanager/statistic', component: ConsolManagerStatistics, layout: ConsolManagerLayout},
 
     //Chức năng nhân viên giao dịch
-    {path: '/bill', component: Bill, layout: null },
     {path: '/transstaff/statistics', component: TransStaffStatistics, layout: TransStaffLayout},
     {path: '/transstaff/addfinish', component: FinishedTransaction, layout: TransStaffLayout},
     {path: '/transstaff/addnew', component: NewTransaction, layout: TransStaffLayout},

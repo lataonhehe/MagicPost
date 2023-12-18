@@ -1,46 +1,45 @@
 .wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .containerOpen {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 }
 
 .containerClosed {
-    justify-content: center;
-    width: 100%;
-    display: flex;
-    align-items: center;
+  justify-content: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .contentOpen {
-    margin-left: 48px;
-    flex: 1;
-    background-color: white;
-    min-height: 1000px;
+  flex: 1;
+  background-color: white;
+  min-height: 1000px;
 }
 
 .contentClosed {
-    width: var(--default-layout-header-width);
-    display: flex;
-    align-content: center;
-    background-color: white;
-    min-height: 1000px;
+  width: var(--default-layout-header-width);
+  display: flex;
+  align-content: center;
+  background-color: white;
+  min-height: 1000px;
 }
 
 .functionBarOpen {
-    background: #f0f0f0;
-    margin-top: 2px;
+  background: #f0f0f0;
+  margin-top: 2px;
 }
 
 div .Open {
-    width: 250px;
+  width: 250px;
 }
 
 .functionBarOpen {
-    position:fixed;
-    width: 250px;
+  position: fixed;
+  width: 250px;
 }
