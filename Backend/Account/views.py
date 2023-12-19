@@ -180,7 +180,7 @@ def manager_list(request):
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsManager])
-def list_employee(request):
+def employee_list(request):
     '''
     Rerturn the list employee via manager
     '''
@@ -203,3 +203,44 @@ def list_employee(request):
         response_data,
         status = status.HTTP_200_OK
     )
+
+
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsManager])
+def delete_employee(request):
+    '''
+    Delete selected employees via manager
+    '''
+    if request.method == 'DELETE':
+        manager = request.user
+        department = manager.department
+
+        # Ensure the request body contains a list of employee IDs to delete
+        employee_ids = request.data.get('ids', [])
+
+        try:
+            # Perform the delete operation
+            for employee_id in employee_ids:
+                user_to_delete = User.objects.get(id=employee_id, department=department, role='0')
+                user_to_delete.delete()
+
+            return JsonResponse(
+                {'message': 'Employees deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except User.DoesNotExist:
+            return JsonResponse(
+                {'error': 'One or more selected employees do not exist or do not belong to the manager\'s department'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return JsonResponse(
+                {'error': f'An error occurred while deleting employees: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    else:
+        return JsonResponse(
+            {'error': 'Method not allowed'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

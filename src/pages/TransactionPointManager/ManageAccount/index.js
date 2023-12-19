@@ -33,26 +33,6 @@ const ColorButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-// function createData(id, username, department, role) {
-//   return {
-//     id,
-//     username,
-//     department,
-//     role,
-//   };
-// }
-
-// const rows = [
-//   createData(1, "Tuanga", "departmentabc", "nhan vien"),
-//   createData(2, "Tungga", "departmentabc", "nhan vien"),
-//   createData(3, "Eclair", "departmentabc", "nhan vien"),
-//   createData(4, "Frozen yoghurt", "departmentabc", "nhan vien"),
-//   createData(5, "Gingerbread", "departmentabc", "nhan vien"),
-//   createData(6, "Honeycomb", "departmentabc", "nhan vien"),
-//   createData(7, "Ice cream sandwich", "departmentabc", "nhan vien"),
-//   createData(8, "Jelly Bean", "departmentabc", "nhan vien"),
-// ];
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -69,10 +49,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -182,6 +158,7 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
+
 function EnhancedTableToolbar(props) {
   const { numSelected } = props;
 
@@ -252,32 +229,58 @@ export default function TransManagerManageAccounts() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
 
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      const response = await fetch("http://127.0.0.1:8000/Account/employee_list", {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("Token");
-        const response = await fetch("http://127.0.0.1:8000/Account/employee_list", {
-          method: "GET",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-  
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-  
-        const data = await response.json();
-        setRows(data.employee_list);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    };
-  
+
+      const data = await response.json();
+      setRows(data.employee_list);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+
+      // Assuming your delete API endpoint is something like "http://127.0.0.1:8000/Account/delete_employee"
+      const deleteResponse = await fetch("http://127.0.0.1:8000/Account/delete_employee", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: selected }), // Assuming your backend expects an array of IDs to delete
+      });
+
+      if (!deleteResponse.ok) {
+        throw new Error("Delete request failed");
+      }
+
+      fetchData();
+
+      // Clear the selected items after deletion
+      setSelected([]);
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
+  React.useEffect(() => {  
     fetchData();
   }, []);
+
+  
   
 
   const handleRequestSort = (event, property) => {
@@ -326,6 +329,7 @@ export default function TransManagerManageAccounts() {
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
+
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
