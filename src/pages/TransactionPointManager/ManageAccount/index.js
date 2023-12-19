@@ -234,20 +234,47 @@ EnhancedTableToolbar.propTypes = {
 
 export function InputAdornments() {
   const [showPassword, setShowPassword] = useState(false);
+  const [values, setValues] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const [values, setValues] = useState([]);
 
-  const updateValue = (index, newValue) => {
-    setValues((prevValues) => {
-      const newValues = [...prevValues];
-      newValues[index] = newValue;
-      return newValues;
-    });
+  const handleChange = (field, value) => {
+    setValues((prevValues) => ({
+      ...prevValues,
+      [field]: value,
+    }));
+  };
+
+  const handleAddUser = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      console.log(values);
+      const addResponse = await fetch("http://127.0.0.1:8000/Account/register", {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+        }),
+      });
+        
+      if (!addResponse.ok) {
+        throw new Error("Add user request failed");
+      }
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
   };
 
   return (
@@ -258,27 +285,11 @@ export function InputAdornments() {
           variant="outlined"
         >
           <TextField
-            placeholder="Nhập ID:"
-            id="outlined-start-adornment"
-            sx={{ m: 1, width: "25ch" }}
-            key={1}
-            value={values[1]}
-            onChange={(e) => {
-              updateValue(1, e.target.value);
-            }}
-            startAdornment={
-              <InputAdornment position="start">ID:</InputAdornment>
-            }
-          />
-          <TextField
             sx={{ m: 1, width: "25ch" }}
             id="outlined-adornment-weight"
             placeholder="Nhập username"
-            key={2}
-            value={values[2]}
-            onChange={(e) => {
-              updateValue(2, e.target.value);
-            }}
+            value={values.username}
+            onChange={(e) => handleChange('username', e.target.value)}
             inputProps={{
               "aria-label": "weight",
             }}
@@ -301,11 +312,8 @@ export function InputAdornments() {
               </InputAdornment>
             }
             placeholder="Nhập mật khẩu:"
-            key={3}
-            value={values[3]}
-            onChange={(e) => {
-              updateValue(3, e.target.value);
-            }}
+            value={values.password}
+            onChange={(e) => handleChange('password', e.target.value)}
           />
           <TextField
             sx={{ m: 1, width: "25ch" }}
@@ -324,15 +332,12 @@ export function InputAdornments() {
               </InputAdornment>
             }
             placeholder="Nhập lại mật khẩu:"
-            key={4}
-            value={values[4]}
-            onChange={(e) => {
-              updateValue(4, e.target.value);
-            }}
+            value={values.confirmPassword}
+            onChange={(e) => handleChange('confirmPassword', e.target.value)}
           />
           <ColorButton
             variant="contained"
-            //   onClick={handleOpenTable}
+            onClick={handleAddUser}
             sx={{
               fontSize: "16px",
               margin: "32px",
@@ -348,8 +353,9 @@ export function InputAdornments() {
   );
 }
 
+
 export default function TransManagerManageAccounts() {
-  const [themnv, setThemnv] = useState(false);
+  const [addUser, setAddUser] = useState(false);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
@@ -357,10 +363,6 @@ export default function TransManagerManageAccounts() {
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
-
-  function handleThemnv() {
-    setThemnv(!themnv);
-  }
 
   const updateRows = (index, newValue) => {
     setRows((prevValues) => {
@@ -389,7 +391,7 @@ export default function TransManagerManageAccounts() {
       }
 
       const data = await response.json();
-      updateRows(data.employee_list.id, data.employee_list);
+      setRows(data.employee_list)
 
       // Save the employee list to local storage
       localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
@@ -424,6 +426,11 @@ export default function TransManagerManageAccounts() {
       console.error("Error deleting data:", error);
     }
   };
+
+  function handleAddUser() {
+    fetchData();
+    setAddUser(!addUser);
+  }
 
   useEffect(() => {
     // Retrieve employee list from local storage when component mounts
@@ -503,13 +510,13 @@ export default function TransManagerManageAccounts() {
         <ColorButton
           startIcon={<PersonAddIcon />}
           variant="contained"
-          onClick={handleThemnv}
+          onClick={handleAddUser}
           sx={{ fontSize: "22px" }}
         >
           Thêm nhân viên{" "}
         </ColorButton>
-        <Collapse in={themnv} timeout="auto">
-          {themnv && <InputAdornments />}
+        <Collapse in={addUser} timeout="auto">
+          {addUser && <InputAdornments /> }
         </Collapse>
         <Paper sx={{ width: "100%", mb: 2 }} elevation={3}>
           <EnhancedTableToolbar
