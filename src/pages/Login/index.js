@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 import styles from './Login.module.scss'
 import classNames from "classnames/bind";
 import img from '~/assets/delivery-services-poster-flyer--made-with-postermywall-1@2x.png'
@@ -76,6 +76,7 @@ const Login = () => {
                     localStorage.setItem("role", JSON.stringify({ role: r.role }))
                     localStorage.setItem("department", JSON.stringify({ department: r.department }))
                     localStorage.setItem("isLogged", JSON.stringify({ login: true }))
+                    localStorage.setItem("Token", r.Token)
                 }
             })
             .catch((error) => {

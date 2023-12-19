@@ -33,25 +33,25 @@ const ColorButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function createData(id, username, department, role) {
-  return {
-    id,
-    username,
-    department,
-    role,
-  };
-}
+// function createData(id, username, department, role) {
+//   return {
+//     id,
+//     username,
+//     department,
+//     role,
+//   };
+// }
 
-const rows = [
-  createData(1, "Tuanga", "departmentabc", "nhan vien"),
-  createData(2, "Tungga", "departmentabc", "nhan vien"),
-  createData(3, "Eclair", "departmentabc", "nhan vien"),
-  createData(4, "Frozen yoghurt", "departmentabc", "nhan vien"),
-  createData(5, "Gingerbread", "departmentabc", "nhan vien"),
-  createData(6, "Honeycomb", "departmentabc", "nhan vien"),
-  createData(7, "Ice cream sandwich", "departmentabc", "nhan vien"),
-  createData(8, "Jelly Bean", "departmentabc", "nhan vien"),
-];
+// const rows = [
+//   createData(1, "Tuanga", "departmentabc", "nhan vien"),
+//   createData(2, "Tungga", "departmentabc", "nhan vien"),
+//   createData(3, "Eclair", "departmentabc", "nhan vien"),
+//   createData(4, "Frozen yoghurt", "departmentabc", "nhan vien"),
+//   createData(5, "Gingerbread", "departmentabc", "nhan vien"),
+//   createData(6, "Honeycomb", "departmentabc", "nhan vien"),
+//   createData(7, "Ice cream sandwich", "departmentabc", "nhan vien"),
+//   createData(8, "Jelly Bean", "departmentabc", "nhan vien"),
+// ];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -250,6 +250,35 @@ export default function TransManagerManageAccounts() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("Token");
+        const response = await fetch("http://127.0.0.1:8000/Account/employee_list", {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+  
+        const data = await response.json();
+        setRows(data.employee_list);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
