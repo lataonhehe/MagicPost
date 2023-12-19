@@ -31,6 +31,9 @@ def login_api(request):
                 #create token
                 token, created = Token.objects.get_or_create(user=user)
                 serializer = UserSerializer(instance=user)
+                department_type = 3
+                if(user.role != '2'): 
+                    department_type = user.department.department_type
                 #return response
 
                 department_type = 3

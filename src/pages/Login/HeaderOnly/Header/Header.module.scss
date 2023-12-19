@@ -9,7 +9,7 @@
     justify-content: center;
     background-color: #001B42;
     color: white;
-    
+    margin-bottom: 1px;
 }
 
 .inner-header {
@@ -59,38 +59,28 @@
 }
 
 .gioi-thieu {
-    width: 150px;
+    width: 250px;
     justify-content: center;
 
 }
 .tra-cuu {
-    width: 150px;
+    width: 250px;
     justify-content: center;
 
 }
 
 .dich-vu {
-    width: 150px;
+    width: 250px;
     justify-content: center;
 
 }
 
 .tin-tuc {
-    width: 150px;
+    width: 250px;
     justify-content: center;
 
 }
 
-.login {
-    flex: 1;
-    justify-content: flex-end;
-
-}
-
-.user {
-    width: 200px;
-    justify-content: center;
-}
 .inputButton:hover {
     background-color:#f7941e ;
     opacity:1 ;

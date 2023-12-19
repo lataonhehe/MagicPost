@@ -1,22 +1,18 @@
 import classNames from 'classnames/bind';
 import styles from './Header.module.scss';
 import logo from '~/assets/logo-1@2x - Copy.png'
-import { useEffect, useState } from 'react';
- 
 
 const cx = classNames.bind(styles);
 
 
 function Header() {
-        
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [email, setEmail] = useState("");
 
     return (<header className= {cx('wrapper')} style={{background: '#001B42'}}>
         <nav className = {cx('inner-header')}>
             <ul>
                 <li className = {cx('logo')}>
-                    <img src = {logo} alt = 'MagicPost' href = '/' /></li>
+                    <img src = {logo} alt = 'MagicPost' />
+                </li>
                 
                 <li className = {cx('gioi-thieu')}><a href = '/'>Giới thiệu</a></li>
                 <li className = {cx('tra-cuu')}><a href='/transactiontable'>Tra cứu</a></li>
