@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import check_password
@@ -12,8 +12,6 @@ from .models import User
 from django.shortcuts import get_object_or_404
 
 @api_view(["POST"])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
 def login_api(request):
     """Log in and response token"""
 
@@ -37,7 +35,12 @@ def login_api(request):
                 if(user.role != '2'): 
                     department_type = user.department.department_type
                 #return response
-                return Response({
+
+                department_type = 3
+                if(user.role != '2'): 
+                    department_type = user.department.department_type
+                #return response
+                return JsonResponse({
                     "Token": token.key,
                     "username": user.username,
                     "role": user.role,
@@ -45,14 +48,14 @@ def login_api(request):
                 }, status= status.HTTP_200_OK)
             else:
                 # Authentication failed
-                return Response({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
+                return JsonResponse({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             # Authentication failed
-            return Response({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"detail": "Wrong username or password"}, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
         print(e) 
         #Return this if the data from request is now what the server expected
-        return Response({"detail": "Wrong username or password."}, status=status.HTTP_401_UNAUTHORIZED)
+        return JsonResponse({"detail": "Wrong username or password."}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(["POST"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -60,7 +63,7 @@ def login_api(request):
 def logout_api(request):
     """Log out user"""
     request.auth.delete()
-    return Response(status=status.HTTP_200_OK, data={"message": "Logout successful"})
+    return JsonResponse(status=status.HTTP_200_OK, data={"message": "Logout successful"})
 
 # @api_view(["GET"])
 # @permission_classes([IsLeader])
@@ -72,15 +75,38 @@ def logout_api(request):
 #     return JsonResponse(json_data)
 
 @api_view(["POST"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsManager])
 def register_api(request):
     """Create a new account and respond with a success message."""
-    serializer = UserSerializer(data=request.data)
+    #Get usename and password from request
+    username = request.data.get('username', None)
+    password = request.data.get('password', None)
+    department = request.user.department
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response(status=status.HTTP_201_CREATED, data={"message": "User is registered successfully."})
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
+    # Check data 
+    if username == None or password == None:
+        return JsonResponse({
+            "detail": "Username or password is not provided"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Check username exist in database or not
+    exist = User.objects.filter(username=username).exists()
+
+    if exist:
+        return JsonResponse({
+            "detail": "Username exists."}, 
+            status=status.HTTP_409_CONFLICT
+        )
+    
+    user = User(username=username, password=password, role='0', department=department)
+    user.save()
+
+    return JsonResponse({
+        "detail": "Account is created successfully."}, 
+        status=status.HTTP_201_CREATED
+    ) 
 
 @api_view(["POST"])
 @permission_classes([IsManager])
@@ -90,9 +116,9 @@ def create_employee(request):
 
     if serializer.is_valid():
         serializer.save()
-        return Response(status=status.HTTP_201_CREATED, data={"message": "Employee is created successfully."})
+        return JsonResponse(status=status.HTTP_201_CREATED, data={"message": "Employee is created successfully."})
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
+        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
     
 @api_view(["POST"])
 @permission_classes([IsLeader])
@@ -102,9 +128,9 @@ def create_manager(request):
 
     if serializer.is_valid():
         serializer.save()
-        return Response(status=status.HTTP_201_CREATED, data={"message": "Employee is created successfully."})
+        return JsonResponse(status=status.HTTP_201_CREATED, data={"message": "Employee is created successfully."})
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
+        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
     
 @api_view(["GET", "DELETE"])
 @permission_classes([IsManager])
@@ -114,19 +140,19 @@ def employee_list(request):
         manager = request.user
         employees = User.objects.filter(department=manager.department, role='0')  # Filter users with role 'Employee' in the same department
         serializer = UserSerializer(employees, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data)
 
     elif request.method == "DELETE":
         employee_id = request.data.get('employee_id')
         try:
             employee = User.objects.get(id=employee_id, role='0', department=request.user.department)
             employee.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse(status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND)
 
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid request method."})
+        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid request method."})
 
 @api_view(["GET", "DELETE"])
 @permission_classes([IsLeader])
@@ -135,16 +161,86 @@ def manager_list(request):
     if request.method == "GET":
         managers = User.objects.filter(role='1')  # Filter users with role 'Manager'
         serializer = UserSerializer(managers, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data)
 
     elif request.method == "DELETE":
         manager_id = request.data.get('manager_id')
         try:
             manager = User.objects.get(id=manager_id, role='1')
             manager.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse(status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND)
 
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid request method."})
+        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid request method."})
+
+### Truong diem tap ket, giao dich
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsManager])
+def employee_list(request):
+    '''
+    Rerturn the list employee via manager
+    '''
+    manager = request.user
+    department = manager.department
+
+    # Get list of employee via manager department
+    employee_list = list(User.objects.filter(department=department, role='0'))
+
+    response_data = {
+        'employee_list': [
+        {
+            'id': x.pk,
+            'username': x.username,
+            'role': 'Transaction Employee' if department.department_type == '0' else 'Consolidation Employee',
+            'department': department.call_name(),
+        } for x in employee_list]
+    }
+    return JsonResponse (
+        response_data,
+        status = status.HTTP_200_OK
+    )
+
+
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsManager])
+def delete_employee(request):
+    '''
+    Delete selected employees via manager
+    '''
+    if request.method == 'DELETE':
+        manager = request.user
+        department = manager.department
+
+        # Ensure the request body contains a list of employee IDs to delete
+        employee_ids = request.data.get('ids', [])
+
+        try:
+            # Perform the delete operation
+            for employee_id in employee_ids:
+                user_to_delete = User.objects.get(id=employee_id, department=department, role='0')
+                user_to_delete.delete()
+
+            return JsonResponse(
+                {'message': 'Employees deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except User.DoesNotExist:
+            return JsonResponse(
+                {'error': 'One or more selected employees do not exist or do not belong to the manager\'s department'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return JsonResponse(
+                {'error': f'An error occurred while deleting employees: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    else:
+        return JsonResponse(
+            {'error': 'Method not allowed'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

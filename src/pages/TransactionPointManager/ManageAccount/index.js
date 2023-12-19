@@ -33,26 +33,6 @@ const ColorButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function createData(id, username, department, role) {
-  return {
-    id,
-    username,
-    department,
-    role,
-  };
-}
-
-const rows = [
-  createData(1, "Tuanga", "departmentabc", "nhan vien"),
-  createData(2, "Tungga", "departmentabc", "nhan vien"),
-  createData(3, "Eclair", "departmentabc", "nhan vien"),
-  createData(4, "Frozen yoghurt", "departmentabc", "nhan vien"),
-  createData(5, "Gingerbread", "departmentabc", "nhan vien"),
-  createData(6, "Honeycomb", "departmentabc", "nhan vien"),
-  createData(7, "Ice cream sandwich", "departmentabc", "nhan vien"),
-  createData(8, "Jelly Bean", "departmentabc", "nhan vien"),
-];
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -69,10 +49,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -182,9 +158,9 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
 
+function EnhancedTableToolbar(props) {
+  const { numSelected, handleDelete } = props;
   return (
     <Toolbar
       sx={{
@@ -228,6 +204,7 @@ function EnhancedTableToolbar(props) {
             sx={{ fontSize: "14px", marginRight: "16px" }}
             variant="contained"
             startIcon={<DeleteIcon sx={{ fontSize: "24px" }} />}
+            onClick={handleDelete}
           >
             Xóa
           </Button>
@@ -241,6 +218,7 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 export default function TransManagerManageAccounts() {
@@ -250,6 +228,67 @@ export default function TransManagerManageAccounts() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+
+  
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      const response = await fetch("http://127.0.0.1:8000/Account/employee_list", {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setRows(data.employee_list);
+
+      // Save the employee list to local storage
+      localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+
+      const deleteResponse = await fetch("http://127.0.0.1:8000/Account/delete_employee", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: selected }),
+      });
+
+      if (!deleteResponse.ok) {
+        throw new Error("Delete request failed");
+      }
+
+      fetchData();
+      setSelected([]);
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    // Retrieve employee list from local storage when component mounts
+    const storedEmployeeList = localStorage.getItem("employeeList");
+    if (storedEmployeeList) {
+      setRows(JSON.parse(storedEmployeeList));
+    } else {
+      fetchData();
+    }
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -298,6 +337,7 @@ export default function TransManagerManageAccounts() {
     setDense(event.target.checked);
   };
 
+
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -325,7 +365,7 @@ export default function TransManagerManageAccounts() {
           Thêm nhân viên{" "}
         </ColorButton>
         <Paper sx={{ width: "100%", mb: 2 }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+          <EnhancedTableToolbar numSelected={selected.length} handleDelete={handleDelete}/>
           <Divider />
           <TableContainer>
             <Table

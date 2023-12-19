@@ -50,6 +50,17 @@ class Shipment(models.Model):
         # Use UUID to generate a unique DHCode
         return str(uuid.uuid4().hex)[:15]
     
+    def to_json(self, status):
+        return {
+            'shipment_id': self.shipment_id,
+            'status': status,
+            'DHCode': self.DHCode,
+            'sender_address': self.sender_address,
+            'receiver_address': self.receiver_address,
+            'type': self.good_type,
+            'weight': self.weight
+        }
+    
      
     
 @receiver(pre_save, sender=Shipment)
@@ -77,6 +88,9 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.transaction_id} - {self.status}"
+    
+    def call_name(self):
+        return f"Department {self.pk}"
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=Transaction)

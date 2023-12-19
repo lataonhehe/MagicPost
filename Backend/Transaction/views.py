@@ -269,8 +269,8 @@ def list_complete_and_fail_shipment(request):
     failed_shipment = list(Shipment.objects.filter(des=department, status='Failed'))
 
     response_data = {
-        'Completed_shipment': completed_shipment,
-        'Failed_shipment': failed_shipment
+        'Completed_shipment': [x.to_json('completed') for x in completed_shipment],
+        'Failed_shipment': [x.to_json('failed') for x in failed_shipment]
     }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
@@ -496,3 +496,32 @@ def search_shipment(request):
     else:
         response_data = {'message': 'Your DHCode is not correct.'}
         return JsonResponse(response_data, status = status.HTTP_400_BAD_REQUEST)
+
+
+### Truong diem giao dich, tap ket
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsManager])
+def list_shipment(request):
+
+    manager = request.user
+    department = manager.department
+
+    # Take shipment of transaction that have des = manager.department and in progress
+    coming_transaction = list(Transaction.objects.filter(des=department, status='In Progress'))    
+    sending_transaction = list(Transaction.objects.filter(pos=department, status='In Progress'))
+    sending_customer_transaction = list(CustomerTransaction.objects.filter(shipment__des=department, status='In Progress'))
+
+    coming_shipment = [x.shipment for x in coming_transaction]
+    sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
+    pending_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
+
+    response_data = {
+        'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
+        'outgoing_shipment': [x.to_json('outgoing') for x in sending_shipment],
+        'pending_shipment': [x.to_json('pending') for x in pending_shipment]
+    }
+    return JsonResponse (
+        response_data,
+        status = status.HTTP_200_OK
+    )
