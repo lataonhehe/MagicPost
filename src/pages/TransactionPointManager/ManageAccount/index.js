@@ -160,8 +160,7 @@ EnhancedTableHead.propTypes = {
 
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
+  const { numSelected, handleDelete } = props;
   return (
     <Toolbar
       sx={{
@@ -205,6 +204,7 @@ function EnhancedTableToolbar(props) {
             sx={{ fontSize: "14px", marginRight: "16px" }}
             variant="contained"
             startIcon={<DeleteIcon sx={{ fontSize: "24px" }} />}
+            onClick={handleDelete}
           >
             Xóa
           </Button>
@@ -218,6 +218,7 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 export default function TransManagerManageAccounts() {
@@ -229,6 +230,7 @@ export default function TransManagerManageAccounts() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
 
+  
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Token");
@@ -246,22 +248,25 @@ export default function TransManagerManageAccounts() {
 
       const data = await response.json();
       setRows(data.employee_list);
+
+      // Save the employee list to local storage
+      localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("Token");
 
-      // Assuming your delete API endpoint is something like "http://127.0.0.1:8000/Account/delete_employee"
       const deleteResponse = await fetch("http://127.0.0.1:8000/Account/delete_employee", {
         method: "DELETE",
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ids: selected }), // Assuming your backend expects an array of IDs to delete
+        body: JSON.stringify({ ids: selected }),
       });
 
       if (!deleteResponse.ok) {
@@ -269,19 +274,21 @@ export default function TransManagerManageAccounts() {
       }
 
       fetchData();
-
-      // Clear the selected items after deletion
       setSelected([]);
     } catch (error) {
       console.error("Error deleting data:", error);
     }
   };
-  React.useEffect(() => {  
-    fetchData();
-  }, []);
 
-  
-  
+  React.useEffect(() => {
+    // Retrieve employee list from local storage when component mounts
+    const storedEmployeeList = localStorage.getItem("employeeList");
+    if (storedEmployeeList) {
+      setRows(JSON.parse(storedEmployeeList));
+    } else {
+      fetchData();
+    }
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -358,7 +365,7 @@ export default function TransManagerManageAccounts() {
           Thêm nhân viên{" "}
         </ColorButton>
         <Paper sx={{ width: "100%", mb: 2 }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+          <EnhancedTableToolbar numSelected={selected.length} handleDelete={handleDelete}/>
           <Divider />
           <TableContainer>
             <Table
