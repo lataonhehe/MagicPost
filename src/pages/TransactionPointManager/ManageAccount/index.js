@@ -1,4 +1,13 @@
-import { Button, Divider, InputBase, styled } from "@mui/material";
+import {
+  Button,
+  Collapse,
+  Divider,
+  FormControl,
+  InputAdornment,
+  InputBase,
+  TextField,
+  styled,
+} from "@mui/material";
 import classNames from "classnames/bind";
 import * as React from "react";
 import PropTypes from "prop-types";
@@ -24,6 +33,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { visuallyHidden } from "@mui/utils";
 import { blue } from "@mui/material/colors";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { useState } from "react";
+import { useEffect } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const ColorButton = styled(Button)(({ theme }) => ({
   color: theme.palette.getContrastText(blue[500]),
@@ -158,7 +170,6 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-
 function EnhancedTableToolbar(props) {
   const { numSelected, handleDelete } = props;
   return (
@@ -221,33 +232,164 @@ EnhancedTableToolbar.propTypes = {
   handleDelete: PropTypes.func.isRequired,
 };
 
-export default function TransManagerManageAccounts() {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("id");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRows] = React.useState([]);
+export function InputAdornments() {
+  const [showPassword, setShowPassword] = useState(false);
 
-  
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+  const [values, setValues] = useState([]);
+
+  const updateValue = (index, newValue) => {
+    setValues((prevValues) => {
+      const newValues = [...prevValues];
+      newValues[index] = newValue;
+      return newValues;
+    });
+  };
+
+  return (
+    <Box sx={{ margin: "auto" }}>
+      <div>
+        <FormControl
+          sx={{ m: 1, width: "45ch", fontSize: "32px" }}
+          variant="outlined"
+        >
+          <TextField
+            placeholder="Nhập ID:"
+            id="outlined-start-adornment"
+            sx={{ m: 1, width: "25ch" }}
+            key={1}
+            value={values[1]}
+            onChange={(e) => {
+              updateValue(1, e.target.value);
+            }}
+            startAdornment={
+              <InputAdornment position="start">ID:</InputAdornment>
+            }
+          />
+          <TextField
+            sx={{ m: 1, width: "25ch" }}
+            id="outlined-adornment-weight"
+            placeholder="Nhập username"
+            key={2}
+            value={values[2]}
+            onChange={(e) => {
+              updateValue(2, e.target.value);
+            }}
+            inputProps={{
+              "aria-label": "weight",
+            }}
+          />
+
+          <TextField
+            sx={{ m: 1, width: "25ch" }}
+            id="outlined-adornment-password"
+            type={showPassword ? "text" : "password"}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            placeholder="Nhập mật khẩu:"
+            key={3}
+            value={values[3]}
+            onChange={(e) => {
+              updateValue(3, e.target.value);
+            }}
+          />
+          <TextField
+            sx={{ m: 1, width: "25ch" }}
+            id="outlined-adornment-password"
+            type={showPassword ? "text" : "password"}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            placeholder="Nhập lại mật khẩu:"
+            key={4}
+            value={values[4]}
+            onChange={(e) => {
+              updateValue(4, e.target.value);
+            }}
+          />
+          <ColorButton
+            variant="contained"
+            //   onClick={handleOpenTable}
+            sx={{
+              fontSize: "16px",
+              margin: "32px",
+              marginLeft: "132px",
+              width: "160px",
+            }}
+          >
+            Xác nhận
+          </ColorButton>
+        </FormControl>
+      </div>
+    </Box>
+  );
+}
+
+export default function TransManagerManageAccounts() {
+  const [themnv, setThemnv] = useState(false);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("id");
+  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState(0);
+  const [dense, setDense] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState([]);
+
+  function handleThemnv() {
+    setThemnv(!themnv);
+  }
+
+  const updateRows = (index, newValue) => {
+    setRows((prevValues) => {
+      const newValues = [...prevValues];
+      newValues[index] = newValue;
+      return newValues;
+    });
+  };
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Token");
-      const response = await fetch("http://127.0.0.1:8000/Account/employee_list", {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/Account/employee_list",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
-      setRows(data.employee_list);
+      updateRows(data.employee_list.id, data.employee_list);
 
       // Save the employee list to local storage
       localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
@@ -260,14 +402,17 @@ export default function TransManagerManageAccounts() {
     try {
       const token = localStorage.getItem("Token");
 
-      const deleteResponse = await fetch("http://127.0.0.1:8000/Account/delete_employee", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids: selected }),
-      });
+      const deleteResponse = await fetch(
+        "http://127.0.0.1:8000/Account/delete_employee",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids: selected }),
+        }
+      );
 
       if (!deleteResponse.ok) {
         throw new Error("Delete request failed");
@@ -280,7 +425,7 @@ export default function TransManagerManageAccounts() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Retrieve employee list from local storage when component mounts
     const storedEmployeeList = localStorage.getItem("employeeList");
     if (storedEmployeeList) {
@@ -337,7 +482,6 @@ export default function TransManagerManageAccounts() {
     setDense(event.target.checked);
   };
 
-
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -359,13 +503,19 @@ export default function TransManagerManageAccounts() {
         <ColorButton
           startIcon={<PersonAddIcon />}
           variant="contained"
-          // onClick={handleOpenTable}
+          onClick={handleThemnv}
           sx={{ fontSize: "22px" }}
         >
           Thêm nhân viên{" "}
         </ColorButton>
+        <Collapse in={themnv} timeout="auto">
+          {themnv && <InputAdornments />}
+        </Collapse>
         <Paper sx={{ width: "100%", mb: 2 }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} handleDelete={handleDelete}/>
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            handleDelete={handleDelete}
+          />
           <Divider />
           <TableContainer>
             <Table

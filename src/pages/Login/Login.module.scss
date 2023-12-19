@@ -1,71 +1,66 @@
+.container {
+  direction: row;
+}
+.paper {
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+}
+.img {
+  width: 100%;
+  margin-top: -1px;
+  height: fit-content;
+}
 
-  .container {
-    direction: row;
-  }
-  .paper {
-    width: 50%;
-    align-items: center;
-    justify-content: center;
+input[type="button"] {
+  border: none;
+  background: #6495ed;
+  color: white;
+  padding: 12px 24px;
+  margin: 8px;
+  font-size: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type="button"]:hover {
+  background-color: #f38600;
+}
 
-  }
-  .img {
-    width: 100%; 
-    height: fit-content;
-  }  
-    
+.titleContainer {
+  padding: 75px;
+  display: flex;
+  flex-direction: column;
+  font-size: 64px;
+  font-weight: bolder;
+  align-items: center;
+  justify-content: center;
+}
 
-  input[type="button"] {
-      border: none;
-      background: #6495ed;
-      color: white;
-      padding: 12px 24px;
-      margin: 8px;
-      font-size: 24px;
-      border-radius: 4px;
-      cursor: pointer;
-  }
-  input[type="button"]:hover {
-      background-color:#f38600 ;
-  }
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+}
 
-  
-  .titleContainer {
-    padding: 75px;
-    display: flex;
-    flex-direction: column;
-    font-size: 64px;
-    font-weight: bolder;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  
-  
-  .buttonContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 260px;
-  }
-  
-  .inputContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .inputContainer > .errorLabel {
-    color: red;
-    font-size: 20px;
-  }
-  
-  .inputBox {
-    height: 48px;
-    width: 400px;
-    font-size: large;
-    border-radius: 8px;
-    border: 1px solid grey;
-    padding-left: 8px;
-  }
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputContainer > .errorLabel {
+  color: red;
+  font-size: 20px;
+}
+
+.inputBox {
+  height: 48px;
+  width: 400px;
+  font-size: large;
+  border-radius: 8px;
+  border: 1px solid grey;
+  padding-left: 8px;
+}
