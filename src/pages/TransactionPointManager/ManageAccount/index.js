@@ -504,7 +504,7 @@ export default function TransManagerManageAccounts() {
           startIcon={<PersonAddIcon />}
           variant="contained"
           onClick={handleThemnv}
-          sx={{ fontSize: "22px" }}
+          sx={{ fontSize: "22px", marginTop: "100px", marginBottom: "32px" }}
         >
           Thêm nhân viên{" "}
         </ColorButton>
