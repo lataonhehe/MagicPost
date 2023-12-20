@@ -514,7 +514,7 @@ def list_shipment(request):
 
     coming_shipment = [x.shipment for x in coming_transaction]
     sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
-    pending_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
+    pending_shipment = [x for x in list(Shipment.objects.all()) if x.des == department and x not in sending_shipment]
 
     response_data = {
         'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
@@ -524,4 +524,71 @@ def list_shipment(request):
     return JsonResponse (
         response_data,
         status = status.HTTP_200_OK
+    )
+
+### Lãnh đạo
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsLeader])
+def list_department(request):
+    department_list = Department.objects.all().values()
+    response_data = {
+        'department_list': [x.to_json() for x in department_list]
+    }
+    return JsonResponse(
+        response_data,
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsLeader])
+def list_manager(request):
+    manager_list = list(User.objects.filter(role='1'))
+    response_data = {
+        'manager_list': [x.to_json() for x in manager_list]
+    }
+
+    return JsonResponse(
+        response_data,
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsLeader])
+def shipment_statistic(request):
+    
+    department_list = Department.objects.all().values()
+    response_data = {
+        
+    }
+
+    for i in department_list:
+        response_data[i.call_name()] = {
+            'coming_shipment': [],
+            'sending_shipment': [],
+            'pending_shipment': []
+        }
+
+    inprogress_transaction = list(Transaction.objects.filter(status='In Progress'))  
+    inprogress_customer_transaction = list(CustomerTransaction.objects.filter(status='In Progress'))
+    inprogress_shipment = [x.shipment for x in inprogress_transaction + inprogress_customer_transaction]
+    pending_shipment = [x for x in list(Shipment.objects.all()) if x not in inprogress_shipment]
+
+    for x in pending_shipment:
+        department_name = x.current_pos.call_name()
+        response_data[department_name]['pending_shipment'].append(x.to_json())
+
+    for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):
+        des = trans.des.call_name()
+        pos = trans.pos.call_name()
+        data = _shipment.to_json()
+        response_data[pos]['sending_shipmnet'].append(data)
+        response_data[des]['coming_shipment'].append(data)
+
+    return JsonResponse(
+        response_data, 
+        status=status.HTTP_200_OK
     )
