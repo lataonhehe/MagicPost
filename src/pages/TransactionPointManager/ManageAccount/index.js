@@ -36,7 +36,9 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import styles from "./ManageAccount.module.scss";
 
+const cx = classNames.bind(styles);
 const ColorButton = styled(Button)(({ theme }) => ({
   color: theme.palette.getContrastText(blue[500]),
   backgroundColor: theme.palette.primary,
@@ -239,6 +241,9 @@ export function InputAdornments({ fetchData }) {
     password: "",
     confirmPassword: "",
   });
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmpwError, setConfirmPWError] = useState("");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -272,9 +277,45 @@ export function InputAdornments({ fetchData }) {
       );
       fetchData();
       if (!addResponse.ok) {
+        setUsernameError("Username không hợp lệ!");
         throw new Error("Add user request failed");
       }
     } catch (error) {}
+  };
+
+  const onButtonClick = () => {
+    setUsernameError("");
+    setPasswordError("");
+    setConfirmPWError("");
+    if (values.username.trim() === "") {
+      setUsernameError("Hãy nhập username");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(values.username.trim())) {
+      setUsernameError("Username không hợp lệ!");
+      return;
+    }
+
+    if (values.password.trim() === "") {
+      setPasswordError("Hãy nhập mật khẩu!");
+      return;
+    }
+    if (values.confirmPassword.trim() === "") {
+      setConfirmPWError("Hãy nhập lại mật khẩu!");
+      return;
+    }
+    if (values.confirmPassword !== values.password) {
+      setConfirmPWError("Mật khẩu không khớp!");
+      return;
+    }
+
+    if (values.password.length < 5) {
+      setPasswordError("Mật khẩu phải từ 5 kí tự trở lên!");
+      return;
+    }
+
+    handleAddUser();
   };
 
   return (
@@ -294,7 +335,7 @@ export function InputAdornments({ fetchData }) {
               "aria-label": "weight",
             }}
           />
-
+          <label className={cx("errorLabel")}>{usernameError}</label>
           <TextField
             sx={{ m: 1, width: "25ch" }}
             id="outlined-adornment-password"
@@ -315,6 +356,7 @@ export function InputAdornments({ fetchData }) {
             value={values.password}
             onChange={(e) => handleChange("password", e.target.value)}
           />
+          <label className={cx("errorLabel")}>{passwordError}</label>
           <TextField
             sx={{ m: 1, width: "25ch" }}
             id="outlined-adornment-password"
@@ -335,9 +377,10 @@ export function InputAdornments({ fetchData }) {
             value={values.confirmPassword}
             onChange={(e) => handleChange("confirmPassword", e.target.value)}
           />
+          <label className={cx("errorLabel")}>{confirmpwError}</label>
           <ColorButton
             variant="contained"
-            onClick={handleAddUser}
+            onClick={onButtonClick}
             sx={{
               fontSize: "16px",
               margin: "32px",
@@ -427,7 +470,7 @@ export default function TransManagerManageAccounts() {
     setAddUser(!addUser);
   }
 
-  React.useLayoutEffect(() => {
+  useEffect(() => {
     // Retrieve employee list from local storage when component mounts
     const storedEmployeeList = localStorage.getItem("employeeList");
     if (storedEmployeeList) {
@@ -435,7 +478,7 @@ export default function TransManagerManageAccounts() {
     } else {
       fetchData();
     }
-  }, []);
+  }, [rows]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
