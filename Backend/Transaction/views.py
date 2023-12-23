@@ -5,7 +5,7 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from Account.serializers import UserSerializer
-from Account.permissions import IsLeader, IsManager, IsConsolidationEmployee, IsTransactionEmployee
+from Account.permissions import IsLeader, IsManager, IsEmployee, IsConsolidationEmployee, IsTransactionEmployee
 from Account.models import User, Department
 from Transaction.models import Shipment, Transaction, CustomerTransaction
 from django import forms
@@ -281,6 +281,51 @@ def list_complete_and_fail_shipment(request):
     }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsEmployee])
+def get_coming_transaction_list(request):
+    department = request.user.department
+
+    # Get coming transaction
+    transaction_list = list(Transaction.objects.filter(des=department))
+
+    response_data = {
+        'coming_transaction': [
+            {
+                "transaction": x.call_name(),
+                "transaction_id": x.pk
+            } for x in transaction_list
+        ]
+    }
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsEmployee])
+def get_department_shipment_list(request):
+    department = request.user.department
+
+    # Get shipment in department
+    shipment_list = list(Shipment.objects.filter(current_pos=department))
+    dep_shipment_list = []
+    for x in shipment_list:
+        inprogress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
+        if len(inprogress_transaction) > 0:
+            continue
+        dep_shipment_list.append(x)
+
+    response_data = {
+        'shipment_list': [
+            {
+                "shipment": x.call_name(),
+                "shipment_id": x.pk
+            } for x in dep_shipment_list
+        ]
+    }
+
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
 
 
 
@@ -306,7 +351,7 @@ def create_transaction_to_target_consolidation_point(request):
         return JsonResponse(response_data, status=status.HTTP_404_NOT_FOUND)
     
     #Check shipment are being delivered
-    transaction_list = (Transaction.objects.filter(shipment=shipment).order_by('-created_at'))
+    transaction_list = Transaction.objects.filter(shipment=shipment).order_by('-created_at')
     if transaction_list[0].status == 'In Progress':
         response_data = {'message': 'Shipment has been in progress already.'}
         return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)

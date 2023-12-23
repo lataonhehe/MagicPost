@@ -60,6 +60,9 @@ class Shipment(models.Model):
             'type': self.good_type,
             'weight': self.weight
         }
+
+    def call_name(self):
+        return f"Shipment{self.pk}"
     
      
     
@@ -90,7 +93,7 @@ class Transaction(models.Model):
         return f"{self.transaction_id} - {self.status}"
     
     def call_name(self):
-        return f"Department {self.pk}"
+        return f"Transaction{self.pk}"
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=Transaction)
