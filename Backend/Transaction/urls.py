@@ -15,7 +15,7 @@ urlpatterns = [
     path('consolidation_employee/shipment_from_consolidation', confirm_transaction_from_other_consolidation_department),
     path('consolidation_employee/shipment_to_transaction', create_transaction_to_target_transaction_point),
     path('search_shipment', search_shipment),
-    path('manager/list_shipment', list_shipment),
+    path('list_shipment', list_shipment),
 
     path('list_department', list_department),
     path('list_manager', list_manager),
