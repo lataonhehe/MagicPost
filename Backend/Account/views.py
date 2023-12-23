@@ -21,7 +21,7 @@ def login_api(request):
     try:
         #Get User info by username
         user = User.objects.get(username=username)
-
+        
         #Run when username exists
         if user is not None:
 

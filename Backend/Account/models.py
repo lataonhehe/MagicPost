@@ -15,6 +15,15 @@ class Department(models.Model):
 
     def call_name(self):
         return f"Deparment{self.department_id}"
+    
+    def to_json(self):
+        return {
+            'department_id': self.department_id,
+            'manager': self.manager.call_name(),
+            'department_type': self.department_type,
+            'consolidation_point': self.consolidation_point.call_name() \
+                                    if self.consolidation_point is not None else None,
+        }
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, department=None, role='0', **extra_fields):
@@ -74,3 +83,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def is_consolidation_manager(self):
         return self.is_leader() and self.department.department_type == '1'
+    
+    def call_name(self):
+        return self.username
+    
+    def to_json(self):
+        return {
+            'username': self.username,
+            'password': self.password,
+            'department': self.department.call_name(),
+        }
