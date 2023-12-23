@@ -18,7 +18,7 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/login
 Content-Type: application/json
 
-{"username": "employee50", "password": "123456"}
+{"username": "employee82", "password": "123456"}
 
 ### Logout
 
@@ -35,60 +35,74 @@ Content-Type: application/json
 Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
-    "sender_address": "jfdi",
-    "sender_postal_code": "fewfw",
-    "sender_total_payment": 0,
-    "receiver_address": "fwefw",
-    "receiver_postal_code": "fef",
-    "receiver_name": "fef",
-    "receiver_phone": "543453",
+    "des": 30,
+    "sender_address": "fjwejfiwejfj",
+    "sender_postal_code": "HHHHH12345",
+    "sender_total_payment": 15,
+    "sender_phone": 19001008,
+    "receiver_address": "New York",
+    "receiver_postal_code": "HHHHH12346",
+    "receiver_name": "John Smith",
+    "receiver_phone": "482938428",
     "receiver_total_payment": 0,
-    "receiving_date": "2023-12-04",
+    "receiving_date": "2023-12-25",
     "good_type": "HH",
-    "weight": 0
+    "special_service": "",
+    "weight": 20
 }
 
 
 ### create_transaction_to_consolidation_point
 
-POST http://127.0.0.1:8000/Transaction/create_transaction_to_consolidation_point
+POST http://127.0.0.1:8000/Transaction/transaction_employee/shipment_to_consolidation
 Content-Type: application/json
 Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
-    "shipment_id": 2,
-    "des_id": 3  
+    "shipment_id": 5  
 }
 
-### confirm_shipment_from_consolidation_department
-POST http://127.0.0.1:8000/confirm_shipment_from_consolidation_department
+### confirm shipment from consolidation point
+POST http://127.0.0.1:8000/Transaction/transaction_employee/shipment_from_consolidation
 Content-Type: application/json
-Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "transaction_id": 2
+    "transaction_id": 12
 }
 
-### Create transaction from transaction point to receiver
-
-### Confirm shipment to receiver
-POST http://127.0.0.1:8000/confirm_shipment_to_receiver
+### create transaction to receiver
+POST http://127.0.0.1:8000/Transaction/transaction_employee/create_transaction_to_receiver
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "transaction_id": 1
+    "shipment_id": 5
 }
 
-### confirm_failed_shipment_and_create_transaction
-
-POST http://127.0.0.1:8000/confirm_failed_shipment_and_create_transaction
+### confirm success customer transaction
+POST http://127.0.0.1:8000/Transaction/transaction_employee/confirm_complete_shipment
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "transaction_id": 2
+    "customer_transaction_id": 1
 }
+
+
+### confirm failed customer transaction
+POST http://127.0.0.1:8000/Transaction/transaction_employee/confirm_failed_shipment_and_send_back
+Content-Type: application/json
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
+
+{
+    "customer_transaction_id": 1
+}
+
+### statistic failed, completed shipment
+GET http://127.0.0.1:8000/Transaction/transaction_employee/list_complete_and_fail_shipment
+Content-Type: application/json
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -96,41 +110,41 @@ Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
 # ----------------------------------------------------------------------------------------------------
 
 ### confirm_shipment_from_transaction_department
-POST http://127.0.0.1:8000/confirm_transaction_from_transaction_department
+POST http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_from_transaction
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token b3219d00ae92b7bfc17cf3fd2321dddcda053b2b
 
 {
-    "transaction_id": 2
+    "transaction_id": 10
 }
 
-### create_transaction_to_target_consolidation_point
-POST http://127.0.0.1:8000/create_transaction_to_target_consolidation_point
+### create transaction to target consolidation point
+POST http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_consolidation
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token b3219d00ae92b7bfc17cf3fd2321dddcda053b2b
 
 {
-    "shipment_id": 1,
-    "des_id": 1
+    "shipment_id": 5
 }
 
-### confirm_transaction_from_other_consolidation_department(request)
-POST http://127.0.0.1:8000/confirm_shipment_from_other_consolidation_department
+### confirm transaction from other consolidation point
+POST http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_from_consolidation
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token d7e89cd0c62b8b8d901fb6f72fd616772323653a
 
 {
-    "transaction_id": 2
+    "transaction_id": 11
 }
 
-### create_transaction_to_target_transaction_point
-POST http://127.0.0.1:8000/create_transaction_to_target_transaction_point
+### Create transaction to correspond transaction point
+POST http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_transaction
 Content-Type: application/json
-Authorization: Token c18058b97ff230ba351f6615496048f5e00c9802
+Authorization: Token 93139181e2eae9a2f92cc6454a30591a94078ccf
 
 {
-    "shipment_id": 2
+    "shipment_id": 5
 }
+
 
 ## Khách hàng
 
@@ -141,3 +155,27 @@ Content-Type: application/json
 {
     "code": "662be96f9aa34d1"
 }
+
+## Truong diem giao dich, tap ket
+
+### list_shipment
+GET http://127.0.0.1:8000/Transaction/manager/list_shipment
+Content-Type: application/json
+Authorization: Token a8617bdeae22488cdce6860fa42b2fba402cfdff
+
+## Lãnh đạo
+
+### list_department
+GET http://127.0.0.1:8000/Transaction/list_department
+Content-Type: application/json
+Authorization: Token 62db23a728621431acd7df44ba712bbb677af26a
+
+### list_manager
+GET http://127.0.0.1:8000/Transaction/list_manager
+Content-Type: application/json
+Authorization: Token 62db23a728621431acd7df44ba712bbb677af26a
+
+### shipment_statistic
+GET http://127.0.0.1:8000/Transaction/shipment_statistic
+Content-Type: application/json
+Authorization: Token 62db23a728621431acd7df44ba712bbb677af26a

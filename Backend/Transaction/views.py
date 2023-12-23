@@ -34,13 +34,13 @@ def create_shipment(request):
     request.data['current_pos'] = pos
 
     #Check and create target transaction deparment
-    try:
-        des_id = request.data['des_id']
-        request.data['des'] = Department.objects.get(pk=des_id, department_type='0')
-        request.data.pop('des_id')
-    except Exception:
-        Response(status=status.HTTP_400_BAD_REQUEST, 
-                 data={"message": "Request does not have destination id or destination id does not exist or not transaction point."})
+    # try:
+    #     des_id = request.data['des_id']
+    #     request.data['des'] = Department.objects.get(pk=des_id, department_type='0')
+    #     request.data.pop('des_id')
+    # except Exception:
+    #     Response(status=status.HTTP_400_BAD_REQUEST, 
+    #              data={"message": "Request does not have destination id or destination id does not exist or not transaction point."})
 
     # Convert json data to Shipment    
     serializer = ShipmentSerializer(data=request.data)
@@ -67,7 +67,7 @@ def create_transaction_to_correspond_consolidation_point(request):
     data = request.data
 
     # Check request data has expected data
-    shipment_id = request.date.get('shipment_id', None)
+    shipment_id = request.data.get('shipment_id', None)
     if shipment_id is None:
         response_data = {
             'message': 'Your request does not have shipment_id'
@@ -86,9 +86,10 @@ def create_transaction_to_correspond_consolidation_point(request):
 
     #Check shipment are being delivered
     transaction_list = (Transaction.objects.filter(shipment=shipment).order_by('-created_at'))
-    if transaction_list[0].status == 'In Progress':
-        response_data = {'status': 'errror', 'message': 'Shipment has been in progress already.'}
-        return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
+    if len(transaction_list) > 0:
+        if transaction_list[0].status == 'In Progress':
+            response_data = {'status': 'errror', 'message': 'Shipment has been in progress already.'}
+            return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
     
     #Check position is transaction point and match to employee transaction point
     try:
@@ -171,14 +172,14 @@ def create_transaction_to_receiver(request):
 
     # Check shipment
     try:
-        shipment = Shipment.objects.get(transaction_id=data['shipment_id'])
+        shipment = Shipment.objects.get(shipment_id=data['shipment_id'])
     except Exception:
         response_data = {'message': 'Shipment does not exist.'}
         return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
 
     # Check that shipment des have to be the same as employess department
     shipment_des = shipment.des
-    employee_department = data.user.department
+    employee_department = request.user.department
     if shipment_des != employee_department:
         response_data = {'message': 'Your department is not match with shipmet target transaction point.'}
         return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
@@ -191,7 +192,7 @@ def create_transaction_to_receiver(request):
     except Exception:
         pass
     finally:
-        transaction = CustomerTransaction(shipment)
+        transaction = CustomerTransaction(shipment=shipment)
         transaction.save()
         response_data = {'message': 'Customer transaction is created succesfully.'}
         return JsonResponse(response_data, status=status.HTTP_201_CREATED)
@@ -251,10 +252,16 @@ def confirm_failed_shipment_and_send_back(request):
     customer_transaction.save()
     shipment = customer_transaction.shipment
     shipment.status = 'Failed'
+    shipment.des = shipment.pos
+    shipment.pos = request.user.department
+    shipment.current_pos = shipment.pos
     shipment.save()
 
     # Create transaction to send back
-
+    pos = shipment.current_pos
+    des = pos.consolidation_point
+    transaction = Transaction(shipment=shipment, pos=pos, des=des, status='In Progress')
+    transaction.save()
     response_data = {'message': 'Confirm failed shipment successfully.'}
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
@@ -265,8 +272,8 @@ def list_complete_and_fail_shipment(request):
     department = request.user.department
 
     # Get customer transaction that completed and failed
-    completed_shipment = list(Shipment.objects.filter(des=department, status='Completed'))
-    failed_shipment = list(Shipment.objects.filter(des=department, status='Failed'))
+    completed_shipment = list(Shipment.objects.filter(pos=department, status='Completed'))
+    failed_shipment = list(Shipment.objects.filter(pos=department, status='Failed'))
 
     response_data = {
         'Completed_shipment': [x.to_json('completed') for x in completed_shipment],
@@ -355,7 +362,7 @@ def confirm_transaction_from_correspond_transaction_department(request):
         return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
     
     #Check position is correspond transaction
-    if transaction.pos.pk.consolidation_point != request.user.department:
+    if transaction.pos.consolidation_point != request.user.department:
         response_data = {'message': 'Transaction is not from correspond transaction department.'}
         return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED) 
 
@@ -514,7 +521,7 @@ def list_shipment(request):
 
     coming_shipment = [x.shipment for x in coming_transaction]
     sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
-    pending_shipment = [x for x in list(Shipment.objects.all()) if x.des == department and x not in sending_shipment]
+    pending_shipment = [x for x in list(Shipment.objects.all()) if x.current_pos == department and x not in sending_shipment]
 
     response_data = {
         'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
@@ -559,7 +566,6 @@ def list_manager(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsLeader])
 def shipment_statistic(request):
-    
     department_list = list(Department.objects.all())
     response_data = {
         
@@ -579,13 +585,13 @@ def shipment_statistic(request):
 
     for x in pending_shipment:
         department_name = x.current_pos.call_name()
-        response_data[department_name]['pending_shipment'].append(x.to_json())
+        response_data[department_name]['pending_shipment'].append(x.to_json(''))
 
     for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):
         des = trans.des.call_name()
         pos = trans.pos.call_name()
-        data = _shipment.to_json()
-        response_data[pos]['sending_shipmnet'].append(data)
+        data = _shipment.to_json('')
+        response_data[pos]['sending_shipment'].append(data)
         response_data[des]['coming_shipment'].append(data)
 
     return JsonResponse(
