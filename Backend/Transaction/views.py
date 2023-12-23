@@ -531,7 +531,7 @@ def list_shipment(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsLeader])
 def list_department(request):
-    department_list = Department.objects.all().values()
+    department_list = list(Department.objects.all())
     response_data = {
         'department_list': [x.to_json() for x in department_list]
     }
@@ -560,7 +560,7 @@ def list_manager(request):
 @permission_classes([IsLeader])
 def shipment_statistic(request):
     
-    department_list = Department.objects.all().values()
+    department_list = list(Department.objects.all())
     response_data = {
         
     }
