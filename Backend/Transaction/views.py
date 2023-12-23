@@ -514,7 +514,7 @@ def list_shipment(request):
 
     coming_shipment = [x.shipment for x in coming_transaction]
     sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
-    pending_shipment = [x for x in Shipment.objects.all().values() if x.des == department and x not in coming_shipment and x not in sending_shipment]
+    pending_shipment = [x for x in Shipment.objects.all() if x.des == department and x not in coming_shipment and x not in sending_shipment]
 
     response_data = {
         'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
