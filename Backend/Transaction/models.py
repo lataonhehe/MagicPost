@@ -29,7 +29,7 @@ class Shipment(models.Model):
     sender_postal_code = models.CharField(max_length=10, default=None, null=True)
     sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
     sender_phone = models.CharField(max_length=15, default=None, null=True, blank=True)
-
+    sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     #receiver info
     receiver_address = models.CharField(max_length=100, default=None, null=True)
     receiver_postal_code = models.CharField(max_length=10, default=None, null=True)

@@ -36,6 +36,7 @@ Authorization: Token 877dc3520735d130169f41e876a0cdd4ff686f72
 
 {
     "des": 30,
+    "sender_name": "Alan",
     "sender_address": "fjwejfiwejfj",
     "sender_postal_code": "HHHHH12345",
     "sender_total_payment": 15,
