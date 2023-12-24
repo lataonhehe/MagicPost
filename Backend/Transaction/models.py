@@ -30,7 +30,7 @@ class Shipment(models.Model):
     sender_postal_code = models.CharField(max_length=10, default=None, null=True)
     sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
     sender_phone = models.CharField(max_length=15, default=None, null=True, blank=True)
-
+    sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     #receiver info
     receiver_address = models.CharField(max_length=100, default=None, null=True)
     receiver_postal_code = models.CharField(max_length=10, default=None, null=True)
@@ -61,6 +61,9 @@ class Shipment(models.Model):
             'type': self.good_type,
             'weight': self.weight
         }
+
+    def call_name(self):
+        return f"Shipment{self.pk}"
     
      
     
@@ -91,7 +94,7 @@ class Transaction(models.Model):
         return f"{self.transaction_id} - {self.status}"
     
     def call_name(self):
-        return f"Department {self.pk}"
+        return f"Transaction{self.pk}"
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=Transaction)
