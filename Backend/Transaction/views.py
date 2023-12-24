@@ -414,37 +414,42 @@ def confirm_transaction_from_correspond_transaction_department(request):
 
     #Check transaction id
     try:
-        print(data)
-        transaction = Transaction.objects.get(transaction_id=data['transaction_id'])
+        transaction_list = []
+        for id in data['transaction_id']:
+            transaction_list.append(Transaction.objects.get(transaction_id=id))
     except Exception:
         response_data = {'message': 'Transaction doest not exist.'}
         return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
     
     #Check the transaction progress
-    if transaction.status != 'In Progress':
-        response_data = {'message': 'Transaction was not in progress.'}
-        return JsonResponse(response_data, status=status.HTTP_409_CONFLICT) 
+
+    for trans in transaction_list:
+        if trans.status != 'In Progress':
+            response_data = {'message': 'Transaction was not in progress.'}
+            return JsonResponse(response_data, status=status.HTTP_409_CONFLICT) 
     
-    # Check destination of transaction is employee department
-    if transaction.des.pk != request.user.department.pk:
-        response_data = {'message': 'Transaction destination does not match with your department.'}
-        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
-    
-    #Check position is correspond transaction
-    if transaction.pos.consolidation_point != request.user.department:
-        response_data = {'message': 'Transaction is not from correspond transaction department.'}
-        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED) 
+        # Check destination of transaction is employee department
+        if trans.des.pk != request.user.department.pk:
+            response_data = {'message': 'Transaction destination does not match with your department.'}
+            return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #Check position is correspond transaction
+        if trans.pos.consolidation_point != request.user.department:
+            response_data = {'message': 'Transaction is not from correspond transaction department.'}
+            return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED) 
 
     if request.method == 'POST':
+        
+        for trans in transaction_list:
+            #Update shipment
+            shipment = trans.shipment
+            shipment.current_pos = trans.des
+            shipment.save()
 
-        #Update shipment
-        shipment = transaction.shipment
-        shipment.current_pos = transaction.des
-        shipment.save()
-
-        #Update transaction
-        transaction.status = 'Completed'
-        transaction.save()
+            #Update transaction
+            trans.status = 'Completed'
+            trans.save()
+            
         response_data = {'status': 'success', 'message': 'Transaction status is updated successfully.'}
         return JsonResponse(response_data)
     
