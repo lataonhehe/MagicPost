@@ -241,7 +241,6 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function ConsolStaffAcceptConsolidation() {
-  const [addUser, setAddUser] = useState(false);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
@@ -260,52 +259,11 @@ export default function ConsolStaffAcceptConsolidation() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("Token");
-      const response = await fetch(
-        "http://127.0.0.1:8000/Account/employee_list",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      updateRows(data.employee_list.id, data.employee_list);
-
-      // Save the employee list to local storage
-      localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
     } catch (error) {}
   };
 
   const handleAccept = async () => {
     try {
-      const token = localStorage.getItem("Token");
-
-      const deleteResponse = await fetch(
-        "http://127.0.0.1:8000/Account/delete_employee",
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ids: selected }),
-        }
-      );
-
-      if (!deleteResponse.ok) {
-        throw new Error("Delete request failed");
-      }
-
-      fetchData();
-      setSelected([]);
     } catch (error) {}
   };
 

@@ -24,6 +24,7 @@ function FunctionBar() {
   const [open5, setOpen5] = useState(false);
   const [open6, setOpen6] = useState(false);
   const [open7, setOpen7] = useState(false);
+  const [open9, setOpen9] = useState(false);
 
   const handleClick7 = () => {
     setOpen7(!open7);
@@ -33,6 +34,7 @@ function FunctionBar() {
     setOpen4(false);
     setOpen5(false);
     setOpen6(false);
+    setOpen9(false);
   };
   const handleClick1 = () => {
     setOpen1(!open1);
@@ -48,6 +50,7 @@ function FunctionBar() {
     setOpen4(false);
     setOpen5(false);
     setOpen6(false);
+    setOpen9(false);
   };
   const handleClick4 = () => {
     setOpen4(!open4);
@@ -56,6 +59,7 @@ function FunctionBar() {
     setOpen3(false);
     setOpen5(false);
     setOpen6(false);
+    setOpen9(false);
   };
   const handleClick5 = () => {
     setOpen5(!open5);
@@ -64,6 +68,7 @@ function FunctionBar() {
     setOpen3(false);
     setOpen4(false);
     setOpen6(false);
+    setOpen9(false);
   };
   const handleClick6 = () => {
     setOpen6(!open6);
@@ -72,18 +77,30 @@ function FunctionBar() {
     setOpen3(false);
     setOpen4(false);
     setOpen5(false);
+    setOpen9(false);
   };
-
-  const path = window.location.href;
-  useEffect(() => {
-    if (path.includes("/accepttrans")) {
+  const handleClick9 = () => {
+    setOpen2(true);
+    setOpen9(!open9);
+    setOpen1(false);
+    setOpen3(false);
+    setOpen4(false);
+    setOpen5(false);
+    setOpen9(false);
+    setOpen7(false);
+  };
+  const checkPath = () => {
+    if (path.includes("/acceptfinish")) {
       handleClick3();
     }
     if (path.includes("/acceptconsol")) {
       handleClick4();
     }
-    if (path.includes("/addtrans")) {
+    if (path.includes("/addfinish")) {
       handleClick5();
+    }
+    if (path.includes("/addnew")) {
+      handleClick9();
     }
     if (path.includes("/addconsol")) {
       handleClick6();
@@ -91,6 +108,10 @@ function FunctionBar() {
     if (path.includes("/statistics")) {
       handleClick7();
     }
+  };
+  const path = window.location.href;
+  useEffect(() => {
+    checkPath();
   }, [path]);
 
   return (
@@ -118,7 +139,8 @@ function FunctionBar() {
           <List>
             <ListItem>
               <ListItemButton
-                // component="a" href="/consolstaff/add"
+                component="a"
+                href="/transstaff/acceptfinish"
                 selected={open3}
                 onClick={() => handleClick3()}
               >
@@ -126,14 +148,15 @@ function FunctionBar() {
                   <ArrowRightIcon fontSize="large" />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Điểm Giao Dịch"
+                  primary="Người nhận"
                   primaryTypographyProps={{ fontSize: "small" }}
                 />
               </ListItemButton>
             </ListItem>
             <ListItem>
               <ListItemButton
-                // component="a" href="/consolstaff/add"
+                component="a"
+                href="/transstaff/acceptconsol"
                 selected={open4}
                 onClick={() => handleClick4()}
               >
@@ -169,7 +192,24 @@ function FunctionBar() {
           <List>
             <ListItem>
               <ListItemButton
-                // component="a" href="/consolstaff/add"
+                component="a"
+                href="/transstaff/addnew"
+                selected={open9}
+                onClick={() => handleClick9()}
+              >
+                <ListItemIcon>
+                  <AddBoxIcon fontSize="medium" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Người gửi"
+                  primaryTypographyProps={{ fontSize: "small" }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem>
+              <ListItemButton
+                component="a"
+                href="/transstaff/addfinish"
                 selected={open5}
                 onClick={() => handleClick5()}
               >
@@ -177,14 +217,15 @@ function FunctionBar() {
                   <AddBoxIcon fontSize="medium" />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Điểm Giao Dịch"
+                  primary="Người nhận"
                   primaryTypographyProps={{ fontSize: "small" }}
                 />
               </ListItemButton>
             </ListItem>
             <ListItem>
               <ListItemButton
-                // component="a" href="/consolstaff/add"
+                component="a"
+                href="/transstaff/addconsol"
                 selected={open6}
                 onClick={() => handleClick6()}
               >
@@ -202,7 +243,8 @@ function FunctionBar() {
         <List>
           <ListItem>
             <ListItemButton
-              // component="a" href="/consolstaff/add"
+              component="a"
+              href="/transstaff/statistics"
               selected={open7}
               onClick={() => handleClick7()}
             >
