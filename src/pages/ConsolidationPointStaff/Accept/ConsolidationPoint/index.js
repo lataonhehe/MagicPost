@@ -243,19 +243,15 @@ export default function ConsolStaffAcceptConsolidation() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
 
-  const updateRows = (index, newValue) => {
-    setRows((prevValues) => {
-      const newValues = [...prevValues];
-      newValues[index] = newValue;
-      return newValues;
-    });
+  const updateRows = (newRows) => {
+    setRows(newRows);
   };
 
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Token");
       const response = await fetch(
-        "http://127.0.0.1:8000/Account/employee_list",
+        "http://127.0.0.1:8000/Transaction/employee/get_coming_transaction",
         {
           method: "GET",
           headers: {
@@ -270,26 +266,30 @@ export default function ConsolStaffAcceptConsolidation() {
       }
 
       const data = await response.json();
-      updateRows(data.employee_list.id, data.employee_list);
+      updateRows(data.consolidation_point);
 
-      // Save the employee list to local storage
-      localStorage.setItem("employeeList", JSON.stringify(data.employee_list));
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []); // Run once when the component mounts
 
   const handleAccept = async () => {
     try {
       const token = localStorage.getItem("Token");
 
       const deleteResponse = await fetch(
-        "http://127.0.0.1:8000/Account/delete_employee",
+        "http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_from_transaction",
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ ids: selected }),
+          body: JSON.stringify({ transaction_id: selected }),
         }
       );
 
@@ -300,17 +300,7 @@ export default function ConsolStaffAcceptConsolidation() {
       fetchData();
       setSelected([]);
     } catch (error) {}
-  };
-
-  useEffect(() => {
-    // Retrieve employee list from local storage when component mounts
-    const storedEmployeeList = localStorage.getItem("employeeList");
-    if (storedEmployeeList) {
-      setRows(JSON.parse(storedEmployeeList));
-    } else {
-      fetchData();
-    }
-  }, [rows]);
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -397,16 +387,16 @@ export default function ConsolStaffAcceptConsolidation() {
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
-                  const isItemSelected = isSelected(row.id);
+                  const isItemSelected = isSelected(row.shipment_id);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <StyledTableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
+                      onClick={(event) => handleClick(event, row.shipment_id)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row.shipment_id}
                       selected={isItemSelected}
                       sx={{ cursor: "pointer" }}
                     >
@@ -427,28 +417,28 @@ export default function ConsolStaffAcceptConsolidation() {
                         scope="row"
                         padding="none"
                       >
-                        {row.id}
+                        {row.shipment_id}
                       </TableCell>
                       <TableCell
                         align="right"
                         padding="none"
                         sx={{ fontSize: "16px", padding: "20px" }}
                       >
-                        {row.username}
+                        {row.current_pos}
                       </TableCell>
                       <TableCell
                         align="right"
                         padding="none"
                         sx={{ fontSize: "16px", padding: "20px" }}
                       >
-                        {row.department}
+                        {row.status}
                       </TableCell>
                       <TableCell
                         align="right"
                         padding="none"
                         sx={{ fontSize: "16px", padding: "20px" }}
                       >
-                        {row.role}
+                        {row.transaction_id}
                       </TableCell>
                     </StyledTableRow>
                   );

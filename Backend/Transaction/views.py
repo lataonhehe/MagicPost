@@ -290,14 +290,37 @@ def get_coming_transaction_list(request):
     # Get coming transaction
     transaction_list = list(Transaction.objects.filter(des=department))
 
+    consolidation_point = []
+    transaction_point = []
+
+    for x in transaction_list:
+        transaction_data = {
+            "shipment_id": x.shipment_id,
+            "current_pos": x.pos.call_name(),
+            "status": x.status,
+            "transaction_id": x.pk
+        }
+
+        if x.pos.department_type == '0':
+            transaction_point.append(transaction_data)
+        else:
+            consolidation_point.append(transaction_data)
+
     response_data = {
-        'coming_transaction': [
-            {
-                "transaction": x.call_name(),
-                "transaction_id": x.pk
-            } for x in transaction_list
-        ]
+        'consolidation_point': consolidation_point,
+        'transaction_point': transaction_point,
     }
+
+    # response_data = {
+    #     'coming_transaction': [
+    #         {
+    #             "shipment_id": x.shipment_id,
+    #             "current_pos": x.pos.call_name(),
+    #             "status": x.status,
+    #             "transaction_id": x.pk
+    #         } for x in transaction_list
+    #     ]
+    # }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
