@@ -86,13 +86,7 @@ const headCells = [
     id: "current_pos",
     numeric: false,
     disablePadding: true,
-    label: "Vị trí hiện tại",
-  },
-  {
-    id: "des",
-    numeric: false,
-    disablePadding: true,
-    label: "Đích đến",
+    label: "Nơi gửi",
   },
   {
     id: "status",
@@ -241,7 +235,6 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function ConsolStaffAcceptConsolidation() {
-  const [addUser, setAddUser] = useState(false);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);

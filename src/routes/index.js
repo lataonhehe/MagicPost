@@ -33,8 +33,10 @@ import ConsolManagerStatistics from "~/pages/ConsolidationPointManager/Statistic
 //Chức năng nhân viên tập kết
 import ConsolStaffAcceptConsolidation from "~/pages/ConsolidationPointStaff/Accept/ConsolidationPoint";
 import ConsolStaffAcceptTransaction from "~/pages/ConsolidationPointStaff/Accept/TransactionPoint";
-import ConsolStaffAddConsolidation from "~/pages/ConsolidationPointStaff/Add/SolidationPoint";
+import ConsolStaffAddConsolidation from "~/pages/ConsolidationPointStaff/Add/ConsolidationPoint";
 import ConsolStaffAddTransaction from "~/pages/ConsolidationPointStaff/Add/TransactionPoint";
+
+//Chức năng nhân viên giao dịch
 import TransStaffStatistics from "~/pages/TransactionPointStaff/Statistics";
 import FinishedTransaction from "~/pages/TransactionPointStaff/Add/Finished";
 import NewTransaction from "~/pages/TransactionPointStaff/Add/New";

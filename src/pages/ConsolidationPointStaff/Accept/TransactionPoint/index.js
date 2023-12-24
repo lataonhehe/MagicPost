@@ -86,13 +86,7 @@ const headCells = [
     id: "current_pos",
     numeric: false,
     disablePadding: true,
-    label: "Vị trí hiện tại",
-  },
-  {
-    id: "des",
-    numeric: false,
-    disablePadding: true,
-    label: "Đích đến",
+    label: "Nơi gửi",
   },
   {
     id: "status",
@@ -218,7 +212,7 @@ function EnhancedTableToolbar(props) {
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Xóa nhân viên">
+        <Tooltip title="Xác nhận đơn hàng">
           <Button
             sx={{ fontSize: "14px", marginRight: "16px" }}
             variant="contained"

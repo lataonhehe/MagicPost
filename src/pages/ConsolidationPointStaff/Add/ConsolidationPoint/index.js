@@ -30,10 +30,9 @@ import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import ListAltIcon from "@mui/icons-material/ListAlt";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import { visuallyHidden } from "@mui/utils";
 import { blue } from "@mui/material/colors";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useState } from "react";
 import { useEffect } from "react";
 // import styles from "./AcceptTrans.module.scss";
@@ -213,7 +212,7 @@ function EnhancedTableToolbar(props) {
           component="div"
           fontWeight="Bold"
         >
-          Tạo đơn hàng tới điểm giao dịch
+          Tạo đơn hàng tới điểm tập kết
         </Typography>
       )}
 
@@ -240,7 +239,7 @@ EnhancedTableToolbar.propTypes = {
   handleDelete: PropTypes.func.isRequired,
 };
 
-export default function ConsolStaffAddTransaction() {
+export default function ConsolStaffAddConsolidation() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
