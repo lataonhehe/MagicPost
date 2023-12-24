@@ -82,7 +82,12 @@ function FunctionBar() {
   // path.includes(`/accept${department == 0 ? 'trans' : 'consol'}}`)
   return (
     <Box className={cx("wrapper")} sx={{ boxShadow: 1 }} p={2}>
-      <h3 style={{ paddingLeft: "16px" }}>Nhân Viên Tập Kết</h3>
+      <h3 style={{ margin: "auto", paddingLeft: "48px", lineHeight: "64px" }}>
+        Nhân Viên
+      </h3>
+      <h3 style={{ margin: "auto", paddingLeft: "48px", lineHeight: "64px" }}>
+        Tập kết
+      </h3>
       <Divider />
       <List>
         <ListItem>
