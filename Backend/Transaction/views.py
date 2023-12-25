@@ -300,7 +300,7 @@ def get_coming_transaction_list(request):
     department = request.user.department
 
     # Get coming transaction
-    transaction_list = list(Transaction.objects.filter(des=department))
+    transaction_list = list(Transaction.objects.filter(des=department, status='In Progress'))
 
     consolidation_point = []
     transaction_point = []
@@ -334,6 +334,25 @@ def get_coming_transaction_list(request):
     #     ]
     # }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsEmployee])
+def get_transaction(request):
+    
+    user_department = request.user.department
+    transaction_list = list(Transaction.objects.filter(pos=user_department))
+
+    response_data = {
+        'transaction_list': [
+            x.to_json() for x in transaction_list
+        ]
+    }
+
+    return JsonResponse(
+        response_data,
+        status=status.HTTP_200_OK
+    )
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -399,31 +418,31 @@ def create_transaction_to_target_consolidation_point(request):
 
     #Check shipment exist
     data = request.data
-    try:
-        shipment = Shipment.objects.get(shipment_id=data['shipment_id']) 
-    except Exception:
-        response_data = {'message': 'Shipment does not exist.'}
-        return JsonResponse(response_data, status=status.HTTP_404_NOT_FOUND)
-    
-    #Check shipment are being delivered
-    transaction_list = Transaction.objects.filter(shipment=shipment).order_by('-created_at')
-    if transaction_list[0].status == 'In Progress':
-        response_data = {'message': 'Shipment has been in progress already.'}
-        return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
-    
-    #Check position is consolidation point and match to employee transaction point
-    try:
-        pos = Department.objects.get(department_id=shipment.current_pos.department_id, department_type='1') 
-        employee_department = request.user.department
-
-        if pos.pk != employee_department.pk:
-            response_data = {'message': 'Shipment current position and your position does not match.'}
+    for shipment_id in data['shipment_id']:
+        try:
+            shipment = Shipment.objects.get(shipment_id=shipment_id) 
+        except Exception:
+            response_data = {'message': 'Shipment does not exist.'}
+            return JsonResponse(response_data, status=status.HTTP_404_NOT_FOUND)
+        
+        #Check shipment are being delivered
+        transaction_list = Transaction.objects.filter(shipment=shipment).order_by('-created_at')
+        if transaction_list[0].status == 'In Progress':
+            response_data = {'message': 'Shipment has been in progress already.'}
             return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
-    except Exception:
-        response_data = {'message': 'Shipment position is not transaction point or does not exist.'}
-        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #Check position is consolidation point and match to employee transaction point
+        try:
+            pos = Department.objects.get(department_id=shipment.current_pos.department_id, department_type='1') 
+            employee_department = request.user.department
 
-    if request.method == 'POST':
+            if pos.pk != employee_department.pk:
+                response_data = {'message': 'Shipment current position and your position does not match.'}
+                return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
+        except Exception:
+            response_data = {'message': 'Shipment position is not transaction point or does not exist.'}
+            return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+
 
         #Update shipment status
         shipment.status = 'In Progress'
@@ -434,8 +453,8 @@ def create_transaction_to_target_consolidation_point(request):
         transaction = Transaction(shipment=shipment, pos=request.user.department, des=consolidation_des, status='In Progress')
         transaction.save()
 
-        response_data = {'message': 'Transaction is created successfully.'}
-        return JsonResponse(response_data, status=status.HTTP_201_CREATED)
+    response_data = {'message': 'Transaction is created successfully.'}
+    return JsonResponse(response_data, status=status.HTTP_201_CREATED)
     
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])

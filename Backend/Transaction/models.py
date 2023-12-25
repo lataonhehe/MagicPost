@@ -95,6 +95,16 @@ class Transaction(models.Model):
     
     def call_name(self):
         return f"Transaction{self.pk}"
+    
+    def to_json(self):
+        return {
+            'id': self.transaction_id,
+            'shipment_id': self.shipment.pk,
+            'pos': self.pos.pk,
+            'des': self.des.pk,
+            'status': self.status,
+            'created_at': self.created_at
+        }
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=Transaction)
