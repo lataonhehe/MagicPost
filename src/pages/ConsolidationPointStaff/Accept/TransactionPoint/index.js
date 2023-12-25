@@ -1,11 +1,6 @@
 import {
   Button,
-  Collapse,
   Divider,
-  FormControl,
-  InputAdornment,
-  InputBase,
-  TextField,
   styled,
 } from "@mui/material";
 import classNames from "classnames/bind";
@@ -25,27 +20,22 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { visuallyHidden } from "@mui/utils";
 import { blue } from "@mui/material/colors";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import styles from "./AcceptTrans.module.scss";
 
-const cx = classNames.bind(styles);
-const ColorButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.getContrastText(blue[500]),
-  backgroundColor: theme.palette.primary,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.light,
-  },
-}));
+// const cx = classNames.bind(styles);
+// const ColorButton = styled(Button)(({ theme }) => ({
+//   color: theme.palette.getContrastText(blue[500]),
+//   backgroundColor: theme.palette.primary,
+//   "&:hover": {
+//     backgroundColor: theme.palette.primary.light,
+//   },
+// }));
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -212,7 +202,7 @@ function EnhancedTableToolbar(props) {
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Xóa nhân viên">
+        <Tooltip title="Xác nhận giao dịch">
           <Button
             sx={{ fontSize: "14px", marginRight: "16px" }}
             variant="contained"
@@ -234,7 +224,7 @@ EnhancedTableToolbar.propTypes = {
   handleDelete: PropTypes.func.isRequired,
 };
 
-export default function ConsolStaffAcceptTransaction() {
+export default function ConsolStaffAcceptConsolidation() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
@@ -281,7 +271,7 @@ export default function ConsolStaffAcceptTransaction() {
     try {
       const token = localStorage.getItem("Token");
 
-      const deleteResponse = await fetch(
+      const response = await fetch(
         "http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_from_transaction",
         {
           method: "POST",
@@ -293,8 +283,11 @@ export default function ConsolStaffAcceptTransaction() {
         }
       );
 
-      if (!deleteResponse.ok) {
-        throw new Error("Delete request failed");
+      const data = await response.json();
+      console.log(data)
+
+      if (!response.ok) {
+        throw new Error(data.message)
       }
 
       fetchData();
@@ -387,16 +380,16 @@ export default function ConsolStaffAcceptTransaction() {
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
-                  const isItemSelected = isSelected(row.shipment_id);
+                  const isItemSelected = isSelected(row.transaction_id);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <StyledTableRow
                       hover
-                      onClick={(event) => handleClick(event, row.shipment_id)}
+                      onClick={(event) => handleClick(event, row.transaction_id)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.shipment_id}
+                      key={row.transaction_id}
                       selected={isItemSelected}
                       sx={{ cursor: "pointer" }}
                     >
