@@ -118,13 +118,20 @@ export function InputAdornments({ fetchData }) {
   };
 
   const [province, setProvince] = useState([]);
-  const [district, setDistrict] = useState([]);
-  const [ward, setWard] = useState([]);
+  const [districtSender, setDistrictSender] = useState([]);
+  const [districtReceiver, setDistrictReceiver] = useState([]);
+  const [wardSender, setWardSender] = useState([]);
+  const [wardReceiver, setWardReceiver] = useState([]);
+  const [wardSenderName, setWardSenderName] = useState([]);
+  const [wardReceiverName, setWardReceiverName] = useState([]);
   const [service, setService] = useState([]);
-  const [provinceID, setProvinceID] = useState();
-  const [districtID, setDistrictID] = useState();
-  const [wardID, setWardID] = useState();
-  const [serviceID, setServiceID] = useState();
+  const [provinceIDSender, setProvinceIDSender] = useState([]);
+  const [districtIDSender, setDistrictIDSender] = useState([]);
+  const [provinceIDReceiver, setProvinceIDReceiver] = useState([]);
+  const [districtIDReceiver, setDistrictIDReceiver] = useState([]);
+  const [wardIDReceiver, setWardIDReceiver] = useState([]);
+  const [serviceID, setServiceID] = useState([]);
+  const [total_payment, setTotal_payment] = useState([]);
   async function fetchDataProvince() {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/master-data/province";
@@ -146,17 +153,17 @@ export function InputAdornments({ fetchData }) {
         throw new Error("Network response was not ok");
       }
       //ProvinceID ProvinceName
+
       setProvince((await response.json()).data);
       // Xử lý dữ liệu ở đây
     } catch (error) {
       console.log("Error to get Province");
     }
   }
-  async function fetchDataDistrict() {
+  async function fetchDataDistrict(provinceid, setDistrict) {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/master-data/district";
     const token = "ecd6ab5f-a269-11ee-af43-6ead57e9219a";
-
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -165,26 +172,21 @@ export function InputAdornments({ fetchData }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          //   province_id: provinceid,
+          province_id: provinceid,
         }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setDistrict(data);
-          // Xử lý dữ liệu ở đây
-        });
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      setDistrict((await response.json()).data);
+      // Xử lý dữ liệu ở đây
 
       // Xử lý dữ liệu ở đây
     } catch (error) {
       console.log("Error to get District");
     }
   }
-  async function fetchDataWard() {
+  async function fetchDataWard(districtid, setWard) {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward";
     const token = "ecd6ab5f-a269-11ee-af43-6ead57e9219a";
@@ -197,7 +199,7 @@ export function InputAdornments({ fetchData }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          //   district_id: districtid,
+          district_id: districtid,
         }),
       });
 
@@ -205,15 +207,14 @@ export function InputAdornments({ fetchData }) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
-      setWard(data);
+      setWard((await response.json()).data);
 
       // Xử lý dữ liệu ở đây
     } catch (error) {
-      console.log("Error to get District");
+      console.log("Error to get Ward");
     }
   }
-  async function fetchDataService() {
+  async function fetchDataService(districtid, todistrictid) {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services";
     const token = "ecd6ab5f-a269-11ee-af43-6ead57e9219a";
@@ -225,9 +226,9 @@ export function InputAdornments({ fetchData }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          //   shop_id: 4791893,
-          //   from_district: districtid,
-          //   to_district: toDistrictID,
+          shop_id: 4791893,
+          from_district: districtid,
+          to_district: todistrictid,
         }),
       });
 
@@ -235,15 +236,20 @@ export function InputAdornments({ fetchData }) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
-      setService(data);
+      setService((await response.json()).data);
 
       // Xử lý dữ liệu ở đây
     } catch (error) {
-      console.log("Error to get District");
+      console.log("Error to get Service");
     }
   }
-  async function canculatePayment() {
+  async function calculatePayment(
+    serviceid,
+    districtid,
+    toDistrictID,
+    wardIDReceiver,
+    weight
+  ) {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
     const token = "ecd6ab5f-a269-11ee-af43-6ead57e9219a";
@@ -252,43 +258,97 @@ export function InputAdornments({ fetchData }) {
         method: "POST",
         headers: {
           token: token,
-          "Content-Type": "application/json",
+          shop_id: 4791893,
         },
         body: JSON.stringify({
-          //   name: "test",
-          //   service_id: serviceid,
-          //   coupon: null,
-          //   from_district_id: districtid,
-          //   to_district_id: toDistrictID,
-          //   to_ward_code: wardid,
-          //   weight: weightt,
+          service_id: serviceID.service_id,
+          insurance_value: 500000,
+          coupon: null,
+          from_district_id: districtIDSender.DistrictID,
+          to_district_id: districtIDReceiver.DistrictID,
+          to_ward_code: wardReceiverName.WardCode,
+          height: 30,
+          length: 30,
+          weight: values.weight,
+          width: 25,
         }),
       });
-
+      console.log("service:", serviceid);
+      console.log("district sender:", districtid);
+      console.log("district receiver:", toDistrictID);
+      console.log("wardcode:", wardIDReceiver);
+      console.log("weight", weight);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
-      setService(data);
+      setTotal_payment((await response.json()).data);
 
       // Xử lý dữ liệu ở đây
     } catch (error) {
-      console.log("Error to get District");
+      console.log("Error to get payment");
     }
   }
 
   useLayoutEffect(() => {
     fetchDataProvince();
-    //   fetchDataDistrict();
-    //   fetchDataWard();
+    // if (provinceIDSender != null)
+    // fetchDataDistrict(provinceIDSender.ProvinceID, setDistrictSender);
+    // if (provinceIDReceiver != null)
+    //   fetchDataDistrict(provinceIDReceiver.ProvinceID, setDistrictReceiver);
+    // if (districtIDReceiver != null && districtIDReceiver.DistrictID)
+    //   fetchDataWard(districtIDReceiver.DistrictID, setWardReceiver);
+    // if (districtIDSender != null && districtIDReceiver.DistrictID != null)
+    //   fetchDataWard(districtIDReceiver.DistrictID, setWardSender);
     //   fetchDataService();
     //   canculatePayment();
     // console.log(ward);
-  }, []);
+    if (provinceIDSender)
+      fetchDataDistrict(provinceIDSender.ProvinceID, setDistrictSender);
+    if (provinceIDReceiver)
+      fetchDataDistrict(provinceIDReceiver.ProvinceID, setDistrictReceiver);
+    if (districtIDSender && districtIDSender.DistrictID)
+      fetchDataWard(districtIDSender.DistrictID, setWardSender);
+    if (districtIDReceiver && districtIDReceiver.DistrictID)
+      fetchDataWard(districtIDReceiver.DistrictID, setWardReceiver);
+    if (
+      districtIDSender.DistrictID &&
+      districtIDReceiver.DistrictID &&
+      wardIDReceiver
+    ) {
+      fetchDataService(
+        districtIDSender.DistrictID,
+        districtIDReceiver.DistrictID
+      );
+    }
+    if (
+      serviceID.service_id &&
+      districtIDSender.DistrictID &&
+      districtIDReceiver.DistrictID &&
+      wardReceiverName.WardCode &&
+      values.weight
+    ) {
+      calculatePayment(
+        serviceID.service_id,
+        districtIDSender.DistrictID,
+        districtIDReceiver.DistrictID,
+        wardReceiverName.WardCode,
+        values.weight
+      );
+
+      console.log("PAYMENT DAYROI:", total_payment);
+    }
+  }, [
+    provinceIDSender,
+    provinceIDReceiver,
+    districtIDSender,
+    districtIDReceiver,
+    serviceID,
+    wardReceiverName,
+    values.weight,
+  ]);
 
   const handleChange = (field, value) => {
-    console.log(values.sender_address);
     setValues((prevValues) => ({
       ...prevValues,
       [field]: value,
@@ -409,23 +469,98 @@ export function InputAdornments({ fetchData }) {
               >
                 Địa chỉ
               </label>
-              {console.log(province)}
+
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="outlined-adornment-weight"
                 disablePortal
-                options={province.map((value) => value.ProvinceName)}
-                // value={values.sender_address}
-                // onChange={(e) => handleChange("sender_address", e.target.value)}
+                options={
+                  province &&
+                  province.map &&
+                  province.map((value) => value.ProvinceName)
+                }
                 inputProps={{
                   "aria-label": "sender_address",
                 }}
+                value={province.ProvinceID}
+                getOptionSelected={(option, value) =>
+                  option.ProvinceID === value.ProvinceID
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    handleChange("sender_address", newValue);
+
+                    setProvinceIDSender(
+                      province.find((item) => item.ProvinceName === newValue)
+                    );
+                  }
+                }}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{ fontSize: "16px" }}
-                    placeholder="Tỉnh, Thành phố"
-                  />
+                  <TextField {...params} label="Tỉnh, thành phố" />
+                )}
+              />
+              <label className={cx("errorLabel")}>{error.sender_address}</label>
+              <Autocomplete
+                sx={{ m: 1, width: "25ch" }}
+                id="outlined-adornment-weight"
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  districtSender &&
+                  districtSender.map &&
+                  districtSender.map((value) => value.DistrictName)
+                }
+                inputProps={{
+                  "aria-label": "sender_address",
+                }}
+                value={districtSender.DistrictID}
+                getOptionSelected={(option, value) =>
+                  option.DistrictID === value.DistrictID
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    setDistrictIDSender(
+                      districtSender.find(
+                        (item) => item.DistrictName === newValue
+                      )
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Quận, huyện" />
+                )}
+              />
+              <label className={cx("errorLabel")}>{error.sender_address}</label>
+              <Autocomplete
+                sx={{ m: 1, width: "25ch" }}
+                id="outlined-adornment-weight"
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  districtSender &&
+                  districtSender.map &&
+                  wardSender &&
+                  wardSender.map &&
+                  wardSender.map((value) => value.WardName)
+                }
+                inputProps={{
+                  "aria-label": "sender_address",
+                }}
+                value={wardSender.WardCode}
+                getOptionSelected={(option, value) =>
+                  option.WardCode === value.WardCode
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    setWardSenderName(
+                      wardSender.find((item) => item.WardName === newValue)
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Phường, xã" />
                 )}
               />
               <label className={cx("errorLabel")}>{error.sender_address}</label>
@@ -499,17 +634,99 @@ export function InputAdornments({ fetchData }) {
               >
                 Địa chỉ
               </label>
-              <TextField
+              <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="outlined-adornment-weight"
-                placeholder="Tỉnh, Thành phố"
-                value={values.receiver_address}
-                onChange={(e) =>
-                  handleChange("receiver_address", e.target.value)
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  province.map((value) => value.ProvinceName)
                 }
                 inputProps={{
                   "aria-label": "receiver_address",
                 }}
+                value={province.ProvinceID}
+                getOptionSelected={(option, value) =>
+                  option.ProvinceID === value.ProvinceID
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    handleChange("receiver_address", newValue);
+
+                    setProvinceIDReceiver(
+                      province.find((item) => item.ProvinceName === newValue)
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Tỉnh, thành phố" />
+                )}
+              />
+              <Autocomplete
+                sx={{ m: 1, width: "25ch" }}
+                id="outlined-adornment-weight"
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  districtReceiver &&
+                  districtReceiver.map &&
+                  districtReceiver.map((value) => value.DistrictName)
+                }
+                inputProps={{
+                  "aria-label": "receiver_address",
+                }}
+                value={districtReceiver.DistrictID}
+                getOptionSelected={(option, value) =>
+                  option.DistrictID === value.DistrictID
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    setDistrictIDReceiver(
+                      districtReceiver.find(
+                        (item) => item.DistrictName === newValue
+                      )
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Quận, huyện" />
+                )}
+              />
+              <label className={cx("errorLabel")}>
+                {error.receiver_address}
+              </label>
+              <Autocomplete
+                sx={{ m: 1, width: "25ch" }}
+                id="outlined-adornment-weight"
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  districtReceiver &&
+                  districtReceiver.map &&
+                  wardReceiver &&
+                  wardReceiver.map &&
+                  wardReceiver.map((value) => value.WardName)
+                }
+                inputProps={{
+                  "aria-label": "sender_address",
+                }}
+                value={wardReceiver.WardCode}
+                getOptionSelected={(option, value) =>
+                  option.WardCode === value.WardCode
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    setWardReceiverName(
+                      wardReceiver.find((item) => item.WardName === newValue)
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Phường, xã" />
+                )}
               />
               <label className={cx("errorLabel")}>
                 {error.receiver_address}
@@ -559,81 +776,19 @@ export function InputAdornments({ fetchData }) {
                   lineHeight: "48px",
                 }}
               >
-                Loại hàng
+                Tên hàng
               </label>
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
                 id="outlined-adornment-weight"
-                placeholder="Hàng hóa | Tài liệu"
                 value={values.good_type}
                 onChange={(e) => handleChange("good_type", e.target.value)}
                 inputProps={{
                   "aria-label": "good_type",
                 }}
               />
-              <label className={cx("errorLabel")}>{error.good_type}</label>
-              <label
-                style={{
-                  fontSize: "18px",
-                  paddingLeft: "24px",
-                  fontWeight: "bold",
-                  flex: "none",
-                  lineHeight: "48px",
-                }}
-              >
-                Khối lượng
-              </label>
-              <TextField
-                fullWidth
-                sx={{ m: 1 }}
-                id="outlined-adornment-weight"
-                placeholder="0.5 kg"
-                value={values.weight}
-                onChange={(e) => handleChange("weight", e.target.value)}
-                inputProps={{
-                  "aria-label": "weight",
-                }}
-              />
-              <label className={cx("errorLabel")}>{error.weight}</label>
-              <label
-                style={{
-                  fontSize: "18px",
-                  paddingLeft: "24px",
-                  fontWeight: "bold",
-                  flex: "none",
-                  lineHeight: "48px",
-                }}
-              >
-                Dịch vụ thêm
-              </label>
-              <TextField
-                fullWidth
-                sx={{ m: 1 }}
-                select
-                id="special_service"
-                defaultValue={"Nhanh"}
-                value={values.special_service}
-                onChange={(newValue) =>
-                  handleChange("special_service", newValue.target.value)
-                }
-                inputProps={{
-                  "aria-label": "special_service",
-                }}
-              >
-                <MenuItem key={"Nhanh"} value={"Nhanh"}>
-                  Nhanh
-                </MenuItem>
-                <MenuItem key={"Hoatoc"} value={"Hoatoc"}>
-                  Hỏa tốc
-                </MenuItem>
-                <MenuItem key={"Tietkiem"} value={"Tietkiem"}>
-                  Tiết kiệm
-                </MenuItem>
-              </TextField>
-              <label className={cx("errorLabel")}>
-                {error.special_service}
-              </label>
+              {/* <label className={cx("errorLabel")}>{error.good_type}</label> */}
               <label
                 style={{
                   fontSize: "18px",
@@ -665,6 +820,7 @@ export function InputAdornments({ fetchData }) {
                 </MenuItem>
               </TextField>
               <label className={cx("errorLabel")}>{error.good_type}</label>
+
               <label
                 style={{
                   fontSize: "18px",
@@ -674,30 +830,72 @@ export function InputAdornments({ fetchData }) {
                   lineHeight: "48px",
                 }}
               >
-                Người thanh toán cước
+                Khối lượng
               </label>
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
-                select
                 id="outlined-adornment-weight"
-                onChange={(e) => {
-                  if (e.target.value == "sender")
-                    handleChange("sender_total_payment", e.target.value);
-                  else handleChange();
-                }}
+                placeholder="500 gram"
+                value={values.weight}
+                onChange={(e) => handleChange("weight", e.target.value)}
                 inputProps={{
                   "aria-label": "weight",
                 }}
-              >
-                <MenuItem key={"sender"} value={"sender"}>
-                  Người gửi
-                </MenuItem>
-                <MenuItem key={"receiver"} value={"receiver"}>
-                  Người nhận
-                </MenuItem>
-              </TextField>
+              />
               <label className={cx("errorLabel")}>{error.weight}</label>
+              <label
+                style={{
+                  fontSize: "18px",
+                  paddingLeft: "24px",
+                  fontWeight: "bold",
+                  flex: "none",
+                  lineHeight: "48px",
+                }}
+              >
+                Gói dịch vụ
+              </label>
+              <Autocomplete
+                sx={{ m: 1, width: "25ch" }}
+                id="outlined-adornment-weight"
+                fullWidth
+                disablePortal
+                options={
+                  province &&
+                  province.map &&
+                  districtIDSender &&
+                  districtIDSender.DistrictID &&
+                  districtIDReceiver &&
+                  districtIDReceiver.DistrictID &&
+                  wardIDReceiver &&
+                  wardIDReceiver.map &&
+                  wardReceiver &&
+                  wardReceiver.map &&
+                  service &&
+                  service.map((value) => value.short_name)
+                }
+                inputProps={{
+                  "aria-label": "special_payment",
+                }}
+                value={service.service_id}
+                getOptionSelected={(option, value) =>
+                  option.service_id === value.service_id
+                }
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    setServiceID(
+                      service.find((item) => item.short_name === newValue)
+                    );
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Các dịch vụ hiện có" />
+                )}
+              />
+              <label className={cx("errorLabel")}>
+                {error.special_service}
+              </label>
+
               <label
                 style={{
                   fontSize: "18px",
@@ -713,17 +911,9 @@ export function InputAdornments({ fetchData }) {
                 fullWidth
                 sx={{ m: 1 }}
                 id="outlined-adornment-weight"
+                value={total_payment}
                 placeholder="Tổng cước"
-                value={
-                  values.sender_total_payment == ""
-                    ? values.sender_total_payment
-                    : values.receiver_total_payment
-                }
-                onChange={(e) => {
-                  if (values.sender_total_payment == "")
-                    handleChange("receiver_total_payment", e.target.value);
-                  else handleChange("sender_total_payment", e.target.value);
-                }}
+                onChange={(e) => {}}
                 // onChange={(e) => {
                 //   setTiencuoc(
                 //     Math.floor(Math.random() * (400 - 50 + 1)) * 100 + 5000
@@ -734,6 +924,63 @@ export function InputAdornments({ fetchData }) {
                 }}
               />
               <label className={cx("errorLabel")}>{error.good_type}</label>
+              <div style={{ display: "flex" }}>
+                <label
+                  style={{
+                    fontSize: "18px",
+                    paddingLeft: "24px",
+                    fontWeight: "bold",
+                    flex: "none",
+                    lineHeight: "48px",
+                  }}
+                >
+                  Tính cước người gửi:
+                </label>
+                <TextField
+                  fullWidth
+                  sx={{ m: 1 }}
+                  id="outlined-adornment-weight"
+                  onChange={(e) => {
+                    handleChange("sender_total_payment", e.target.value);
+                  }}
+                  inputProps={{
+                    "aria-label": "sender_total_payment",
+                  }}
+                ></TextField>
+                <label className={cx("errorLabel")}>
+                  {error.sender_total_payment}
+                </label>
+                <label
+                  style={{
+                    fontSize: "18px",
+                    paddingLeft: "24px",
+                    fontWeight: "bold",
+                    flex: "none",
+                    lineHeight: "48px",
+                  }}
+                >
+                  Tính cước người nhận:
+                </label>
+                <TextField
+                  fullWidth
+                  sx={{ m: 1 }}
+                  id="outlined-adornment-weight"
+                  onChange={(e) => {
+                    handleChange(
+                      "receiver_total_payment",
+                      total_payment
+                        ? total_payment - e.target.value
+                        : e.target.value
+                    );
+                  }}
+                  inputProps={{
+                    "aria-label": "receiver_total_payment",
+                  }}
+                ></TextField>
+                <label className={cx("errorLabel")}>
+                  {error.receiver_total_payment}
+                </label>
+              </div>
             </div>
           </div>
 
