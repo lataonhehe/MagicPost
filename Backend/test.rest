@@ -69,7 +69,7 @@ Content-Type: application/json
 Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "transaction_id": 12
+    "transaction_id": [12]
 }
 
 ### create transaction to receiver
@@ -87,7 +87,7 @@ Content-Type: application/json
 Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "customer_transaction_id": 1
+    "customer_transaction_id": [1]
 }
 
 
@@ -97,7 +97,7 @@ Content-Type: application/json
 Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
 {
-    "customer_transaction_id": 1
+    "customer_transaction_id": [1]
 }
 
 ### statistic failed, completed shipment
@@ -116,7 +116,7 @@ Content-Type: application/json
 Authorization: Token b3219d00ae92b7bfc17cf3fd2321dddcda053b2b
 
 {
-    "transaction_id": 10
+    "transaction_id": [10]
 }
 
 ### create transaction to target consolidation point
@@ -134,7 +134,7 @@ Content-Type: application/json
 Authorization: Token d7e89cd0c62b8b8d901fb6f72fd616772323653a
 
 {
-    "transaction_id": 11
+    "transaction_id": [11]
 }
 
 ### Create transaction to correspond transaction point
