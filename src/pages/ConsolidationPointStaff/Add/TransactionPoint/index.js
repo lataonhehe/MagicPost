@@ -237,7 +237,7 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
-  handleDelete: PropTypes.func.isRequired,
+  handleAccept: PropTypes.func.isRequired,
 };
 
 export default function ConsolStaffAddTransaction() {
@@ -300,16 +300,16 @@ export default function ConsolStaffAddTransaction() {
       );
 
       const data = await response.json();
-      console.log(data)
+      console.log(data);
 
       if (!response.ok) {
-        throw new Error(data.message)
+        throw new Error(data.message);
       }
 
       fetchData();
       setSelected([]);
     } catch (error) {}
-  }
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";

@@ -29,7 +29,11 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import OutlinedInput from "@mui/material/OutlinedInput";
+
 import styles from "./AddNew.module.scss";
+
 import { useLayoutEffect } from "react";
 
 const cx = classNames.bind(styles);
@@ -42,15 +46,17 @@ const ColorButton = styled(Button)(({ theme }) => ({
 }));
 
 export function InputAdornments({ fetchData }) {
-  const [nguoigui, setNguoigui] = useState(true);
   const [values, setValues] = useState({
-    sender_name: "",
     des: "",
+    shipment_name: "",
+    sender_name: "",
     sender_address: "",
+    sender_address_detail: "",
     sender_postal_code: "",
     sender_total_payment: "",
     sender_phone: "",
     receiver_address: "",
+    receiver_address_detail: "",
     receiver_postal_code: "",
     receiver_name: "",
     receiver_phone: "",
@@ -61,13 +67,16 @@ export function InputAdornments({ fetchData }) {
     weight: "",
   });
   const [error, setError] = useState({
-    sender_name: "",
     des: "",
+    shipment_name: "",
+    sender_name: "",
     sender_address: "",
+    sender_address_detail: "",
     sender_postal_code: "",
     sender_total_payment: "",
     sender_phone: "",
     receiver_address: "",
+    receiver_address_detail: "",
     receiver_postal_code: "",
     receiver_name: "",
     receiver_phone: "",
@@ -79,13 +88,16 @@ export function InputAdornments({ fetchData }) {
   });
   const handleResetForm = () => {
     setValues({
-      sender_name: "",
       des: "",
+      shipment_name: "",
+      sender_name: "",
       sender_address: "",
+      sender_address_detail: "",
       sender_postal_code: "",
       sender_total_payment: "",
       sender_phone: "",
       receiver_address: "",
+      receiver_address_detail: "",
       receiver_postal_code: "",
       receiver_name: "",
       receiver_phone: "",
@@ -99,13 +111,16 @@ export function InputAdornments({ fetchData }) {
 
   const handleResetError = () => {
     setError({
-      sender_name: "",
       des: "",
+      shipment_name: "",
+      sender_name: "",
       sender_address: "",
+      sender_address_detail: "",
       sender_postal_code: "",
       sender_total_payment: "",
       sender_phone: "",
       receiver_address: "",
+      receiver_address_detail: "",
       receiver_postal_code: "",
       receiver_name: "",
       receiver_phone: "",
@@ -243,6 +258,7 @@ export function InputAdornments({ fetchData }) {
       console.log("Error to get Service");
     }
   }
+
   async function calculatePayment(
     serviceid,
     districtid,
@@ -253,56 +269,43 @@ export function InputAdornments({ fetchData }) {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
     const token = "ecd6ab5f-a269-11ee-af43-6ead57e9219a";
+    const shopId = 4791893;
+    const headers = {
+      "Content-Type": "application/json",
+      token: token,
+      shop_id: shopId,
+    };
+
+    const data = {
+      service_id: parseInt(serviceid),
+      insurance_value: 500000,
+      coupon: null,
+      from_district_id: parseInt(districtid),
+      to_district_id: parseInt(toDistrictID),
+      to_ward_code: String(wardIDReceiver),
+      height: 30,
+      length: 30,
+      weight: parseInt(weight),
+      width: 25,
+    };
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          token: token,
-          shop_id: 4791893,
-        },
-        body: JSON.stringify({
-          service_id: serviceID.service_id,
-          insurance_value: 500000,
-          coupon: null,
-          from_district_id: districtIDSender.DistrictID,
-          to_district_id: districtIDReceiver.DistrictID,
-          to_ward_code: wardReceiverName.WardCode,
-          height: 30,
-          length: 30,
-          weight: values.weight,
-          width: 25,
-        }),
+        headers: headers,
+        body: JSON.stringify(data),
       });
-      console.log("service:", serviceid);
-      console.log("district sender:", districtid);
-      console.log("district receiver:", toDistrictID);
-      console.log("wardcode:", wardIDReceiver);
-      console.log("weight", weight);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
 
       setTotal_payment((await response.json()).data);
-
-      // Xử lý dữ liệu ở đây
+      // console.log((await response.json()).data);
+      // Xử lý phản hồi thành công từ API
     } catch (error) {
-      console.log("Error to get payment");
+      console.error(error);
+      // Xử lý lỗi
     }
   }
 
   useLayoutEffect(() => {
     fetchDataProvince();
-    // if (provinceIDSender != null)
-    // fetchDataDistrict(provinceIDSender.ProvinceID, setDistrictSender);
-    // if (provinceIDReceiver != null)
-    //   fetchDataDistrict(provinceIDReceiver.ProvinceID, setDistrictReceiver);
-    // if (districtIDReceiver != null && districtIDReceiver.DistrictID)
-    //   fetchDataWard(districtIDReceiver.DistrictID, setWardReceiver);
-    // if (districtIDSender != null && districtIDReceiver.DistrictID != null)
-    //   fetchDataWard(districtIDReceiver.DistrictID, setWardSender);
-    //   fetchDataService();
-    //   canculatePayment();
-    // console.log(ward);
     if (provinceIDSender)
       fetchDataDistrict(provinceIDSender.ProvinceID, setDistrictSender);
     if (provinceIDReceiver)
@@ -322,7 +325,7 @@ export function InputAdornments({ fetchData }) {
       );
     }
     if (
-      serviceID.service_id &&
+      serviceID.service_id !== null &&
       districtIDSender.DistrictID &&
       districtIDReceiver.DistrictID &&
       wardReceiverName.WardCode &&
@@ -335,8 +338,6 @@ export function InputAdornments({ fetchData }) {
         wardReceiverName.WardCode,
         values.weight
       );
-
-      console.log("PAYMENT DAYROI:", total_payment);
     }
   }, [
     provinceIDSender,
@@ -388,26 +389,91 @@ export function InputAdornments({ fetchData }) {
 
   const onButtonClick = () => {
     handleResetError();
-    if (values.name.trim() === "") {
-      handleChangeError("name", "Hãy nhập họ và tên");
+    console.log("des :", values.des);
+    console.log("shipment name:", values.shipment_name);
+    console.log("sender name:", values.sender_name);
+    console.log("sender address:", values.sender_address);
+    console.log("sender_address_detail:", values.sender_address_detail);
+    console.log("sender_total_payment:", values.sender_total_payment);
+    console.log("sender_postal_code:", values.sender_postal_code);
+    console.log("receiver_address :", values.receiver_address);
+    console.log("receiver_address_detail :", values.receiver_address_detail);
+    console.log("receiver_phone:", values.receiver_phone);
+    console.log("receiver_postal_code:", values.receiver_postal_code);
+    console.log("receiver_total_payment:", values.receiver_total_payment);
+    console.log("receiving_date:", values.receiving_date);
+    console.log("good_type:", values.good_type);
+    console.log("special_service:", values.special_service);
+    console.log("weight:", values.weight);
+    handleChange("receiver_postal_code", districtIDReceiver.DistrictID);
+    handleChange("sender_postal_code", districtIDSender.DistrictID);
+    handleChange(
+      "sender_address_detail",
+      `${wardSenderName.WardName} - ${districtIDSender.DistrictName} - ${provinceIDSender.ProvinceName}`
+    );
+    handleChange(
+      "receiver_address_detail",
+      `${wardReceiverName.WardName} - ${districtIDReceiver.DistrictName} - ${provinceIDReceiver.ProvinceName}`
+    );
+    handleChange(
+      "receiver_total_payment",
+      total_payment.total - parseInt(values.sender_total_payment)
+    );
+    const dateString = JSON.stringify(values.receiving_date);
+    const dateTime = new Date(dateString);
+    handleChange("receiving_date", dateTime);
+
+    console.log("total_payment:", total_payment.total);
+    if (values.sender_name === "") {
+      handleChangeError("sender_name", "Hãy nhập họ và tên");
+      return;
+    }
+    if (values.receiver_name === "") {
+      handleChangeError("receiver_name", "Hãy nhập họ và tên");
       return;
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(values.username.trim())) {
-      handleChangeError("name", "Họ và tên không hợp lệ!");
-      return;
-    }
-
-    if (values.password.trim() === "") {
+    if (values.sender_address === "" || districtIDSender.DistrictID === "") {
       handleChangeError("sender_address", "Hãy nhập địa chỉ!");
       return;
     }
-    if (values.password.trim() === "") {
+    if (
+      values.receiver_address === "" ||
+      (districtIDReceiver.DistrictID === "" && wardReceiverName === "")
+    ) {
+      handleChangeError("receiver_address", "Hãy nhập địa chỉ!");
+      return;
+    }
+    if (values.sender_phone === "") {
       handleChangeError("sender_phone", "Hãy nhập số điện thoại!");
       return;
     }
+    if (values.receiver_phone === "") {
+      handleChangeError("receiver_phone", "Hãy nhập số điện thoại!");
+      return;
+    }
+    if (values.shipment_name === "") {
+      handleChangeError("shipement_name", "Hãy nhập tên hàng!");
+      return;
+    }
+    if (values.good_type === "") {
+      handleChangeError("good_type", "Hãy nhập loại hàng!");
+      return;
+    }
+    if (values.weight === "") {
+      handleChangeError("weight", "Hãy nhập khối lượng hàng!");
+      return;
+    }
+    if (values.special_service === "") {
+      handleChangeError("special_service", "Hãy nhập gói dịch vụ!");
+      return;
+    }
+    if (values.sender_total_payment === "") {
+      handleChangeError("sender_total_payment", "Hãy nhập số tiền!");
+      return;
+    }
 
-    handleAddNew();
+    // handleAddNew();
   };
 
   return (
@@ -435,7 +501,7 @@ export function InputAdornments({ fetchData }) {
                 margin: "24px",
               }}
             >
-              <h5 style={{ margin: "auto" }}>Thông tin người gửi</h5>
+              <h4 style={{ margin: "auto" }}>Thông tin người gửi</h4>
               <label
                 style={{
                   fontSize: "18px",
@@ -531,7 +597,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Quận, huyện" />
                 )}
               />
-              <label className={cx("errorLabel")}>{error.sender_address}</label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="outlined-adornment-weight"
@@ -563,7 +628,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Phường, xã" />
                 )}
               />
-              <label className={cx("errorLabel")}>{error.sender_address}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -587,7 +651,7 @@ export function InputAdornments({ fetchData }) {
               />
               <label className={cx("errorLabel")}>{error.sender_phone}</label>
             </div>
-            <Grid item style={{ alignSelf: "center", height: "400px" }}>
+            <Grid item style={{ alignSelf: "center", height: "600px" }}>
               <Divider orientation="vertical" variant="middle" />
             </Grid>
             <div
@@ -598,9 +662,10 @@ export function InputAdornments({ fetchData }) {
                 alignContent: "center",
                 flexDirection: "column",
                 margin: "24px",
+                marginLeft: "60px",
               }}
             >
-              <h5 style={{ margin: "auto" }}>Thông tin người nhận</h5>
+              <h4 style={{ margin: "auto" }}>Thông tin người nhận</h4>
               <label
                 style={{
                   fontSize: "18px",
@@ -663,6 +728,9 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Tỉnh, thành phố" />
                 )}
               />
+              <label className={cx("errorLabel")}>
+                {error.receiver_address}
+              </label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="outlined-adornment-weight"
@@ -694,9 +762,7 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Quận, huyện" />
                 )}
               />
-              <label className={cx("errorLabel")}>
-                {error.receiver_address}
-              </label>
+
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="outlined-adornment-weight"
@@ -728,9 +794,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Phường, xã" />
                 )}
               />
-              <label className={cx("errorLabel")}>
-                {error.receiver_address}
-              </label>
               <label
                 style={{
                   fontSize: "18px",
@@ -766,7 +829,7 @@ export function InputAdornments({ fetchData }) {
                 margin: "24px",
               }}
             >
-              <h5 style={{ margin: "auto" }}>Thông tin đơn hàng</h5>
+              <h4 style={{ margin: "auto" }}>Thông tin đơn hàng</h4>
               <label
                 style={{
                   fontSize: "18px",
@@ -782,13 +845,13 @@ export function InputAdornments({ fetchData }) {
                 fullWidth
                 sx={{ m: 1 }}
                 id="outlined-adornment-weight"
-                value={values.good_type}
-                onChange={(e) => handleChange("good_type", e.target.value)}
+                value={values.shipment_name}
+                onChange={(e) => handleChange("shipment_name", e.target.value)}
                 inputProps={{
-                  "aria-label": "good_type",
+                  "aria-label": "shipment_name",
                 }}
               />
-              {/* <label className={cx("errorLabel")}>{error.good_type}</label> */}
+              <label className={cx("errorLabel")}>{error.shipment_name}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -856,10 +919,10 @@ export function InputAdornments({ fetchData }) {
                 Gói dịch vụ
               </label>
               <Autocomplete
-                sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
                 fullWidth
                 disablePortal
+                sx={{ marginLeft: "8px" }}
+                readOnly={service.length <= 0}
                 options={
                   province &&
                   province.map &&
@@ -872,6 +935,7 @@ export function InputAdornments({ fetchData }) {
                   wardReceiver &&
                   wardReceiver.map &&
                   service &&
+                  service.map &&
                   service.map((value) => value.short_name)
                 }
                 inputProps={{
@@ -882,6 +946,7 @@ export function InputAdornments({ fetchData }) {
                   option.service_id === value.service_id
                 }
                 onChange={(e, newValue) => {
+                  handleChange("special_service", newValue);
                   if (newValue != null) {
                     setServiceID(
                       service.find((item) => item.short_name === newValue)
@@ -895,7 +960,52 @@ export function InputAdornments({ fetchData }) {
               <label className={cx("errorLabel")}>
                 {error.special_service}
               </label>
-
+              <label
+                style={{
+                  fontSize: "18px",
+                  paddingLeft: "24px",
+                  fontWeight: "bold",
+                  flex: "none",
+                  lineHeight: "48px",
+                }}
+              >
+                Điểm giao dịch đích
+              </label>
+              <TextField
+                fullWidth
+                sx={{ m: 1 }}
+                id="outlined-adornment-des"
+                placeholder="Department"
+                value={values.des}
+                onChange={(e) => handleChange("des", e.target.value)}
+                inputProps={{
+                  "aria-label": "des",
+                }}
+              />
+              <label className={cx("errorLabel")}>{error.receiving_date}</label>
+              <label
+                style={{
+                  fontSize: "18px",
+                  paddingLeft: "24px",
+                  fontWeight: "bold",
+                  flex: "none",
+                  lineHeight: "48px",
+                }}
+              >
+                Ngày nhận
+              </label>
+              <TextField
+                fullWidth
+                sx={{ m: 1 }}
+                id="outlined-adornment-weight"
+                placeholder="2023-11-20"
+                value={values.receiving_date}
+                onChange={(e) => handleChange("receiving_date", e.target.value)}
+                inputProps={{
+                  "aria-label": "datetime",
+                }}
+              />
+              <label className={cx("errorLabel")}>{error.receiving_date}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -907,23 +1017,23 @@ export function InputAdornments({ fetchData }) {
               >
                 Tổng cước
               </label>
-              <TextField
+              <OutlinedInput
                 fullWidth
                 sx={{ m: 1 }}
                 id="outlined-adornment-weight"
-                value={total_payment}
+                endAdornment={
+                  <InputAdornment position="end">VND</InputAdornment>
+                }
+                value={
+                  total_payment !== null && total_payment.total >= 0
+                    ? total_payment.total
+                    : 0
+                }
                 placeholder="Tổng cước"
-                onChange={(e) => {}}
-                // onChange={(e) => {
-                //   setTiencuoc(
-                //     Math.floor(Math.random() * (400 - 50 + 1)) * 100 + 5000
-                //   );
-                // }}
                 inputProps={{
                   "aria-label": "total_payment",
                 }}
               />
-              <label className={cx("errorLabel")}>{error.good_type}</label>
               <div style={{ display: "flex" }}>
                 <label
                   style={{
@@ -965,21 +1075,15 @@ export function InputAdornments({ fetchData }) {
                   fullWidth
                   sx={{ m: 1 }}
                   id="outlined-adornment-weight"
-                  onChange={(e) => {
-                    handleChange(
-                      "receiver_total_payment",
-                      total_payment
-                        ? total_payment - e.target.value
-                        : e.target.value
-                    );
-                  }}
+                  value={
+                    total_payment !== null && total_payment.total > 0
+                      ? total_payment.total - values.sender_total_payment
+                      : 0
+                  }
                   inputProps={{
                     "aria-label": "receiver_total_payment",
                   }}
                 ></TextField>
-                <label className={cx("errorLabel")}>
-                  {error.receiver_total_payment}
-                </label>
               </div>
             </div>
           </div>
@@ -1024,7 +1128,7 @@ export default function NewTransaction() {
   }
 
   return (
-    <Box sx={{ width: "80%", margin: "auto" }}>
+    <Box sx={{ width: "85%", margin: "auto" }}>
       <Paper sx={{ width: "100%", mb: 2, marginTop: "48px" }} elevation={5}>
         {/* <Collapse in={true} timeout="auto"> */}
         <InputAdornments handleAddNew={handleAddNew} />
