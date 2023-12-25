@@ -322,17 +322,6 @@ def get_coming_transaction_list(request):
         'consolidation_point': consolidation_point,
         'transaction_point': transaction_point,
     }
-
-    # response_data = {
-    #     'coming_transaction': [
-    #         {
-    #             "shipment_id": x.shipment_id,
-    #             "current_pos": x.pos.call_name(),
-    #             "status": x.status,
-    #             "transaction_id": x.pk
-    #         } for x in transaction_list
-    #     ]
-    # }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -382,20 +371,28 @@ def get_department_shipment_list(request):
 
     # Get shipment in department
     shipment_list = list(Shipment.objects.filter(current_pos=department))
+    print(shipment_list)
     dep_shipment_list = []
     for x in shipment_list:
-        inprogress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
-        if len(inprogress_transaction) > 0:
+        in_progress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
+        if len(in_progress_transaction) > 0:
             continue
         dep_shipment_list.append(x)
+    
+    consolidation_point = []
+    transaction_point = []
+
+    for x in dep_shipment_list:
+        transaction_data = x.to_json()
+
+        if x.des.department_type == '0':
+            transaction_point.append(transaction_data)
+        else:
+            consolidation_point.append(transaction_data)
 
     response_data = {
-        'shipment_list': [
-            {
-                "shipment": x.call_name(),
-                "shipment_id": x.pk
-            } for x in dep_shipment_list
-        ]
+        'consolidation_point': consolidation_point,
+        'transaction_point': transaction_point,
     }
 
     return JsonResponse(response_data, status=status.HTTP_200_OK)
