@@ -137,6 +137,11 @@ Authorization: Token d7e89cd0c62b8b8d901fb6f72fd616772323653a
     "transaction_id": [11]
 }
 
+### get transaction
+GET http://127.0.0.1:8000/Transaction/employee/get_transaction
+Content-Type: application/json
+Authorization: Token d7e89cd0c62b8b8d901fb6f72fd616772323653a
+
 ### Create transaction to correspond transaction point
 POST http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_transaction
 Content-Type: application/json
