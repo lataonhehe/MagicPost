@@ -103,10 +103,10 @@ class Transaction(models.Model):
     
     def to_json(self):
         return {
-            'id': self.transaction_id,
+            'transaction_id': self.transaction_id,
             'shipment_id': self.shipment.pk,
-            'pos': self.pos.pk,
-            'des': self.des.pk,
+            'pos': self.pos.call_name(),
+            'des': self.des.call_name(),
             'status': self.status,
             'created_at': self.created_at
         }

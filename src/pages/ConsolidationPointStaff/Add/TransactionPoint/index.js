@@ -1,29 +1,12 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Checkbox,
-} from "@mui/material";
-import EnhancedTableToolbar from "../EnhancedTableToolbar";
-import {
-  ColorButton,
-  StyledTableRow,
-} from "../../../../components/UI/TableStyles";
-import {
-  descendingComparator,
-  getComparator,
-  stableSort,
-} from "../../../../hooks/TableUtils";
-import EnhancedTableHead from "../EnhancedTableHead";
+import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
+import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
+import { ColorButton } from "~/components/UI/TableStyles";
+import { createCells, viewCells } from "~/components/UI/TableCell";
+import { getComparator, stableSort } from "~/hooks/TableUtils";
+import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
+import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
@@ -44,10 +27,7 @@ export default function ConsolStaffAddTransaction() {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Token");
-      const apiUrl =
-        activeButton === "create"
-          ? "http://127.0.0.1:8000/Transaction/employee/get_shipment_list"
-          : "YOUR_API_URL_FOR_VIEW";
+      const apiUrl = activeButton === "create" ? "http://127.0.0.1:8000/Transaction/employee/get_shipment_list" : "http://127.0.0.1:8000/Transaction/employee/get_transaction";
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -75,11 +55,7 @@ export default function ConsolStaffAddTransaction() {
   const handleAccept = async () => {
     try {
       const token = localStorage.getItem("Token");
-      const apiUrl =
-        activeButton === "create"
-          ? "http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_transaction"
-          : "http://127.0.0.1:8000/Transaction/transaction_employee/get_transaction_department";
-      const response = await fetch(apiUrl, {
+      const response = await fetch("http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_transaction", {
         method: "POST",
         headers: {
           Authorization: `Token ${token}`,
@@ -135,10 +111,7 @@ export default function ConsolStaffAddTransaction() {
     } else if (selectedIndex === selected.length - 1) {
       newSelected = selected.slice(0, -1);
     } else if (selectedIndex > 0) {
-      newSelected = [
-        ...selected.slice(0, selectedIndex),
-        ...selected.slice(selectedIndex + 1),
-      ];
+      newSelected = [...selected.slice(0, selectedIndex), ...selected.slice(selectedIndex + 1)];
     }
 
     setSelected(newSelected);
@@ -160,14 +133,10 @@ export default function ConsolStaffAddTransaction() {
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(() => {
-    return stableSort(rows, getComparator(order, orderBy)).slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage
-    );
+    return stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   return (
@@ -201,13 +170,11 @@ export default function ConsolStaffAddTransaction() {
           <EnhancedTableToolbar
             numSelected={selected.length}
             handleAccept={handleAccept}
+            tableName={activeButton === "create" ? "Tạo đơn hàng tới điểm giao dịch" : "Đơn hàng đã tạo"}
+            tableType={"create"}
           />
           <TableContainer>
-            <Table
-              sx={{ minWidth: 750 }}
-              aria-labelledby="tableTitle"
-              size={dense ? "small" : "medium"}
-            >
+            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -215,85 +182,17 @@ export default function ConsolStaffAddTransaction() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
+                hasCheckbox={activeButton === "create" ? true : false}
+                headCells={activeButton === "create" ? createCells : viewCells}
               />
-              <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isItemSelected = isSelected(row.shipment_id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
-                  return (
-                    <StyledTableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.shipment_id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.shipment_id}
-                      selected={isItemSelected}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{ fontSize: "16px", padding: "20px" }}
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                      >
-                        {row.shipment_id}
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{ fontSize: "16px", padding: "20px" }}
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                      >
-                        {row.type}
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        padding="none"
-                        sx={{ fontSize: "16px", padding: "20px" }}
-                      >
-                        {row.current_pos}
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        padding="none"
-                        sx={{ fontSize: "16px", padding: "20px" }}
-                      >
-                        {row.des}
-                      </TableCell>
-                      <TableCell
-                        align="right"
-                        padding="none"
-                        sx={{ fontSize: "16px", padding: "20px" }}
-                      >
-                        {row.status}
-                      </TableCell>
-                    </StyledTableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: 75 * emptyRows,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
+              <EnhancedTableBody
+                visibleRows={visibleRows}
+                isSelected={isSelected}
+                handleClick={handleClick}
+                emptyRows={emptyRows}
+                hasCheckbox={activeButton === "create" ? true : false}
+                headCells={activeButton === "create" ? createCells : viewCells}
+              />
             </Table>
           </TableContainer>
           <TablePagination
