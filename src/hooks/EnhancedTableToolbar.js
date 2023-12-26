@@ -45,7 +45,7 @@ function EnhancedTableToolbar({ numSelected, handleAccept, tableName, tableType 
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
-  handleAccept: PropTypes.func.isRequired,
+  // handleAccept: PropTypes.func.isRequired,
   tableName: PropTypes.string.isRequired,
   tableType: PropTypes.string.isRequired,
 };

@@ -655,9 +655,9 @@ def list_shipment(request):
     pending_shipment = [x for x in list(Shipment.objects.all()) if x.current_pos == department and x not in sending_shipment]
 
     response_data = {
-        'coming_shipment': [x.to_json('incoming') for x in coming_shipment], 
-        'outgoing_shipment': [x.to_json('outgoing') for x in sending_shipment],
-        'pending_shipment': [x.to_json('pending') for x in pending_shipment]
+        'coming_shipment': [x.to_json() for x in coming_shipment], 
+        'outgoing_shipment': [x.to_json() for x in sending_shipment],
+        'pending_shipment': [x.to_json() for x in pending_shipment]
     }
     return JsonResponse (
         response_data,
