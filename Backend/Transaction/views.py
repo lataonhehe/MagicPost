@@ -131,6 +131,7 @@ def confirm_shipment_from_correspond_consolidation_department(request):
     # Check transaction exist
     try:
         transaction_list = []
+        print(data)
         for id in data['transaction_id']:
             transaction_list.append(Transaction.objects.get(transaction_id=id))
     except Exception:
@@ -307,12 +308,7 @@ def get_coming_transaction_list(request):
     transaction_point = []
 
     for x in transaction_list:
-        transaction_data = {
-            "shipment_id": x.shipment_id,
-            "current_pos": x.pos.call_name(),
-            "status": x.status,
-            "transaction_id": x.pk
-        }
+        transaction_data = x.to_json()
 
         if x.pos.department_type == '0':
             transaction_point.append(transaction_data)

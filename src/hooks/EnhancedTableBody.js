@@ -7,17 +7,17 @@ const EnhancedTableBody = ({ visibleRows, isSelected, handleClick, emptyRows, he
   return (
     <TableBody>
       {visibleRows.map((row, index) => {
-        const isItemSelected = isSelected(row.shipment_id);
+        const isItemSelected = isSelected(row.id);
         const labelId = `enhanced-table-checkbox-${index}`;
 
         return (
           <StyledTableRow
             hover
-            onClick={(event) => handleClick(event, row.shipment_id)}
+            onClick={(event) => handleClick(event, row.id)}
             role="checkbox"
             aria-checked={isItemSelected}
             tabIndex={-1}
-            key={row.shipment_id}
+            key={row.id}
             selected={isItemSelected}
             sx={{ cursor: "pointer" }}
           >

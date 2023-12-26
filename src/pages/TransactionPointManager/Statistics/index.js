@@ -19,8 +19,17 @@ export default function TransManagerStatics() {
   const [rows, setRows] = useState([]);
   const [activeButton, setActiveButton] = useState("sent");
 
-  const updateRows = (newRows) => {
-    setRows(newRows);
+  const updateRows = (data) => {
+    //Change id to key id
+    if (Array.isArray(data)) {
+      const updatedData = data.map((point) => {
+        return { ...point, id: point.shipment_id };
+      });
+      
+      setRows(updatedData)
+    } else {
+      console.error("Invalid data:", data);
+    }
   };
 
   const fetchData = async () => {

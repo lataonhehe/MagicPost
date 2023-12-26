@@ -16,8 +16,17 @@ export default function ConsolStaffAddTransaction() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
 
-  const updateRows = (newRows) => {
-    setRows(newRows);
+  const updateRows = (data) => {
+    //Change id to key id
+    if (Array.isArray(data)) {
+      const updatedData = data.map((point) => {
+        return { ...point, id: point.transaction_id };
+      });
+      
+      setRows(updatedData)
+    } else {
+      console.error("Invalid data:", data);
+    }
   };
 
   const fetchData = async () => {

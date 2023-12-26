@@ -53,11 +53,15 @@ export const viewCells = [
 
 export const confirmCells = [
   {
+    id: "created_at",
+    label: "Thời gian"
+  },
+  {
     id: "shipment_id",
     label: "Mã đơn hàng",
   },
   {
-    id: "current_pos",
+    id: "pos",
     label: "Nơi gửi",
   },
   {
