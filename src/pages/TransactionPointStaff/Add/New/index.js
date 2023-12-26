@@ -131,7 +131,7 @@ export function InputAdornments({ fetchData }) {
       weight: "",
     });
   };
-
+  const [department, setDepartment] = useState([]);
   const [province, setProvince] = useState([]);
   const [districtSender, setDistrictSender] = useState([]);
   const [districtReceiver, setDistrictReceiver] = useState([]);
@@ -144,9 +144,77 @@ export function InputAdornments({ fetchData }) {
   const [districtIDSender, setDistrictIDSender] = useState([]);
   const [provinceIDReceiver, setProvinceIDReceiver] = useState([]);
   const [districtIDReceiver, setDistrictIDReceiver] = useState([]);
-  const [wardIDReceiver, setWardIDReceiver] = useState([]);
   const [serviceID, setServiceID] = useState([]);
   const [total_payment, setTotal_payment] = useState([]);
+  const [departmentID, setDepartmentID] = useState([]);
+
+  const newShipment = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      const addResponse = await fetch(
+        "http://127.0.0.1:8000/Transaction/create_shipment",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            des: values.des,
+            shipment_name: values.shipment_name,
+            sender_name: values.sender_name,
+            sender_address: values.sender_address,
+            sender_address_detail: values.sender_address_detail,
+            sender_postal_code: values.sender_postal_code,
+            sender_total_payment: values.sender_total_payment,
+            sender_phone: values.sender_phone,
+            receiver_address: values.receiver_address,
+            receiver_address_detail: values.receiver_address_detail,
+            receiver_postal_code: values.receiver_postal_code,
+            receiver_name: values.receiver_name,
+            receiver_phone: values.receiver_phone,
+            receiver_total_payment: values.receiver_total_payment,
+            receiving_date: values.receiving_date,
+            good_type: values.good_type,
+            special_service: values.special_service,
+            weight: values.weight,
+          }),
+        }
+      );
+      if (!addResponse.ok) {
+        window.alert("Thông tin không hợp lệ!");
+        console.log("response data:", addResponse);
+        throw new Error(addResponse);
+      }
+    } catch (error) {
+      console.error("Error add new shipment:", error.message);
+    }
+  };
+
+  const fetchDepartmentData = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/Transaction/transaction_employee/get_transaction_department`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setDepartment(data.transaction_department_list);
+    } catch (error) {
+      console.error("Error get department data:", error.message);
+    }
+  };
+
   async function fetchDataProvince() {
     const url =
       "https://online-gateway.ghn.vn/shiip/public-api/master-data/province";
@@ -305,6 +373,7 @@ export function InputAdornments({ fetchData }) {
   }
 
   useLayoutEffect(() => {
+    fetchDepartmentData();
     fetchDataProvince();
     if (provinceIDSender)
       fetchDataDistrict(provinceIDSender.ProvinceID, setDistrictSender);
@@ -317,7 +386,7 @@ export function InputAdornments({ fetchData }) {
     if (
       districtIDSender.DistrictID &&
       districtIDReceiver.DistrictID &&
-      wardIDReceiver
+      wardReceiverName
     ) {
       fetchDataService(
         districtIDSender.DistrictID,
@@ -362,31 +431,6 @@ export function InputAdornments({ fetchData }) {
     }));
   };
 
-  const handleAddNew = async () => {
-    try {
-      const token = localStorage.getItem("Token");
-      const addResponse = await fetch(
-        "http://127.0.0.1:8000/Account/register",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: values.username,
-            password: values.password,
-          }),
-        }
-      );
-      fetchData();
-      if (!addResponse.ok) {
-        window.alert("Thông tin không hợp lệ!");
-        throw new Error("Add new shipment request failed");
-      }
-    } catch (error) {}
-  };
-
   const onButtonClick = () => {
     handleResetError();
     console.log("des :", values.des);
@@ -396,6 +440,7 @@ export function InputAdornments({ fetchData }) {
     console.log("sender_address_detail:", values.sender_address_detail);
     console.log("sender_total_payment:", values.sender_total_payment);
     console.log("sender_postal_code:", values.sender_postal_code);
+    console.log("receiver_name:", values.receiver_name);
     console.log("receiver_address :", values.receiver_address);
     console.log("receiver_address_detail :", values.receiver_address_detail);
     console.log("receiver_phone:", values.receiver_phone);
@@ -407,6 +452,7 @@ export function InputAdornments({ fetchData }) {
     console.log("weight:", values.weight);
     handleChange("receiver_postal_code", districtIDReceiver.DistrictID);
     handleChange("sender_postal_code", districtIDSender.DistrictID);
+    handleChange("des", departmentID.id);
     handleChange(
       "sender_address_detail",
       `${wardSenderName.WardName} - ${districtIDSender.DistrictName} - ${provinceIDSender.ProvinceName}`
@@ -417,19 +463,15 @@ export function InputAdornments({ fetchData }) {
     );
     handleChange(
       "receiver_total_payment",
-      total_payment.total - parseInt(values.sender_total_payment)
+      parseInt(total_payment.total) - parseInt(values.sender_total_payment)
     );
-    const dateString = JSON.stringify(values.receiving_date);
-    const dateTime = new Date(dateString);
-    handleChange("receiving_date", dateTime);
-
     console.log("total_payment:", total_payment.total);
     if (values.sender_name === "") {
-      handleChangeError("sender_name", "Hãy nhập họ và tên");
+      handleChangeError("sender_name", "Hãy nhập họ và tên!");
       return;
     }
     if (values.receiver_name === "") {
-      handleChangeError("receiver_name", "Hãy nhập họ và tên");
+      handleChangeError("receiver_name", "Hãy nhập họ và tên!");
       return;
     }
 
@@ -473,7 +515,7 @@ export function InputAdornments({ fetchData }) {
       return;
     }
 
-    // handleAddNew();
+    newShipment();
   };
 
   return (
@@ -875,10 +917,10 @@ export function InputAdornments({ fetchData }) {
                   "aria-label": "good_type",
                 }}
               >
-                <MenuItem key={"hanghoa"} value={"hanghoa"}>
+                <MenuItem key={"hanghoa"} value={"HH"}>
                   Hàng hóa
                 </MenuItem>
-                <MenuItem key={"tailieu"} value={"tailieu"}>
+                <MenuItem key={"tailieu"} value={"TL"}>
                   Tài liệu
                 </MenuItem>
               </TextField>
@@ -895,13 +937,16 @@ export function InputAdornments({ fetchData }) {
               >
                 Khối lượng
               </label>
-              <TextField
+              <OutlinedInput
                 fullWidth
                 sx={{ m: 1 }}
                 id="outlined-adornment-weight"
                 placeholder="500 gram"
                 value={values.weight}
                 onChange={(e) => handleChange("weight", e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">gram</InputAdornment>
+                }
                 inputProps={{
                   "aria-label": "weight",
                 }}
@@ -930,8 +975,6 @@ export function InputAdornments({ fetchData }) {
                   districtIDSender.DistrictID &&
                   districtIDReceiver &&
                   districtIDReceiver.DistrictID &&
-                  wardIDReceiver &&
-                  wardIDReceiver.map &&
                   wardReceiver &&
                   wardReceiver.map &&
                   service &&
@@ -971,18 +1014,36 @@ export function InputAdornments({ fetchData }) {
               >
                 Điểm giao dịch đích
               </label>
-              <TextField
+              <Autocomplete
                 fullWidth
-                sx={{ m: 1 }}
-                id="outlined-adornment-des"
-                placeholder="Department"
-                value={values.des}
-                onChange={(e) => handleChange("des", e.target.value)}
+                disablePortal
+                sx={{ marginLeft: "8px" }}
+                readOnly={department.length <= 0}
+                options={
+                  department &&
+                  department.map &&
+                  department.map((value) => value.name)
+                }
                 inputProps={{
                   "aria-label": "des",
                 }}
+                value={department.id}
+                getOptionSelected={(option, value) => option.id === value.id}
+                onChange={(e, newValue) => {
+                  if (newValue != null) {
+                    handleChange("des", newValue);
+                    setDepartmentID(
+                      department.find((item) => item.name === newValue)
+                    );
+                    console.log("departmentID:", departmentID);
+                    console.log("des:", values.des);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Department" />
+                )}
               />
-              <label className={cx("errorLabel")}>{error.receiving_date}</label>
+              <label className={cx("errorLabel")}>{error.des}</label>
               <label
                 style={{
                   fontSize: "18px",

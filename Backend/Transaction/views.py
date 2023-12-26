@@ -28,6 +28,7 @@ def create_shipment(request):
     """
     Create shipment for customer from Transaction Department
     """
+    print(request.data)
     #Create postion and current position for shipment
     pos = request.user.department.pk
     request.data['pos'] = pos

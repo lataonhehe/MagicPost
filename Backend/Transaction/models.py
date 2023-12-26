@@ -45,7 +45,7 @@ class Shipment(models.Model):
 
     good_type = models.CharField(max_length=8, choices=good_type_list, default='HH')
     special_service = models.CharField(max_length=50, default=None, null=True, blank=True)
-    weight = models.DecimalField(max_digits=4, decimal_places=2, default=None, null=True)
+    weight = models.DecimalField(max_digits=10, decimal_places=2, default=None, null=True)
 
     def __str__(self):
         return f"{self.shipment_id} - {self.status}"
