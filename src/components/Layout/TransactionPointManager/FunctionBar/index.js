@@ -20,9 +20,9 @@ function FunctionBar() {
   };
   return (
     <Box className={cx("wrapper")} sx={{ boxShadow: 1 }} p={2}>
-      <h2 style={{ paddingLeft: "16px", lineHeight: "48px" }}>
+      <h3 style={{ margin: "auto", paddingLeft: "24px", lineHeight: "64px" }}>
         Trưởng Điểm Giao Dịch
-      </h2>
+      </h3>
       <Divider />
       <List>
         <ListItemButton

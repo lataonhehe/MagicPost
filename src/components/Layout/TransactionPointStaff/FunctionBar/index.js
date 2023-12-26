@@ -86,7 +86,6 @@ function FunctionBar() {
     setOpen3(false);
     setOpen4(false);
     setOpen5(false);
-    setOpen9(false);
     setOpen7(false);
   };
   const checkPath = () => {
@@ -116,7 +115,12 @@ function FunctionBar() {
 
   return (
     <Box className={cx("wrapper")} sx={{ boxShadow: 1 }} p={2}>
-      <h3 style={{ paddingLeft: "16px" }}>Nhân Viên Giao Dịch</h3>
+      <h3 style={{ margin: "auto", paddingLeft: "48px", lineHeight: "64px" }}>
+        Nhân Viên
+      </h3>
+      <h3 style={{ margin: "auto", paddingLeft: "48px", lineHeight: "64px" }}>
+        Giao dịch
+      </h3>
       <Divider />
       <List>
         <ListItem>
