@@ -1,5 +1,12 @@
+import GetData from "~/components/GetData";
+
 function Home() {
-    return (<h2>Home</h2>);
+  return (
+    <h2>
+      Home
+      <GetData />
+    </h2>
+  );
 }
 
 export default Home;

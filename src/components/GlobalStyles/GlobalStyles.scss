@@ -14,7 +14,7 @@
 }
 
 html {
-  font-size: 62.5%;
+  font-size: 92.5%;
 }
 
 body {
@@ -41,5 +41,20 @@ body {
 }
 
 .MuiInputBase-input {
+  font-size: medium !important;
+}
+.MuiButtonBase-root {
+  font-size: medium !important;
+}
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  margin-top: 12px;
+}
+
+.MuiAutocomplete-popper,
+.MuiAutocomplete-popperDisablePortal {
+  font-size: medium !important;
+}
+
+.MuiPopper-root {
   font-size: medium !important;
 }

@@ -20,6 +20,7 @@ class Shipment(models.Model):
     ]
 
     shipment_id = models.AutoField(primary_key=True)
+    shipment_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
     pos = models.ForeignKey(Department, related_name='shipment_pos', on_delete=models.CASCADE)
     current_pos = models.ForeignKey(Department, related_name='shipment_current_pos', on_delete=models.CASCADE)
@@ -27,12 +28,14 @@ class Shipment(models.Model):
     #sender info
     sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     sender_address = models.CharField(max_length=100, default=None, null=True)
+    sender_address_detail = models.CharField(max_length=100, default=None, null=True)
     sender_postal_code = models.CharField(max_length=10, default=None, null=True)
     sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
     sender_phone = models.CharField(max_length=15, default=None, null=True, blank=True)
     sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     #receiver info
     receiver_address = models.CharField(max_length=100, default=None, null=True)
+    receiver_address_detail = models.CharField(max_length=100, default=None, null=True)
     receiver_postal_code = models.CharField(max_length=10, default=None, null=True)
     receiver_name = models.CharField(max_length=30, default=None, null=True)
     receiver_phone = models.CharField(max_length=15, default=None, null=True)
@@ -42,7 +45,7 @@ class Shipment(models.Model):
 
     good_type = models.CharField(max_length=8, choices=good_type_list, default='HH')
     special_service = models.CharField(max_length=50, default=None, null=True, blank=True)
-    weight = models.DecimalField(max_digits=4, decimal_places=2, default=None, null=True)
+    weight = models.DecimalField(max_digits=10, decimal_places=2, default=None, null=True)
 
     def __str__(self):
         return f"{self.shipment_id} - {self.status}"
@@ -100,10 +103,10 @@ class Transaction(models.Model):
     
     def to_json(self):
         return {
-            'id': self.transaction_id,
+            'transaction_id': self.transaction_id,
             'shipment_id': self.shipment.pk,
-            'pos': self.pos.pk,
-            'des': self.des.pk,
+            'pos': self.pos.call_name(),
+            'des': self.des.call_name(),
             'status': self.status,
             'created_at': self.created_at
         }
