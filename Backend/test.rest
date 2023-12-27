@@ -18,7 +18,7 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/login
 Content-Type: application/json
 
-{"username": "employee82", "password": "123456"}
+{"username": "employee46", "password": "123456"}
 
 ### Logout
 
@@ -108,6 +108,15 @@ GET http://127.0.0.1:8000/Transaction/transaction_employee/list_complete_and_fai
 Content-Type: application/json
 Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
+### get transaction department
+GET http://127.0.0.1:8000/Transaction/transaction_employee/get_transaction_department
+Content-Type: application/json
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
+
+### get customer transaction
+GET http://127.0.0.1:8000/Transaction/transaction_employee/get_customer_transaction
+Content-Type: application/json
+Authorization: Token 7446f5bade104c252cd93feb3b16e5be4a8bc5b0
 
 # ----------------------------------------------------------------------------------------------------
 # NHÂN VIÊN TẬP KẾT

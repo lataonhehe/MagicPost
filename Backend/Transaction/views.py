@@ -406,7 +406,30 @@ def get_department_shipment_list(request):
 
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsTransactionEmployee])
+def get_customer_transaction(request):
+    user_department = request.user.department
 
+    inprogress_transaction = list(
+        CustomerTransaction.objects.filter(
+            shipment__current_pos=user_department,
+            shipment__des=user_department,
+            status='In Progress'
+        )
+    )
+
+    response_data = {
+        'inprogress_customer_transaction_list': [
+            x.to_json() for x in inprogress_transaction
+        ]
+    }
+
+    return JsonResponse(
+        response_data,
+        status=status.HTTP_200_OK
+    )
 
 
 
