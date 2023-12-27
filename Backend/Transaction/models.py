@@ -137,6 +137,13 @@ class CustomerTransaction(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
     created_at = models.DateTimeField(default=timezone.now)
 
+    def to_json(self):
+        return {
+            'shipment': self.shipment.to_json(),
+            'status': self.status,
+            'created_at': self.created_at
+        }
+
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=CustomerTransaction)
