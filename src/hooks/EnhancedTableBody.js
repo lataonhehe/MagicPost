@@ -33,7 +33,7 @@ const EnhancedTableBody = ({ visibleRows, isSelected, handleClick, emptyRows, he
               </TableCell>
             )}
             {headCells.map((headCell) => (
-              <TableCell key={headCell.id} align="right" sx={{ fontSize: "16px", padding: "20px" }} component="th" id={labelId} scope="row" padding="none">
+              <TableCell key={headCell.id} align="center" sx={{ fontSize: "16px", paddingY: "20px" }} component="th" id={labelId} scope="row" padding="none">
                 {row[headCell.id]}
               </TableCell>
             ))}

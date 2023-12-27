@@ -104,3 +104,41 @@ export const statisticCells = [
     label: "Khối lượng",
   },
 ];
+
+export const userCells = [
+  // {
+  //   id: "id",
+  //   label: "ID",
+  // },
+  {
+    id: "username",
+    label: "Username",
+  },
+  {
+    id: "department",
+    label: "Cơ quan",
+  },
+  {
+    id: "role",
+    label: "Chức vụ",
+  },
+];
+
+export const departmentCells = [
+  {
+    id: "department_id",
+    label: "ID",
+  },
+  {
+    id: "manager",
+    label: "Quản lý",
+  },
+  {
+    id: "department_type_name",
+    label: "Loại "
+  },
+  {
+    id: "consolidation_point",
+    label: "Điểm tập kết tương ứng"
+  }
+]

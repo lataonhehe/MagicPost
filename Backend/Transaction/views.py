@@ -737,15 +737,16 @@ def shipment_statistic(request):
 
     for x in pending_shipment:
         department_name = x.current_pos.call_name()
-        response_data[department_name]['pending_shipment'].append(x.to_json(''))
+        response_data[department_name]['pending_shipment'].append(x.to_json())
 
     for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):
         des = trans.des.call_name()
         pos = trans.pos.call_name()
-        data = _shipment.to_json('')
+        data = _shipment.to_json()
         response_data[pos]['sending_shipment'].append(data)
         response_data[des]['coming_shipment'].append(data)
 
+    print(response_data)
     return JsonResponse(
         response_data, 
         status=status.HTTP_200_OK

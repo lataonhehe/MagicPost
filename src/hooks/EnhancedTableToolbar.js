@@ -6,7 +6,9 @@ import { alpha } from "@mui/material/styles";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
 function EnhancedTableToolbar({ numSelected, handleAccept, tableName, tableType }) {
-  const type = tableType === "create" ? "tạo" : "xóa";
+  let type = "tạo";
+  if(tableType === "delete") type = "xóa";
+  if(tableType === "confirm") type = "chọn";
 
   return (
     <Toolbar

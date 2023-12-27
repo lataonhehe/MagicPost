@@ -14,13 +14,16 @@ class Department(models.Model):
     consolidation_point = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)    
 
     def call_name(self):
-        return f"Deparment{self.department_id}"
+        name = "Điểm giao dịch" if self.department_type == '0' else "Điểm tập kết"
+        return f"{name} {self.department_id}"
+
     
     def to_json(self):
         return {
             'department_id': self.department_id,
             'manager': self.manager.call_name(),
             'department_type': self.department_type,
+            'department_type_name': "Điểm giao dịch" if self.department_type == '0' else "Điểm tập kết",
             'consolidation_point': self.consolidation_point.call_name() \
                                     if self.consolidation_point is not None else None,
         }
@@ -90,6 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def to_json(self):
         return {
             'username': self.username,
-            'password': self.password,
             'department': self.department.call_name(),
+            'role': self.get_role_display(),
+            'id': self.pk,            
         }

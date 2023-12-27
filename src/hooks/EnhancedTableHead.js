@@ -31,7 +31,7 @@ const EnhancedTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowC
           </TableCell>
         )}
         {headCells.map((headCell) => (
-          <StyledTableHeadCell key={headCell.id} align="right" padding="normal" sortDirection={orderBy === headCell.id ? order : false}>
+          <StyledTableHeadCell key={headCell.id} align="center" padding="20px" sortDirection={orderBy === headCell.id ? order : false}>
             <StyledTableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : "asc"} onClick={createSortHandler(headCell.id)}>
               {headCell.label}
               {orderBy === headCell.id ? (

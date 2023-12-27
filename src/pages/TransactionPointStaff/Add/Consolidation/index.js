@@ -2,13 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
 import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
-import { ColorButton } from "~/components/UI/TableStyles";
-import { createCells, viewCells } from "~/components/UI/TableCell";
+import { createCells} from "~/components/UI/TableCell";
 import { getComparator, stableSort } from "~/hooks/TableUtils";
 import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
 import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import ListAltIcon from "@mui/icons-material/ListAlt";
 
 function TransStaffAddConsol() {
   const [order, setOrder] = useState("asc");
@@ -18,6 +15,13 @@ function TransStaffAddConsol() {
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
+  //import cell from tableCell in components
+  const cells = createCells;
+  const hasCheckbox = true;
+  const tableName = "Tạo đơn hàng tới điểm tập kết";
+  //table type is create, delete or confirm
+  const tableType = "create";
+
 
   const updateRows = (data) => {
     //Change id to key id
@@ -147,8 +151,8 @@ function TransStaffAddConsol() {
           <EnhancedTableToolbar
             numSelected={selected.length}
             handleAccept={handleAccept}
-            tableName={"Tạo đơn hàng tới điểm tập kết"}
-            tableType={"create"}
+            tableName={tableName}
+            tableType={tableType}
           />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
@@ -159,16 +163,16 @@ function TransStaffAddConsol() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
-                hasCheckbox={true}
-                headCells={createCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
               <EnhancedTableBody
                 visibleRows={visibleRows}
                 isSelected={isSelected}
                 handleClick={handleClick}
                 emptyRows={emptyRows}
-                hasCheckbox={true}
-                headCells={createCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
             </Table>
           </TableContainer>

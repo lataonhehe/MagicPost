@@ -19,6 +19,11 @@ export default function TransManagerStatics() {
   const [rows, setRows] = useState([]);
   const [activeButton, setActiveButton] = useState("sent");
 
+  //import cell from tableCell in components
+  const cells = statisticCells;
+  const hasCheckbox = false;
+  const tableName = "Thống kê";
+
   const updateRows = (data) => {
     //Change id to key id
     if (Array.isArray(data)) {
@@ -162,7 +167,7 @@ export default function TransManagerStatics() {
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
           <EnhancedTableToolbar
             numSelected={selected.length}
-            tableName={"Thống kê"}
+            tableName={tableName}
             tableType={"view"}
           />
           <TableContainer>
@@ -174,16 +179,16 @@ export default function TransManagerStatics() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
-                hasCheckbox={false}
-                headCells={statisticCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
               <EnhancedTableBody
                 visibleRows={visibleRows}
                 isSelected={isSelected}
                 handleClick={handleClick}
                 emptyRows={emptyRows}
-                hasCheckbox={false}
-                headCells={statisticCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
             </Table>
           </TableContainer>

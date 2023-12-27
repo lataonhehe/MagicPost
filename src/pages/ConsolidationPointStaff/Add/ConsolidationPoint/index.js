@@ -152,9 +152,8 @@ export default function ConsolStaffAddTransaction() {
           startIcon={<AddBoxIcon />}
           variant="contained"
           sx={{
-            fontSize: "18px",
-            margin: "32px",
-            backgroundColor: activeButton === "create" ? "#4caf50" : "#2196f3",
+            fontSize: "18px", marginTop: "30px", 
+            backgroundColor: activeButton === "create" ? "#2196f3" : "#ffffff",
           }}
           onClick={() => handleButtonClick("create")}
         >
@@ -164,15 +163,14 @@ export default function ConsolStaffAddTransaction() {
           startIcon={<ListAltIcon />}
           variant="contained"
           sx={{
-            fontSize: "18px",
-            margin: "32px",
-            backgroundColor: activeButton === "view" ? "#4caf50" : "#2196f3",
+            fontSize: "18px",  marginTop: "30px",
+            backgroundColor: activeButton === "view" ? "#2196f3" : "#ffffff",
           }}
           onClick={() => handleButtonClick("view")}
         >
           Đơn đã tạo
         </ColorButton>
-        <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
+        <Paper sx={{ width: "100%", mb: 2,}} elevation={3}>
           <EnhancedTableToolbar
             numSelected={selected.length}
             handleAccept={handleAccept}

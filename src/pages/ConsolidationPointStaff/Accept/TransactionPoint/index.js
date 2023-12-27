@@ -16,6 +16,13 @@ export default function ConsolStaffAddTransaction() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
 
+  //import cell from tableCell in components
+  const cells = confirmCells;
+  const hasCheckbox = true;
+  const tableName = "Xác nhận đơn hàng";
+  //table type is create, delete or confirm
+  const tableType = "confirm";
+
   const updateRows = (data) => {
     //Change id to key id
     if (Array.isArray(data)) {
@@ -138,7 +145,7 @@ export default function ConsolStaffAddTransaction() {
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={"Xác nhận đơn hàng"} tableType={"create"} />
+        <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead
@@ -148,10 +155,10 @@ export default function ConsolStaffAddTransaction() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
-                hasCheckbox={"create"}
-                headCells={confirmCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
-              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={"create"} headCells={confirmCells} />
+              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={hasCheckbox} headCells={cells} />
             </Table>
           </TableContainer>
           <TablePagination

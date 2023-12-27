@@ -19,6 +19,13 @@ function TransStaffStatistics() {
   const [rows, setRows] = useState([]);
   const [activeButton, setActiveButton] = useState("sent");
 
+  //import cell from tableCell in components
+  const cells = statisticCells;
+  const hasCheckbox = false;
+  const tableName = "Thống kê";
+  //table type is create, delete or confirm
+  const tableType = "confirm";
+
   const updateRows = (data) => {
     //Change id to key id
     if (Array.isArray(data)) {
@@ -60,13 +67,10 @@ function TransStaffStatistics() {
 
   useEffect(() => {
     fetchData();
-  }, []); // Run once when the component mounts
+  }, [activeButton]); // Run once when the component mounts
 
   const handleButtonClick = (buttonType) => {
     setActiveButton(buttonType);
-    console.log(activeButton);
-    updateRows([]);
-    fetchData();
   };
 
   const handleRequestSort = (event, property) => {
@@ -165,8 +169,8 @@ function TransStaffStatistics() {
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
           <EnhancedTableToolbar
             numSelected={selected.length}
-            tableName={"Thống kê"}
-            tableType={"view"}
+            tableName={tableName}
+            tableType={tableType}
           />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
@@ -177,16 +181,16 @@ function TransStaffStatistics() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
-                hasCheckbox={false}
-                headCells={statisticCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
               <EnhancedTableBody
                 visibleRows={visibleRows}
                 isSelected={isSelected}
                 handleClick={handleClick}
                 emptyRows={emptyRows}
-                hasCheckbox={false}
-                headCells={statisticCells}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
               />
             </Table>
           </TableContainer>
