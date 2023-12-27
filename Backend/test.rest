@@ -105,6 +105,11 @@ GET http://127.0.0.1:8000/Transaction/transaction_employee/list_complete_and_fai
 Content-Type: application/json
 Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
 
+### get transaction department
+GET http://127.0.0.1:8000/Transaction/transaction_employee/get_transaction_department
+Content-Type: application/json
+Authorization: Token 5fcef48720e0fafae95818d05c7c38d16761b471
+
 
 # ----------------------------------------------------------------------------------------------------
 # NHÂN VIÊN TẬP KẾT
