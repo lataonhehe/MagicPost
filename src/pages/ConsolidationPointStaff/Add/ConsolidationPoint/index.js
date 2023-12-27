@@ -59,7 +59,7 @@ export default function ConsolStaffAddTransaction() {
 
   useEffect(() => {
     fetchData();
-  }, []); // Run once when the component mounts
+  }, [activeButton]); // Run once when the component mounts
 
   const handleAccept = async () => {
     try {
@@ -89,9 +89,6 @@ export default function ConsolStaffAddTransaction() {
 
   const handleButtonClick = (buttonType) => {
     setActiveButton(buttonType);
-    console.log(activeButton);
-    updateRows([]);
-    fetchData();
   };
 
   const handleRequestSort = (event, property) => {

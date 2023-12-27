@@ -60,13 +60,10 @@ export default function TransManagerStatics() {
 
   useEffect(() => {
     fetchData();
-  }, []); // Run once when the component mounts
+  }, [activeButton]); // Run once when the component mounts
 
   const handleButtonClick = (buttonType) => {
     setActiveButton(buttonType);
-    console.log(activeButton);
-    updateRows([]);
-    fetchData();
   };
 
   const handleRequestSort = (event, property) => {
