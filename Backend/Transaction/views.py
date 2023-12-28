@@ -181,32 +181,33 @@ def create_transaction_to_receiver(request):
 
     data = request.data
 
-    # Check shipment
-    try:
-        shipment = Shipment.objects.get(shipment_id=data['shipment_id'])
-    except Exception:
-        response_data = {'message': 'Shipment does not exist.'}
-        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+    for x in data['shipment_id']:
+        # Check shipment
+        try:
+            shipment = Shipment.objects.get(shipment_id=x)
+        except Exception:
+            response_data = {'message': 'Shipment does not exist.'}
+            return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
 
-    # Check that shipment des have to be the same as employess department
-    shipment_des = shipment.des
-    employee_department = request.user.department
-    if shipment_des != employee_department:
-        response_data = {'message': 'Your department is not match with shipmet target transaction point.'}
-        return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
-    
-    # Check that shipment are not in sending process to customer
-    try:
-        customer_transaction = CustomerTransaction.objects.get(shipment=shipment)
-        response_data = {'message': 'Shipment is already delivering to receiver.'}
-        return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
-    except Exception:
-        pass
-    finally:
-        transaction = CustomerTransaction(shipment=shipment)
-        transaction.save()
-        response_data = {'message': 'Customer transaction is created succesfully.'}
-        return JsonResponse(response_data, status=status.HTTP_201_CREATED)
+        # Check that shipment des have to be the same as employess department
+        shipment_des = shipment.des
+        employee_department = request.user.department
+        if shipment_des != employee_department:
+            response_data = {'message': 'Your department is not match with shipmet target transaction point.'}
+            return JsonResponse(response_data, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Check that shipment are not in sending process to customer
+        try:
+            customer_transaction = CustomerTransaction.objects.get(shipment=shipment)
+            response_data = {'message': 'Shipment is already delivering to receiver.'}
+            return JsonResponse(response_data, status=status.HTTP_409_CONFLICT)
+        except Exception:
+            pass
+        finally:
+            transaction = CustomerTransaction(shipment=shipment)
+            transaction.save()
+            response_data = {'message': 'Customer transaction is created succesfully.'}
+    return JsonResponse(response_data, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -397,7 +398,7 @@ def get_department_shipment_list(request):
     for x in dep_shipment_list:
         transaction_data = x.to_json()
 
-        if x.des.department_type == '0':
+        if x.des.consolidation_point == department:
             transaction_point.append(transaction_data)
         else:
             consolidation_point.append(transaction_data)
@@ -416,7 +417,8 @@ def get_department_customer_shipment_list(request):
     department = request.user.department
 
     # Get shipment in department
-    shipment_list = list(Shipment.objects.filter(Q(current_pos=department) & Q(des=F('current_pos'))))
+    shipment_list = list(Shipment.objects.filter(Q(current_pos=department) & Q(des=F('current_pos'))) \
+                          .exclude(pk__in=CustomerTransaction.objects.values_list('shipment__pk', flat=True)))
     response_data = {
         'shipment_list': [
             x.to_json() for x in shipment_list
