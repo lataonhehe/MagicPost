@@ -1,7 +1,7 @@
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Leader from "../pages/Leader";
-import Bill from "../pages/Bill";
+import Invoice from "../pages/Invoice/Invoice";
 
 //import 5 pages, 5 vai trò
 import ConsolidationManager from "../pages/ConsolidationPointManager";
@@ -43,14 +43,15 @@ import NewTransaction from "~/pages/TransactionPointStaff/Add/New";
 import TransStaffAcceptSolidation from "~/pages/TransactionPointStaff/Accept/ConsolidationPoint";
 import TransStaffAcceptFinish from "~/pages/TransactionPointStaff/Accept/Finished/";
 import TransStaffAddConsol from "~/pages/TransactionPointStaff/Add/Consolidation";
+import DichVu from "~/pages/DichVu";
 
 //Chức năng nhân viên giao dịch
 
 // Public pages, don't need account to access
 const publicRoutes = [
   { path: "/", component: Home },
+  { path: "/dichvu", component: DichVu },
   { path: "/login", component: Login, layout: null },
-  { path: "/bill", component: Bill, layout: null },
   { path: "/transactiontable", component: TransactionTable },
 ];
 
@@ -113,6 +114,7 @@ const privateRoutes = [
   },
 
   //Chức năng nhân viên giao dịch
+  { path: "/invoice", component: Invoice, layout: null },
   {
     path: "/transstaff/statistics",
     component: TransStaffStatistics,

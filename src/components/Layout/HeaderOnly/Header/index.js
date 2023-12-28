@@ -19,6 +19,8 @@ function Header() {
           </li>
 
           <Button
+            disableFocusRipple
+            disableRipple
             component="li"
             sx={{
               color: "white",
@@ -35,6 +37,8 @@ function Header() {
             Giới thiệu
           </Button>
           <Button
+            disableFocusRipple
+            disableRipple
             component="li"
             className={cx("tra-cuu")}
             sx={{
@@ -51,6 +55,8 @@ function Header() {
             Tra cứu
           </Button>
           <Button
+            disableFocusRipple
+            disableRipple
             component="li"
             className={cx("dich-vu")}
             sx={{
@@ -67,6 +73,8 @@ function Header() {
             Dịch vụ
           </Button>
           <Button
+            disableFocusRipple
+            disableRipple
             component="li"
             className={cx("tin-tuc")}
             sx={{

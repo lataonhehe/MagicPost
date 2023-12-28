@@ -1,7 +1,6 @@
-import { Navigate } from "react-router-dom";
-
 function Protected({ role, department, path, children }) {
-  if (
+  if (role == 0 && department == 0 && path == "/invoice") return children;
+  else if (
     role == 2 &&
     (path == "/leader" ||
       path == "/leader/managestore" ||

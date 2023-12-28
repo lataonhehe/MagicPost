@@ -165,9 +165,10 @@ function TransactionTable() {
       <div className={cx("btn-page")}>
         <Search>
           <SearchIconWrapper>
-            <SearchIcon fontSize="large" />
+            <SearchIcon fontSize="24px" />
           </SearchIconWrapper>
           <StyledInputBase
+            sx={{ marginLeft: "16px", fontSize: "medium" }}
             placeholder="Nhập mã bưu gửi..."
             inputProps={{ "aria-label": "search" }}
             value={code}
