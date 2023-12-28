@@ -138,7 +138,6 @@ function FunctionBar() {
             />
           </ListItemButton>
         </ListItem>
-        <Divider />
         <Collapse in={open1}>
           <List>
             <ListItem>

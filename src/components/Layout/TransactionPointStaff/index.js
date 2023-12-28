@@ -32,7 +32,7 @@ function LeaderLayout({ children }) {
             style={{
               color: "white",
               position: "fixed",
-              top: "20px",
+              top: "12px",
               left: "20px",
               zIndex: "2000",
             }}
