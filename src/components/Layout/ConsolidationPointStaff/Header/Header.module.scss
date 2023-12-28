@@ -55,17 +55,17 @@
   justify-content: center;
 }
 .tra-cuu {
-  width: 150px;
+  flex: 1;
   justify-content: center;
 }
 
 .dich-vu {
-  width: 150px;
+  flex: 1;
   justify-content: center;
 }
 
 .tin-tuc {
-  width: 150px;
+  flex: 1;
   justify-content: center;
 }
 
@@ -76,9 +76,4 @@
 
 .canhan {
   padding: 32px;
-}
-
-.user {
-  width: 200px;
-  justify-content: center;
 }
