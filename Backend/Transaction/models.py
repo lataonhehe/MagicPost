@@ -64,7 +64,8 @@ class Shipment(models.Model):
             'sender_address': self.sender_address,
             'receiver_address': self.receiver_address,
             'type': self.good_type,
-            'weight': self.weight
+            'weight': self.weight,
+            'target_consolidation_point': self.des.consolidation_point
         }
 
     def call_name(self):

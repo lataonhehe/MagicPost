@@ -19,4 +19,3 @@ class TransactionSerializer(serializers.ModelSerializer):
         transaction = Transaction.objects.create(**validated_data)
         return transaction
     
-
