@@ -6,7 +6,7 @@ import TableRow from "@mui/material/TableRow";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
 import PropTypes from "prop-types";
-import { EnhancedTableHeadContainer, StyledTableHeadCell, StyledTableSortLabel } from "../components/UI/TableStyles";
+import { EnhancedTableHeadContainer, StyledTableHeadCell, StyledTableSortLabel } from "../../components/UI/TableStyles";
 
 const EnhancedTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells, hasCheckbox }) => {
   const createSortHandler = (property) => (event) => {

@@ -1,11 +1,11 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
+import EnhancedTableToolbar from "../../../../hooks/Table/EnhancedTableToolbar";
 import { confirmCells } from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
-import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "../../../../hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "../../../../hooks/Table/EnhancedTableBody";
 
 export default function ConsolStaffAddTransaction() {
   const [order, setOrder] = useState("asc");
@@ -29,8 +29,8 @@ export default function ConsolStaffAddTransaction() {
       const updatedData = data.map((point) => {
         return { ...point, id: point.transaction_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid data:", data);
     }

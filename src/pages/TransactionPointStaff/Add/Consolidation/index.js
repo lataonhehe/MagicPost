@@ -1,11 +1,11 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
-import { createCells} from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
-import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
+import EnhancedTableToolbar from "../../../../hooks/Table/EnhancedTableToolbar";
+import { createCells } from "~/components/UI/TableCell";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "../../../../hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "../../../../hooks/Table/EnhancedTableBody";
 
 function TransStaffAddConsol() {
   const [order, setOrder] = useState("asc");
@@ -22,15 +22,14 @@ function TransStaffAddConsol() {
   //table type is create, delete or confirm
   const tableType = "create";
 
-
   const updateRows = (data) => {
     //Change id to key id
     if (Array.isArray(data)) {
       const updatedData = data.map((point) => {
         return { ...point, id: point.shipment_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid data:", data);
     }
@@ -146,14 +145,9 @@ function TransStaffAddConsol() {
 
   return (
     <>
-      <Box sx={{ width: "94%", margin: "auto" }}>        
+      <Box sx={{ width: "94%", margin: "auto" }}>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar
-            numSelected={selected.length}
-            handleAccept={handleAccept}
-            tableName={tableName}
-            tableType={tableType}
-          />
+          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead
@@ -166,14 +160,7 @@ function TransStaffAddConsol() {
                 hasCheckbox={hasCheckbox}
                 headCells={cells}
               />
-              <EnhancedTableBody
-                visibleRows={visibleRows}
-                isSelected={isSelected}
-                handleClick={handleClick}
-                emptyRows={emptyRows}
-                hasCheckbox={hasCheckbox}
-                headCells={cells}
-              />
+              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={hasCheckbox} headCells={cells} />
             </Table>
           </TableContainer>
           <TablePagination

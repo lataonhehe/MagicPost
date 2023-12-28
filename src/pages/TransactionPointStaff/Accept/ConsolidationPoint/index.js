@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "~/hooks/EnhancedTableToolbar";
+import EnhancedTableToolbar from "~/hooks/Table/EnhancedTableToolbar";
 import { confirmCells } from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "~/hooks/EnhancedTableHead";
-import EnhancedTableBody from "~/hooks/EnhancedTableBody";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "~/hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "~/hooks/Table/EnhancedTableBody";
 
 function TransStaffAcceptConsolidation() {
   const [order, setOrder] = useState("asc");
@@ -28,8 +28,8 @@ function TransStaffAcceptConsolidation() {
       const updatedData = data.map((point) => {
         return { ...point, id: point.transaction_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid consolidation points data:", data);
     }
@@ -64,7 +64,7 @@ function TransStaffAcceptConsolidation() {
   const handleAccept = async () => {
     try {
       const token = localStorage.getItem("Token");
-      
+
       const response = await fetch("http://127.0.0.1:8000/Transaction/transaction_employee/shipment_from_consolidation", {
         method: "POST",
         headers: {
@@ -95,35 +95,34 @@ function TransStaffAcceptConsolidation() {
   const handleSelectAllClick = (event) => {
     setSelected(event.target.checked ? rows.map((n) => n.id) : []);
   };
-  
+
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
-  
+
     if (selectedIndex === -1) {
       newSelected = [...selected, id];
     } else {
       newSelected = [...selected.slice(0, selectedIndex), ...selected.slice(selectedIndex + 1)];
     }
-  
+
     setSelected(newSelected);
   };
-  
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  
+
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
-  
+
   const isSelected = (id) => selected.includes(id);
-  
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;

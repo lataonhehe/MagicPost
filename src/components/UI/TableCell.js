@@ -88,11 +88,11 @@ export const statisticCells = [
     label: "Mã bưu gửi",
   },
   {
-    id: "sender_address",
+    id: "current_pos",
     label: "Địa chỉ gửi",
   },
   {
-    id: "receiver_address",
+    id: "des",
     label: "Địa chỉ nhận",
   },
   {
@@ -142,3 +142,26 @@ export const departmentCells = [
     label: "Điểm tập kết tương ứng"
   }
 ]
+
+export const customerCells = [
+  {
+    id: "shipment_id",
+    label: "Mã đơn hàng",
+  },
+  {
+    id: "type",
+    label: "Loại hàng hóa",
+  },
+  {
+    id: "current_pos",
+    label: "Vị trí hiện tại",
+  },
+  {
+    id: "receiver_address",
+    label: "Đích đến",
+  },
+  {
+    id: "status",
+    label: "Trạng thái",
+  },
+];
