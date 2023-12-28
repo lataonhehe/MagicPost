@@ -106,10 +106,10 @@ export const statisticCells = [
 ];
 
 export const userCells = [
-  // {
-  //   id: "id",
-  //   label: "ID",
-  // },
+  {
+    id: "id",
+    label: "ID",
+  },
   {
     id: "username",
     label: "Username",

@@ -71,7 +71,8 @@ class Shipment(models.Model):
             'sender_address': self.sender_address_detail,
             'receiver_address': self.receiver_address_detail,
             'type': "Tài liệu" if self.good_type == "TL" else "Hàng hóa",
-            'weight': self.weight
+            'weight': self.weight,
+            'target_consolidation_point': self.des.consolidation_point
         }
 
     def call_name(self):

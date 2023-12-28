@@ -1,15 +1,32 @@
-function NewUserForm({ fetchData }) {
-    const [showPassword, setShowPassword] = useState(false);
-    const [values, setValues] = useState({
+import {
+    FormControl,
+    InputAdornment,
+    TextField,
+    IconButton,
+  } from "@mui/material";
+  import * as React from "react";
+  import Box from "@mui/material/Box";
+  import Visibility from "@mui/icons-material/Visibility";
+  import VisibilityOff from "@mui/icons-material/VisibilityOff";
+  import { ColorButton } from "~/components/UI/TableStyles";
+  import classNames from "classnames/bind";
+  
+  function NewUserForm({ fetchData, onClose }) {
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [values, setValues] = React.useState({
       username: "",
       password: "",
       confirmPassword: "",
     });
-    const [usernameError, setUsernameError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmpwError, setConfirmPWError] = useState("");
+    const [usernameError, setUsernameError] = React.useState("");
+    const [passwordError, setPasswordError] = React.useState("");
+    const [confirmpwError, setConfirmPWError] = React.useState("");
   
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const cx = classNames.bind({ errorLabel: true });
+  
+    const handleClickShowPassword = () => {
+      setShowPassword((prevShowPassword) => !prevShowPassword);
+    };
   
     const handleMouseDownPassword = (event) => {
       event.preventDefault();
@@ -39,12 +56,27 @@ function NewUserForm({ fetchData }) {
             }),
           }
         );
+  
         fetchData();
+  
         if (!addResponse.ok) {
           setUsernameError("Username không hợp lệ!");
           throw new Error("Add user request failed");
         }
-      } catch (error) {}
+  
+        // If successful, reset the form state and close the form
+        setValues({
+          username: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setUsernameError("");
+        setPasswordError("");
+        setConfirmPWError("");
+        onClose(); // Close the form
+      } catch (error) {
+        console.error("Error adding user:", error.message);
+      }
     };
   
     const onButtonClick = () => {
@@ -159,5 +191,6 @@ function NewUserForm({ fetchData }) {
       </Box>
     );
   }
-
+  
   export default NewUserForm;
+  
