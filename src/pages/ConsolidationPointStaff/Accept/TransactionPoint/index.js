@@ -1,11 +1,11 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
+import EnhancedTableToolbar from "../../../../hooks/Table/EnhancedTableToolbar";
 import { confirmCells } from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
-import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "../../../../hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "../../../../hooks/Table/EnhancedTableBody";
 
 export default function ConsolStaffAddTransaction() {
   const [order, setOrder] = useState("asc");
@@ -29,8 +29,8 @@ export default function ConsolStaffAddTransaction() {
       const updatedData = data.map((point) => {
         return { ...point, id: point.transaction_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid data:", data);
     }
@@ -145,7 +145,7 @@ export default function ConsolStaffAddTransaction() {
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-        <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
+          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead

@@ -1,12 +1,12 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "../../../../hooks/EnhancedTableToolbar";
+import EnhancedTableToolbar from "../../../../hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { createCells, viewCells } from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "../../../../hooks/EnhancedTableHead";
-import EnhancedTableBody from "../../../../hooks/EnhancedTableBody";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "../../../../hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "../../../../hooks/Table/EnhancedTableBody";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
@@ -26,8 +26,8 @@ export default function ConsolStaffAddTransaction() {
       const updatedData = data.map((point) => {
         return { ...point, id: point.shipment_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid data:", data);
     }
@@ -50,7 +50,7 @@ export default function ConsolStaffAddTransaction() {
       }
 
       const data = await response.json();
-      updateRows(data.transaction_point);
+      updateRows(data.consolidation_point);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error.message);

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
-import EnhancedTableToolbar from "~/hooks/EnhancedTableToolbar";
+import EnhancedTableToolbar from "~/hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { statisticCells } from "~/components/UI/TableCell";
-import { getComparator, stableSort } from "~/hooks/TableUtils";
-import EnhancedTableHead from "~/hooks/EnhancedTableHead";
-import EnhancedTableBody from "~/hooks/EnhancedTableBody";
+import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
+import EnhancedTableHead from "~/hooks/Table/EnhancedTableHead";
+import EnhancedTableBody from "~/hooks/Table/EnhancedTableBody";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 
@@ -30,8 +30,8 @@ export default function TransManagerStatics() {
       const updatedData = data.map((point) => {
         return { ...point, id: point.shipment_id };
       });
-      
-      setRows(updatedData)
+
+      setRows(updatedData);
     } else {
       console.error("Invalid data:", data);
     }
@@ -165,11 +165,7 @@ export default function TransManagerStatics() {
           Hàng đang vận chuyển
         </ColorButton>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar
-            numSelected={selected.length}
-            tableName={tableName}
-            tableType={"view"}
-          />
+          <EnhancedTableToolbar numSelected={selected.length} tableName={tableName} tableType={"view"} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead
@@ -182,14 +178,7 @@ export default function TransManagerStatics() {
                 hasCheckbox={hasCheckbox}
                 headCells={cells}
               />
-              <EnhancedTableBody
-                visibleRows={visibleRows}
-                isSelected={isSelected}
-                handleClick={handleClick}
-                emptyRows={emptyRows}
-                hasCheckbox={hasCheckbox}
-                headCells={cells}
-              />
+              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={hasCheckbox} headCells={cells} />
             </Table>
           </TableContainer>
           <TablePagination

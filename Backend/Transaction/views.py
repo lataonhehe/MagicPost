@@ -11,6 +11,7 @@ from Transaction.models import Shipment, Transaction, CustomerTransaction
 from django import forms
 from django.http import JsonResponse
 from .serializers import ShipmentSerializer, TransactionSerializer
+from django.db.models import Q, F
 
 # Create your views here.
 
@@ -379,13 +380,16 @@ def get_department_shipment_list(request):
     department = request.user.department
 
     # Get shipment in department
-    shipment_list = list(Shipment.objects.filter(current_pos=department))
+    shipment_list = list(Shipment.objects.filter(Q(current_pos=department) & ~Q(des=F('current_pos'))))
     dep_shipment_list = []
     for x in shipment_list:
-        in_progress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
-        if len(in_progress_transaction) > 0:
-            continue
-        dep_shipment_list.append(x)
+        if x.status == 'Pending':
+            dep_shipment_list.append(x)
+        else: 
+            in_progress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
+            if len(in_progress_transaction) > 0:
+                continue
+            dep_shipment_list.append(x)
     
     consolidation_point = []
     transaction_point = []
@@ -402,8 +406,22 @@ def get_department_shipment_list(request):
         'consolidation_point': consolidation_point,
         'transaction_point': transaction_point,
     }
-    print(response_data)
 
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsTransactionEmployee])
+def get_department_customer_shipment_list(request):
+    department = request.user.department
+
+    # Get shipment in department
+    shipment_list = list(Shipment.objects.filter(Q(current_pos=department) & Q(des=F('current_pos'))))
+    response_data = {
+        'shipment_list': [
+            x.to_json() for x in shipment_list
+        ]
+    }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])

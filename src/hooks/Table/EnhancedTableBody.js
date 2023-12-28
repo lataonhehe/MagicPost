@@ -1,7 +1,7 @@
 // EnhancedTableBody.js
 import React from "react";
 import { TableBody, TableRow, TableCell, Checkbox } from "@mui/material";
-import { StyledTableRow } from "../components/UI/TableStyles";
+import { StyledTableRow } from "../../components/UI/TableStyles";
 
 const EnhancedTableBody = ({ visibleRows, isSelected, handleClick, emptyRows, headCells, hasCheckbox }) => {
   return (

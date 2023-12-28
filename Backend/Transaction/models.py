@@ -55,15 +55,22 @@ class Shipment(models.Model):
         return str(uuid.uuid4().hex)[:15]
     
     def to_json(self):
+        status = "Hàng đợi"
+        if self.status == "In progres":
+            status = "Đang vận chuyển"
+        elif self.status == "Completed":
+            status = "Thành công"
+        elif self.status == "Failed":
+            status = "Thất bại"
         return {
             'shipment_id': self.shipment_id,
-            'status': self.status,
+            'status': status,
             'DHCode': self.DHCode,
             'current_pos': self.current_pos.call_name(),
             'des': self.des.call_name(),
-            'sender_address': self.sender_address,
-            'receiver_address': self.receiver_address,
-            'type': self.good_type,
+            'sender_address': self.sender_address_detail,
+            'receiver_address': self.receiver_address_detail,
+            'type': "Tài liệu" if self.good_type == "TL" else "Hàng hóa",
             'weight': self.weight
         }
 
