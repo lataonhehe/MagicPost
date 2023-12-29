@@ -12,14 +12,14 @@ const EnhancedTableBody = ({ visibleRows, isSelected, handleClick, emptyRows, he
 
         return (
           <StyledTableRow
-            hover
-            onClick={(event) => handleClick(event, row.id)}
+            hover={hasCheckbox} // Only enable hover effect if hasCheckbox is true
+            onClick={hasCheckbox ? (event) => handleClick(event, row.id) : undefined} // Only handle click if hasCheckbox is true
             role="checkbox"
             aria-checked={isItemSelected}
-            tabIndex={-1}
+            tabIndex={hasCheckbox ? 0 : -1} // Set tabIndex to -1 if hasCheckbox is false
             key={row.id}
             selected={isItemSelected}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: hasCheckbox ? "pointer" : "default" }} // Change cursor style based on hasCheckbox
           >
             {hasCheckbox && (
               <TableCell padding="checkbox">

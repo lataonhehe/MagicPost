@@ -23,16 +23,7 @@ function ManageAccountManager() {
   const tableType = "confirm";
 
   const updateRows = (data) => {
-    //Change id to key id
-    if (Array.isArray(data)) {
-      const updatedData = data.map((point) => {
-        return { ...point, id: point.department_id };
-      });
-
-      setRows(updatedData);
-    } else {
-      console.error("Invalid data:", data);
-    }
+    setRows(data)
   };
 
   const fetchData = async () => {
@@ -51,6 +42,7 @@ function ManageAccountManager() {
       }
 
       const data = await response.json();
+      console.log(data)
       updateRows(data.manager_list);
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -61,30 +53,6 @@ function ManageAccountManager() {
     fetchData();
   }, []); // Run once when the component mounts
 
-  const handleAccept = async () => {
-    try {
-      const token = localStorage.getItem("Token");
-
-      const response = await fetch("http://127.0.0.1:8000/Transaction/transaction_employee/shipment_from_consolidation", {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ transaction_id: selected }),
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (!response.ok) {
-        throw new Error(data.message);
-      }
-
-      fetchData();
-      setSelected([]);
-    } catch (error) {}
-  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -135,7 +103,7 @@ function ManageAccountManager() {
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
+          <EnhancedTableToolbar numSelected={selected.length} tableName={tableName} tableType={tableType} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead

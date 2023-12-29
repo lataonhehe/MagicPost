@@ -16,8 +16,6 @@ import {
 } from "@mui/material";
 import classNames from "classnames/bind";
 import * as React from "react";
-import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import { Autocomplete, TextField, Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
 import EnhancedTableToolbar from "~/hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { statisticCells } from "~/components/UI/TableCell";
@@ -18,6 +18,8 @@ function Statistics() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
   const [activeButton, setActiveButton] = useState("sent");
+  const [department, setDepartment] = useState([]);
+  const [departmentID, setDepartmentID] = useState(1);
 
   const updateRows = (data) => {
     //Change id to key id
@@ -48,8 +50,9 @@ function Statistics() {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
-      console.log(data);
+      const resData = await response.json();
+      console.log(departmentID)
+      const data = resData[departmentID];
       if (activeButton === "sent") updateRows(data.outgoing_shipment);
       if (activeButton === "coming") updateRows(data.coming_shipment);
       if (activeButton === "pending") updateRows(data.pending_shipment);
@@ -59,9 +62,38 @@ function Statistics() {
     }
   };
 
+  const fetchDepartmentData = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/Transaction/list_department`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      console.log(data)
+      setDepartment(data.department_list);
+    } catch (error) {
+      console.error("Error get department data:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartmentData();
+  },[])
+
   useEffect(() => {
     fetchData();
-  }, [activeButton]); // Run once when the component mounts
+  }, [activeButton, departmentID]); // Run once when the component mounts
 
   const handleButtonClick = (buttonType) => {
     setActiveButton(buttonType);
@@ -121,9 +153,27 @@ function Statistics() {
     return stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [order, orderBy, page, rowsPerPage, rows]);
 
+
+
   return (
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
+        <Autocomplete
+          options={department}
+          getOptionLabel={(option) => option.department_name}
+          getOptionSelected={(option, value) => option.department_id === value.department_id}
+          renderInput={(params) => (
+            <TextField {...params} label="Department" variant="outlined" />
+          )}
+          value={departmentID}
+          onChange={(event, newValue) => {
+            setDepartmentID(newValue ? newValue.department_id : null);
+            fetchData(newValue ? newValue.department_id : null);
+          }}
+        />
+
+
+
         <ColorButton
           startIcon={<AddBoxIcon />}
           variant="contained"
