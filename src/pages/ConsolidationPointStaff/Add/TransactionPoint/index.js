@@ -50,7 +50,7 @@ export default function ConsolStaffAddTransaction() {
       }
 
       const data = await response.json();
-      updateRows(data.consolidation_point);
+      updateRows(data.transaction_point);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error.message);

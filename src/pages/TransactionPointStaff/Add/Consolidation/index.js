@@ -52,7 +52,7 @@ function TransStaffAddConsol() {
       }
 
       const data = await response.json();
-      updateRows(data.transaction_point);
+      updateRows(data.consolidation_point);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error.message);

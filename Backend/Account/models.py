@@ -2,6 +2,9 @@ from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+'''
+Declare Department object
+'''
 class Department(models.Model):
     TYPE = [
         ('0', 'TransactionPoint'),
@@ -28,8 +31,14 @@ class Department(models.Model):
                                     if self.consolidation_point is not None else None,
         }
 
+'''
+Declare User Manager to add data from server
+'''
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, department=None, role='0', **extra_fields):
+        '''
+        Create new User from server
+        '''
         if not username:
             raise ValueError('The Username field must be set')
         
@@ -40,11 +49,17 @@ class UserManager(BaseUserManager):
     
 
     def create_superuser(self, username, password=None, department=None, role='2', **extra_fields):
+        '''
+        Create user who can modify data from server
+        '''
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         return self.create_user(username, password, department, role, **extra_fields)
 
+'''
+Declear User object, which include employee, manager, leader account
+'''
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('2', 'Leader'),

@@ -15,47 +15,40 @@ from django.db.models import Q, F
 
 # Create your views here.
 
-#Giao dịch viên
+#---------------------------------------------------------------------------------
+# Nhân viên giao dịch
+#---------------------------------------------------------------------------------
 
-class ShipmentForm(forms.ModelForm):
-    class Meta:
-        model = Shipment
-        fields = ['pos', 'current_pos']
-
+# Define a view function for creating a shipment
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated, IsTransactionEmployee]) 
+@permission_classes([IsAuthenticated, IsTransactionEmployee])
 def create_shipment(request):
     """
-    Create shipment for customer from Transaction Department
+    Create a shipment for the customer from the Transaction Department.
     """
+
+    # Print the request data for debugging purposes
     print(request.data)
-    #Create postion and current position for shipment
+
+    # Set the position and current position for the shipment
     pos = request.user.department.pk
     request.data['pos'] = pos
     request.data['current_pos'] = pos
 
-    #Check and create target transaction deparment
-    # try:
-    #     des_id = request.data['des_id']
-    #     request.data['des'] = Department.objects.get(pk=des_id, department_type='0')
-    #     request.data.pop('des_id')
-    # except Exception:
-    #     Response(status=status.HTTP_400_BAD_REQUEST, 
-    #              data={"message": "Request does not have destination id or destination id does not exist or not transaction point."})
-
-    # Convert json data to Shipment    
+    # Convert JSON data to a Shipment using the ShipmentSerializer
     serializer = ShipmentSerializer(data=request.data)
-    
-    # Check json data valid
+
+    # Check if the JSON data is valid
     if serializer.is_valid():
+        # Save the serialized data as a new Shipment instance
         serializer.save()
         return Response(
             status=status.HTTP_201_CREATED,
             data={"message": "Shipment is created successfully."}
         )
+    # Return a response indicating a bad request if the JSON data is not valid
     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": serializer.errors})
-        
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -129,6 +122,9 @@ def create_transaction_to_correspond_consolidation_point(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
 def confirm_shipment_from_correspond_consolidation_department(request):
+    '''
+    Confirm shipment from correspond consolidation point
+    '''
     data = request.data
 
     # Check transaction exist
@@ -248,6 +244,9 @@ def confirm_complete_shipment(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
 def confirm_failed_shipment_and_send_back(request):
+    '''
+    Confirm shipment to receiver is failed and send it back to original transaction point
+    '''
     data = request.data
 
     # Check customer transaction exist
@@ -287,6 +286,9 @@ def confirm_failed_shipment_and_send_back(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
 def list_complete_and_fail_shipment(request):
+    '''
+    Get complete and fail shipment
+    '''
     department = request.user.department
 
     # Get customer transaction that completed and failed
@@ -303,6 +305,10 @@ def list_complete_and_fail_shipment(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsEmployee])
 def get_coming_transaction_list(request):
+    '''
+    Get transactions that are delivering to department of
+    employee send this request.
+    '''
     department = request.user.department
 
     # Get coming transaction
@@ -311,6 +317,7 @@ def get_coming_transaction_list(request):
     consolidation_point = []
     transaction_point = []
 
+    # Classify transaction from consolidation point and from transaction point
     for x in transaction_list:
         transaction_data = x.to_json()
 
@@ -329,7 +336,9 @@ def get_coming_transaction_list(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsEmployee])
 def get_transaction(request):
-    
+    '''
+    Get transactions that are being deliveried from employee department
+    '''
     user_department = request.user.department
     transaction_list = list(Transaction.objects.filter(pos=user_department))
 
@@ -348,12 +357,13 @@ def get_transaction(request):
         'consolidation_point': consolidation_point,
         'transaction_point': transaction_point,
     }
-    print(response_data)
+
     return JsonResponse(
         response_data,
         status=status.HTTP_200_OK
     )
 
+# Define a view function to get a list of transaction departments
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
@@ -374,30 +384,33 @@ def get_transaction_department(request):
         status=status.HTTP_200_OK
     )
 
+# Define a view function to get a list of shipments in the user's department
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsEmployee])
 def get_department_shipment_list(request):
     department = request.user.department
 
-    # Get shipment in department
+    # Get shipments in the department
     shipment_list = list(Shipment.objects.filter(Q(current_pos=department) & ~Q(des=F('current_pos'))))
     dep_shipment_list = []
+
+    # Filter shipments based on status and ongoing transactions
     for x in shipment_list:
         if x.status == 'Pending':
+            print(x)
             dep_shipment_list.append(x)
         else: 
             in_progress_transaction = list(Transaction.objects.filter(shipment=x, status='In Progress'))
             if len(in_progress_transaction) > 0:
                 continue
             dep_shipment_list.append(x)
-    
     consolidation_point = []
     transaction_point = []
 
+    # Categorize shipments into consolidation and transaction points
     for x in dep_shipment_list:
         transaction_data = x.to_json()
-
         if x.des.consolidation_point == department:
             transaction_point.append(transaction_data)
         else:
@@ -414,6 +427,15 @@ def get_department_shipment_list(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
 def get_department_customer_shipment_list(request):
+    """
+    Get shipments are going to deliver to receiver
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
+    """
     department = request.user.department
 
     # Get shipment in department
@@ -426,12 +448,23 @@ def get_department_customer_shipment_list(request):
     }
     return JsonResponse(response_data, status=status.HTTP_200_OK)
 
+# Define a view function to get a list of in-progress customer transactions
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsTransactionEmployee])
 def get_customer_transaction(request):
+    """
+    Retrieve a list of in-progress customer transactions associated with the user's department.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
+    """
     user_department = request.user.department
 
+    # Get in-progress customer transactions in the user's department
     inprogress_transaction = list(
         CustomerTransaction.objects.filter(
             shipment__current_pos=user_department,
@@ -440,6 +473,7 @@ def get_customer_transaction(request):
         )
     )
 
+    # Convert customer transaction instances to JSON-like dictionaries
     response_data = {
         'inprogress_customer_transaction_list': [
             x.to_json() for x in inprogress_transaction
@@ -454,15 +488,22 @@ def get_customer_transaction(request):
 
 
     
-"""
-Nhan vien tap ket
-"""
+#---------------------------------------------------------------------------------
+# Nhân viên tập kết
+#---------------------------------------------------------------------------------
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsConsolidationEmployee])
 def create_transaction_to_target_consolidation_point(request):
     """
     Create transaction to deliver shipment to consolidation point correspond to receiver address.
+
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
     """
 
     #Check shipment exist
@@ -509,6 +550,15 @@ def create_transaction_to_target_consolidation_point(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsConsolidationEmployee])
 def confirm_transaction_from_correspond_transaction_department(request):
+    """
+    Confirm transaction from correspond transaction department
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
+    """
     # Load data
     data = request.data
 
@@ -557,6 +607,15 @@ def confirm_transaction_from_correspond_transaction_department(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsConsolidationEmployee])
 def confirm_transaction_from_other_consolidation_department(request):
+    """
+    Confirm transaction from other consolidation department.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
+    """
     data = request.data
     #Check transaction id
     try:
@@ -601,7 +660,13 @@ def confirm_transaction_from_other_consolidation_department(request):
 @permission_classes([IsConsolidationEmployee])
 def create_transaction_to_target_transaction_point(request):
     """
-    Create transaction to correspond target transaction
+    Create transaction to correspond target transaction.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of in-progress customer transactions.
     """
 
     #Check shipment exist
@@ -647,13 +712,27 @@ def create_transaction_to_target_transaction_point(request):
     
 @api_view(['GET'])
 def search_shipment(request):
+    """
+    Create transaction to correspond target transaction.
 
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the information of shipment via DHCode.
+    """
+
+    # Get shipment code
     shipment_code = request.GET.get('code', '')
-    print(shipment_code)
+
+    # Check shipment code exists
     if shipment_code is not None:
         try:
+            # Get shipment vid shipment code
             shipment = Shipment.objects.get(DHCode=shipment_code)
             transactions = list(Transaction.objects.filter(shipment=shipment).order_by('created_at'))
+
+            # Prepare data to send
             response_data = {
                 'transaction_list': [{
                     'pos': x.pos.call_name(),
@@ -670,46 +749,74 @@ def search_shipment(request):
             }
             return JsonResponse(response_data, status = status.HTTP_200_OK) 
         except Exception as e: 
+            # Return response if shipment does not exist
             response_data = {'message': 'Shipment code does not exist.'}
             return JsonResponse(response_data, status = status.HTTP_404_NOT_FOUND)
     else:
+        # Return response if shipment code does not exist
         response_data = {'message': 'Your DHCode is not correct.'}
         return JsonResponse(response_data, status = status.HTTP_400_BAD_REQUEST)
 
-
-### Truong diem giao dich, tap ket
+#-----------------------------------------------------------------------------
+# Truong diem giao dich, tap ket
+#-----------------------------------------------------------------------------
+# Define a view function to list shipments
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
-# @permission_classes([IsManager])
+# @permission_classes([IsManager])  # Uncomment this line when permission class is specified
 def list_shipment(request):
+    """
+    Retrieve a list of shipments categorized as coming, outgoing, and pending.
 
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the categorized shipment data.
+    """
     manager = request.user
     department = manager.department
 
-    # Take shipment of transaction that have des = manager.department and in progress
-    coming_transaction = list(Transaction.objects.filter(des=department, status='In Progress'))    
+    # Get transactions associated with the manager's department
+    coming_transaction = list(Transaction.objects.filter(des=department, status='In Progress'))
     sending_transaction = list(Transaction.objects.filter(pos=department, status='In Progress'))
     sending_customer_transaction = list(CustomerTransaction.objects.filter(shipment__des=department, status='In Progress'))
 
+    # Extract shipments from transactions
     coming_shipment = [x.shipment for x in coming_transaction]
     sending_shipment = [x.shipment for x in sending_transaction + sending_customer_transaction]
+
+    # Find pending shipments in the manager's department
     pending_shipment = [x for x in list(Shipment.objects.all()) if x.current_pos == department and x not in sending_shipment]
 
+    # Convert shipment instances to JSON-like dictionaries
     response_data = {
         'coming_shipment': [x.to_json() for x in coming_shipment], 
         'outgoing_shipment': [x.to_json() for x in sending_shipment],
         'pending_shipment': [x.to_json() for x in pending_shipment]
     }
+
     return JsonResponse (
         response_data,
-        status = status.HTTP_200_OK
+        status=status.HTTP_200_OK
     )
-
-### Lãnh đạo
+# --------------------------------------------------------------------------------
+# Lãnh đạo
+# --------------------------------------------------------------------------------
+# Define a view function to list all departments
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsLeader])
 def list_department(request):
+    """
+    Retrieve a list of all departments.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of departments.
+    """
     department_list = list(Department.objects.all())
     response_data = {
         'department_list': [x.to_json() for x in department_list]
@@ -719,11 +826,20 @@ def list_department(request):
         status=status.HTTP_200_OK
     )
 
-
+# Define a view function to list all managers
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsLeader])
 def list_manager(request):
+    """
+    Retrieve a list of all managers.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing the list of managers.
+    """
     manager_list = list(User.objects.filter(role='1'))
     response_data = {
         'manager_list': [x.to_json() for x in manager_list]
@@ -734,15 +850,24 @@ def list_manager(request):
         status=status.HTTP_200_OK
     )
 
+# Define a view function to provide shipment statistics
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsLeader])
 def shipment_statistic(request):
-    department_list = list(Department.objects.all())
-    response_data = {
-        
-    }
+    """
+    Retrieve shipment statistics categorized by departments.
 
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: JSON response containing shipment statistics.
+    """
+    department_list = list(Department.objects.all())
+    response_data = {}
+
+    # Initialize response_data dictionary with department names as keys
     for i in department_list:
         response_data[i.call_name()] = {
             'coming_shipment': [],
@@ -750,15 +875,18 @@ def shipment_statistic(request):
             'pending_shipment': []
         }
 
+    # Get in-progress transactions and associated shipments
     inprogress_transaction = list(Transaction.objects.filter(status='In Progress'))  
     inprogress_customer_transaction = list(CustomerTransaction.objects.filter(status='In Progress'))
     inprogress_shipment = [x.shipment for x in inprogress_transaction + inprogress_customer_transaction]
     pending_shipment = [x for x in list(Shipment.objects.all()) if x not in inprogress_shipment]
 
+    # Populate response_data with pending shipments
     for x in pending_shipment:
         department_name = x.current_pos.call_name()
         response_data[department_name]['pending_shipment'].append(x.to_json())
 
+    # Populate response_data with incoming and outgoing shipments
     for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):
         des = trans.des.call_name()
         pos = trans.pos.call_name()
@@ -766,7 +894,6 @@ def shipment_statistic(request):
         response_data[pos]['sending_shipment'].append(data)
         response_data[des]['coming_shipment'].append(data)
 
-    print(response_data)
     return JsonResponse(
         response_data, 
         status=status.HTTP_200_OK

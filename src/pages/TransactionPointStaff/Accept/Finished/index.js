@@ -51,7 +51,7 @@ function TransStaffAcceptFinish() {
       }
 
       const data = await response.json();
-      updateRows(data.consolidation_point);
+      updateRows(data.inprogress_customer_transaction_list);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }

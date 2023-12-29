@@ -6,7 +6,9 @@ from django.utils import timezone
 import uuid
 
 # Create your models here.
+# Define a Shipment model
 class Shipment(models.Model):
+    # Choices for shipment status
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('In Progress', 'In Progress'),
@@ -14,26 +16,29 @@ class Shipment(models.Model):
         ('Failed', 'Failed')
     ]
 
-    good_type_list = [
-        ('TL', 'tai lieu'),
-        ('HH', 'hang hoa')
+    # Choices for good type
+    GOOD_TYPE_CHOICES = [
+        ('TL', 'Tài Liệu'),
+        ('HH', 'Hàng Hóa')
     ]
 
+    # Define Shipment model fields
     shipment_id = models.AutoField(primary_key=True)
     shipment_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
     pos = models.ForeignKey(Department, related_name='shipment_pos', on_delete=models.CASCADE)
     current_pos = models.ForeignKey(Department, related_name='shipment_current_pos', on_delete=models.CASCADE)
     des = models.ForeignKey(Department, related_name='shipment_des', on_delete=models.CASCADE)
-    #sender info
+
+    # Sender information
     sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
     sender_address = models.CharField(max_length=100, default=None, null=True)
     sender_address_detail = models.CharField(max_length=100, default=None, null=True)
     sender_postal_code = models.CharField(max_length=10, default=None, null=True)
     sender_total_payment = models.DecimalField(max_digits=12, decimal_places=2, default=None, null=True)
     sender_phone = models.CharField(max_length=15, default=None, null=True, blank=True)
-    sender_name = models.CharField(max_length=30, default=None, null=True, blank=True)
-    #receiver info
+
+    # Receiver information
     receiver_address = models.CharField(max_length=100, default=None, null=True)
     receiver_address_detail = models.CharField(max_length=100, default=None, null=True)
     receiver_postal_code = models.CharField(max_length=10, default=None, null=True)
@@ -43,20 +48,22 @@ class Shipment(models.Model):
     DHCode = models.CharField(max_length=15, default=None, null=True, blank=True)
     receiving_date = models.DateField(blank=True, default=None, null=True)
 
-    good_type = models.CharField(max_length=8, choices=good_type_list, default='HH')
+    good_type = models.CharField(max_length=8, choices=GOOD_TYPE_CHOICES, default='HH')
     special_service = models.CharField(max_length=50, default=None, null=True, blank=True)
     weight = models.DecimalField(max_digits=10, decimal_places=2, default=None, null=True)
 
+    # Define the __str__ method to represent Shipment instances as a string
     def __str__(self):
         return f"{self.shipment_id} - {self.status}"
-    
+
+    # Generate a unique DHCode using UUID
     def generate_dhcode(self):
-        # Use UUID to generate a unique DHCode
         return str(uuid.uuid4().hex)[:15]
-    
+
+    # Convert Shipment instance to a JSON-like dictionary
     def to_json(self):
         status = "Hàng đợi"
-        if self.status == "In progres":
+        if self.status == "In Progress":
             status = "Đang vận chuyển"
         elif self.status == "Completed":
             status = "Thành công"
@@ -72,14 +79,14 @@ class Shipment(models.Model):
             'receiver_address': self.receiver_address_detail,
             'type': "Tài liệu" if self.good_type == "TL" else "Hàng hóa",
             'weight': self.weight,
-            'target_consolidation_point': self.des.consolidation_point
+            'target_consolidation_point': self.des.consolidation_point.pk
         }
 
+    # Define a method to return a formatted name for the Shipment
     def call_name(self):
         return f"Shipment{self.pk}"
-    
-     
-    
+
+# Signal receiver to set DHCode before saving a Shipment instance
 @receiver(pre_save, sender=Shipment)
 def set_dhcode(sender, instance, **kwargs):
     # Check if the Shipment instance doesn't have a DHCode yet
@@ -87,7 +94,9 @@ def set_dhcode(sender, instance, **kwargs):
         # Generate DHCode and set it to the instance
         instance.DHCode = instance.generate_dhcode()
         
+# Define a Transaction model
 class Transaction(models.Model):
+    # Choices for transaction status
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('In Progress', 'In Progress'),
@@ -95,6 +104,7 @@ class Transaction(models.Model):
         ('Failed', 'Failed')
     ]
 
+    # Define Transaction model fields
     transaction_id = models.AutoField(primary_key=True)
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
     pos = models.ForeignKey(Department, related_name='transactions_pos', on_delete=models.CASCADE)
@@ -102,13 +112,15 @@ class Transaction(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(default=timezone.now)
 
-
+    # Define the __str__ method to represent Transaction instances as a string
     def __str__(self):
         return f"{self.transaction_id} - {self.status}"
-    
+
+    # Define a method to return a formatted name for the Transaction
     def call_name(self):
         return f"Transaction{self.pk}"
-    
+
+    # Convert Transaction instance to a JSON-like dictionary
     def to_json(self):
         return {
             'transaction_id': self.transaction_id,
@@ -132,8 +144,10 @@ def update_created_at(sender, instance, **kwargs):
 
 # Connect the signal
 pre_save.connect(update_created_at, sender=Transaction)
-    
+
+# Define a CustomerTransaction model
 class CustomerTransaction(models.Model):
+    # Choices for transaction status
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('In Progress', 'In Progress'),
@@ -141,17 +155,18 @@ class CustomerTransaction(models.Model):
         ('Failed', 'Failed')
     ]
 
+    # Define CustomerTransaction model fields
     shipment = models.ForeignKey(Shipment, related_name='shipment', on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
     created_at = models.DateTimeField(default=timezone.now)
 
+    # Convert CustomerTransaction instance to a JSON-like dictionary
     def to_json(self):
         return {
             'shipment': self.shipment.to_json(),
             'status': self.status,
             'created_at': self.created_at
         }
-
 
 # Signal receiver to update created_at when status is changed
 @receiver(pre_save, sender=CustomerTransaction)
