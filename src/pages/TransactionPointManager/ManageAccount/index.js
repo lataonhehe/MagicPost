@@ -64,9 +64,8 @@ function TransManagerManageAccounts() {
       }
 
       const data = await response.json();
-      console.log(data)
+      console.log(data);
       updateRows(data.employee_list);
-
     } catch (error) {}
   };
 
@@ -142,9 +141,9 @@ function TransManagerManageAccounts() {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
+  // const handleChangeDense = (event) => {
+  //   setDense(event.target.checked);
+  // };
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 

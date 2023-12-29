@@ -580,16 +580,13 @@ export function InputAdornments({ fetchData }) {
 
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="sender_address"
                 disablePortal
                 options={
                   province &&
                   province.map &&
                   province.map((value) => value.ProvinceName)
                 }
-                inputProps={{
-                  "aria-label": "sender_address",
-                }}
                 value={province.ProvinceID}
                 getOptionSelected={(option, value) =>
                   option.ProvinceID === value.ProvinceID
@@ -610,7 +607,7 @@ export function InputAdornments({ fetchData }) {
               <label className={cx("errorLabel")}>{error.sender_address}</label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="sender_address_district"
                 disablePortal
                 options={
                   province &&
@@ -619,9 +616,6 @@ export function InputAdornments({ fetchData }) {
                   districtSender.map &&
                   districtSender.map((value) => value.DistrictName)
                 }
-                inputProps={{
-                  "aria-label": "sender_address",
-                }}
                 value={districtSender.DistrictID}
                 getOptionSelected={(option, value) =>
                   option.DistrictID === value.DistrictID
@@ -641,7 +635,7 @@ export function InputAdornments({ fetchData }) {
               />
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="sender_address_district"
                 disablePortal
                 options={
                   province &&
@@ -652,9 +646,6 @@ export function InputAdornments({ fetchData }) {
                   wardSender.map &&
                   wardSender.map((value) => value.WardName)
                 }
-                inputProps={{
-                  "aria-label": "sender_address",
-                }}
                 value={wardSender.WardCode}
                 getOptionSelected={(option, value) =>
                   option.WardCode === value.WardCode
@@ -683,13 +674,10 @@ export function InputAdornments({ fetchData }) {
               </label>
               <TextField
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="sender_phone"
                 placeholder="Số điện thoại"
                 value={values.sender_phone}
                 onChange={(e) => handleChange("sender_phone", e.target.value)}
-                inputProps={{
-                  "aria-label": "sender_phone",
-                }}
               />
               <label className={cx("errorLabel")}>{error.sender_phone}</label>
             </div>
@@ -721,13 +709,10 @@ export function InputAdornments({ fetchData }) {
               </label>
               <TextField
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="receiver_name"
                 placeholder="Họ và tên"
                 value={values.receiver_name}
                 onChange={(e) => handleChange("receiver_name", e.target.value)}
-                inputProps={{
-                  "aria-label": "receiver_name",
-                }}
               />
               <label className={cx("errorLabel")}>{error.receiver_name}</label>
               <label
@@ -743,16 +728,13 @@ export function InputAdornments({ fetchData }) {
               </label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="receiver_address"
                 disablePortal
                 options={
                   province &&
                   province.map &&
                   province.map((value) => value.ProvinceName)
                 }
-                inputProps={{
-                  "aria-label": "receiver_address",
-                }}
                 value={province.ProvinceID}
                 getOptionSelected={(option, value) =>
                   option.ProvinceID === value.ProvinceID
@@ -775,7 +757,7 @@ export function InputAdornments({ fetchData }) {
               </label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="receiver_address_district"
                 disablePortal
                 options={
                   province &&
@@ -784,9 +766,6 @@ export function InputAdornments({ fetchData }) {
                   districtReceiver.map &&
                   districtReceiver.map((value) => value.DistrictName)
                 }
-                inputProps={{
-                  "aria-label": "receiver_address",
-                }}
                 value={districtReceiver.DistrictID}
                 getOptionSelected={(option, value) =>
                   option.DistrictID === value.DistrictID
@@ -807,7 +786,7 @@ export function InputAdornments({ fetchData }) {
 
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="receiver_address_ward"
                 disablePortal
                 options={
                   province &&
@@ -818,9 +797,6 @@ export function InputAdornments({ fetchData }) {
                   wardReceiver.map &&
                   wardReceiver.map((value) => value.WardName)
                 }
-                inputProps={{
-                  "aria-label": "sender_address",
-                }}
                 value={wardReceiver.WardCode}
                 getOptionSelected={(option, value) =>
                   option.WardCode === value.WardCode
@@ -849,13 +825,10 @@ export function InputAdornments({ fetchData }) {
               </label>
               <TextField
                 sx={{ m: 1, width: "25ch" }}
-                id="outlined-adornment-weight"
+                id="receiver_phone"
                 placeholder="Số điện thoại"
                 value={values.receiver_phone}
                 onChange={(e) => handleChange("receiver_phone", e.target.value)}
-                inputProps={{
-                  "aria-label": "receiver_phone",
-                }}
               />
               <label className={cx("errorLabel")}>{error.receiver_phone}</label>
             </div>
@@ -886,12 +859,9 @@ export function InputAdornments({ fetchData }) {
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
-                id="outlined-adornment-weight"
+                id="shipment_name"
                 value={values.shipment_name}
                 onChange={(e) => handleChange("shipment_name", e.target.value)}
-                inputProps={{
-                  "aria-label": "shipment_name",
-                }}
               />
               <label className={cx("errorLabel")}>{error.shipment_name}</label>
               <label
@@ -908,14 +878,11 @@ export function InputAdornments({ fetchData }) {
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
-                id="outlined-adornment-weight"
+                id="good_type"
                 placeholder="Hàng hóa | Tài liệu"
                 select
                 value={values.good_type}
                 onChange={(e) => handleChange("good_type", e.target.value)}
-                inputProps={{
-                  "aria-label": "good_type",
-                }}
               >
                 <MenuItem key={"hanghoa"} value={"HH"}>
                   Hàng hóa
@@ -940,16 +907,13 @@ export function InputAdornments({ fetchData }) {
               <OutlinedInput
                 fullWidth
                 sx={{ m: 1 }}
-                id="outlined-adornment-weight"
+                id="weight"
                 placeholder="500 gram"
                 value={values.weight}
                 onChange={(e) => handleChange("weight", e.target.value)}
                 endAdornment={
                   <InputAdornment position="end">gram</InputAdornment>
                 }
-                inputProps={{
-                  "aria-label": "weight",
-                }}
               />
               <label className={cx("errorLabel")}>{error.weight}</label>
               <label
@@ -981,9 +945,6 @@ export function InputAdornments({ fetchData }) {
                   service.map &&
                   service.map((value) => value.short_name)
                 }
-                inputProps={{
-                  "aria-label": "special_payment",
-                }}
                 value={service.service_id}
                 getOptionSelected={(option, value) =>
                   option.service_id === value.service_id
@@ -1024,9 +985,6 @@ export function InputAdornments({ fetchData }) {
                   department.map &&
                   department.map((value) => value.name)
                 }
-                inputProps={{
-                  "aria-label": "des",
-                }}
                 value={department.id}
                 getOptionSelected={(option, value) => option.id === value.id}
                 onChange={(e, newValue) => {
@@ -1058,13 +1016,10 @@ export function InputAdornments({ fetchData }) {
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
-                id="outlined-adornment-weight"
+                id="receiving_date"
                 placeholder="2023-11-20"
                 value={values.receiving_date}
                 onChange={(e) => handleChange("receiving_date", e.target.value)}
-                inputProps={{
-                  "aria-label": "datetime",
-                }}
               />
               <label className={cx("errorLabel")}>{error.receiving_date}</label>
               <label
@@ -1081,7 +1036,7 @@ export function InputAdornments({ fetchData }) {
               <OutlinedInput
                 fullWidth
                 sx={{ m: 1 }}
-                id="outlined-adornment-weight"
+                id="total_payment"
                 endAdornment={
                   <InputAdornment position="end">VND</InputAdornment>
                 }
@@ -1091,9 +1046,6 @@ export function InputAdornments({ fetchData }) {
                     : 0
                 }
                 placeholder="Tổng cước"
-                inputProps={{
-                  "aria-label": "total_payment",
-                }}
               />
               <div style={{ display: "flex" }}>
                 <label
@@ -1110,12 +1062,9 @@ export function InputAdornments({ fetchData }) {
                 <TextField
                   fullWidth
                   sx={{ m: 1 }}
-                  id="outlined-adornment-weight"
+                  id="sender_total_payment"
                   onChange={(e) => {
                     handleChange("sender_total_payment", e.target.value);
-                  }}
-                  inputProps={{
-                    "aria-label": "sender_total_payment",
                   }}
                 ></TextField>
                 <label className={cx("errorLabel")}>
@@ -1135,15 +1084,12 @@ export function InputAdornments({ fetchData }) {
                 <TextField
                   fullWidth
                   sx={{ m: 1 }}
-                  id="outlined-adornment-weight"
+                  id="receiver_total_payment"
                   value={
                     total_payment !== null && total_payment.total > 0
                       ? total_payment.total - values.sender_total_payment
                       : 0
                   }
-                  inputProps={{
-                    "aria-label": "receiver_total_payment",
-                  }}
                 ></TextField>
               </div>
             </div>
@@ -1189,7 +1135,7 @@ export default function NewTransaction() {
   }
 
   return (
-    <Box sx={{ width: "85%", margin: "auto" }}>
+    <Box sx={{ width: "1000px", margin: "auto" }}>
       <Paper sx={{ width: "100%", mb: 2, marginTop: "48px" }} elevation={5}>
         {/* <Collapse in={true} timeout="auto"> */}
         <InputAdornments handleAddNew={handleAddNew} />

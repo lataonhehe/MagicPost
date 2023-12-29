@@ -24,6 +24,10 @@
 //   box-sizing: border-box;
 //   -moz-box-sizing: border-box;
 // }
+.react-pdf__Page.pdf-page {
+  display: flex;
+  justify-content: center;
+}
 .mainPage {
   width: 297mm;
   min-height: 210mm;
