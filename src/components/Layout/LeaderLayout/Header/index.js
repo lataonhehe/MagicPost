@@ -22,6 +22,7 @@ function Header() {
             <a href="/login">
               <input
                 className={cx("inputButton")}
+                style={{ position: "fixed", top: "3px", right: "24px" }}
                 type="button"
                 value={"Đăng xuất"}
                 onClick={() => localStorage.clear()}

@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableContainer,
+  TablePagination,
+} from "@mui/material";
 import EnhancedTableToolbar from "~/hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { statisticCells } from "~/components/UI/TableCell";
 import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
 import EnhancedTableHead from "~/hooks/Table/EnhancedTableHead";
 import EnhancedTableBody from "~/hooks/Table/EnhancedTableBody";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-
+import SendIcon from "@mui/icons-material/Send";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import Leader from "~/pages/Leader";
 function Statistics() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
@@ -93,7 +100,10 @@ function Statistics() {
     } else if (selectedIndex === selected.length - 1) {
       newSelected = selected.slice(0, -1);
     } else if (selectedIndex > 0) {
-      newSelected = [...selected.slice(0, selectedIndex), ...selected.slice(selectedIndex + 1)];
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
     }
 
     setSelected(newSelected);
@@ -115,17 +125,23 @@ function Statistics() {
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(() => {
-    return stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return stableSort(rows, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   return (
     <>
+      {" "}
+      <Leader />
       <Box sx={{ width: "94%", margin: "auto" }}>
         <ColorButton
-          startIcon={<AddBoxIcon />}
+          startIcon={<SendIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -137,7 +153,7 @@ function Statistics() {
           Hàng đã gửi
         </ColorButton>
         <ColorButton
-          startIcon={<ListAltIcon />}
+          startIcon={<InventoryIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -149,7 +165,7 @@ function Statistics() {
           Hàng đã nhận
         </ColorButton>
         <ColorButton
-          startIcon={<ListAltIcon />}
+          startIcon={<LocalShippingIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -161,9 +177,17 @@ function Statistics() {
           Hàng đang vận chuyển
         </ColorButton>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} tableName={"Thống kê"} tableType={"view"} />
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            tableName={"Thống kê"}
+            tableType={"view"}
+          />
           <TableContainer>
-            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -174,7 +198,14 @@ function Statistics() {
                 hasCheckbox={false}
                 headCells={statisticCells}
               />
-              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={false} headCells={statisticCells} />
+              <EnhancedTableBody
+                visibleRows={visibleRows}
+                isSelected={isSelected}
+                handleClick={handleClick}
+                emptyRows={emptyRows}
+                hasCheckbox={false}
+                headCells={statisticCells}
+              />
             </Table>
           </TableContainer>
           <TablePagination

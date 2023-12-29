@@ -66,6 +66,27 @@ const options = {
 const cx = classNames.bind(styles);
 
 const Invoice = () => {
+  const receiver_address_detail = localStorage.getItem(
+    "receiver_address_detail"
+  );
+  const receiving_date = localStorage.getItem("receiving_date");
+  const shipment_name = localStorage.getItem("shipment_name");
+  const sender_name = localStorage.getItem("sender_name");
+  const receiver_name = localStorage.getItem("receiver_name");
+  const sender_postal_code = localStorage.getItem("sender_postal_code");
+  const sender_address = localStorage.getItem("sender_address");
+  const sender_phone = localStorage.getItem("sender_phone");
+  const special_service = localStorage.getItem("special_service");
+  const sender_total_payment = localStorage.getItem("sender_total_payment");
+  const receiver_postal_code = localStorage.getItem("receiver_postal_code");
+  const sender_address_detail = localStorage.getItem("sender_address_detail");
+  const receiver_total_payment = localStorage.getItem("receiver_total_payment");
+  const weight = localStorage.getItem("weight");
+  const receiver_address = localStorage.getItem("receiver_address");
+  const receiver_phone = localStorage.getItem("receiver_phone");
+  const good_type = localStorage.getItem("good_type");
+  const total_payment = localStorage.getItem("total_payment");
+
   const [isLoading, setIsLoading] = useState(false);
   const exportPDF = async () => {
     setIsLoading(true);
@@ -103,7 +124,7 @@ const Invoice = () => {
               <div className={cx(styles.QRCode)}>
                 <div className={cx(styles.box)}>
                   <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?data=Khang!&size=65x65"
+                    src="https://api.qrserver.com/v1/create-qr-code/?data=QRCODE!&size=65x65"
                     alt={""}
                     style={{
                       width: "65px",
@@ -141,10 +162,8 @@ const Invoice = () => {
                           <div className={cx(styles.title)}>
                             1. Họ tên địa chỉ người gửi
                           </div>
-                          <p>
-                            Dịch Vọng Hậu - Cầu Giấy - TP Hà Nội Dịch Vọng Hậu -
-                            Cầu Giấy - TP Hà Nội
-                          </p>
+                          <p>{sender_name}</p>
+                          <p>{sender_address_detail}</p>
                         </div>
                         <div
                           style={{
@@ -155,7 +174,7 @@ const Invoice = () => {
                             <span className={cx(styles.bold)}>
                               Điện thoại:{" "}
                             </span>{" "}
-                            0914508451
+                            {sender_phone}
                           </p>
                         </div>
                         <div
@@ -168,13 +187,13 @@ const Invoice = () => {
                             <span className={cx(styles.bold)}>
                               Mã khách hàng:{" "}
                             </span>
-                            0914508451
+                            {sender_phone}
                           </p>
                           <p className={cx(styles.right)}>
                             <span className={cx(styles.bold)}>
                               Mã bưu chính:{" "}
                             </span>
-                            0914508451
+                            {sender_postal_code}
                           </p>
                         </div>
                       </div>
@@ -203,17 +222,17 @@ const Invoice = () => {
                           <div className={cx(styles.title)}>
                             2. Họ tên địa chỉ người nhận
                           </div>
-                          <p>
-                            Dịch Vọng Hậu - Cầu Giấy - TP Hà Nội Dịch Vọng Hậu -
-                            Cầu Giấy - TP Hà Nội
-                          </p>
+                          <p>{receiver_name}</p>
+                          <p>{receiver_address_detail}</p>
                         </div>
                         <div
                           style={{
                             flex: "1",
                           }}
                         >
-                          <p className={cx(styles.bold)}>Mã ĐH:</p>
+                          <p className={cx(styles.bold)}>
+                            Mã ĐH:38597c1f944b45a
+                          </p>
                         </div>
                         <div
                           style={{
@@ -225,13 +244,13 @@ const Invoice = () => {
                             <span className={cx(styles.bold)}>
                               Mã khách hàng:{" "}
                             </span>
-                            0914508451
+                            {receiver_phone}
                           </p>
                           <p className={cx(styles.right)}>
                             <span className={cx(styles.bold)}>
                               Điện thoại:{" "}
                             </span>{" "}
-                            0914508451
+                            {receiver_phone}
                           </p>
                         </div>
                       </div>
@@ -287,10 +306,14 @@ const Invoice = () => {
                             </thead>
                             <tbody>
                               <tr>
-                                <td className={cx(styles.td)}>a</td>
-                                <td className={cx(styles.td)}>a</td>
-                                <td className={cx(styles.td)}>a</td>
-                                <td className={cx(styles.td)}>a</td>
+                                <td className={cx(styles.td)}>
+                                  {shipment_name}
+                                </td>
+                                <td className={cx(styles.td)}></td>
+                                <td className={cx(styles.td)}>
+                                  {total_payment}
+                                </td>
+                                <td className={cx(styles.td)}></td>
                               </tr>
                             </tbody>
                           </table>
@@ -299,7 +322,7 @@ const Invoice = () => {
                           <div className={cx(styles.title)}>
                             5. Dịch vụ đặc biệt/ Cộng thêm
                           </div>
-                          <p></p>
+                          <p>{special_service}</p>
                         </div>
                       </div>
                     </td>
@@ -307,41 +330,43 @@ const Invoice = () => {
                       <div className={cx(styles.title)}>9. Cước</div>
                       <RowFlexTwoColumnWithFloat
                         label={"a. Cước chính"}
-                        amount={9500}
+                        amount={total_payment}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"b. Phụ phí"}
-                        amount={9500}
+                        amount={0}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"c. Cước GTGT"}
-                        amount={9500}
+                        amount={0}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"d. Tổng cước (gồm VAT)"}
-                        amount={9500}
+                        amount={0}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"e. Thu khác"}
-                        amount={9500}
+                        amount={0}
                       ></RowFlexTwoColumnWithFloat>
                       <div className={cx(styles.bold)}>
                         <RowFlexTwoColumnWithFloat
                           label={"f. Tổng thu"}
-                          amount={9500}
+                          amount={total_payment}
                         ></RowFlexTwoColumnWithFloat>
                       </div>
                     </td>
                     <td className={cx(styles.td)}>
-                      <div className={cx(styles.title)}>10. Khối lượng(kg)</div>
+                      <div className={cx(styles.title)}>
+                        10. Khối lượng - gram{" "}
+                      </div>
 
                       <RowFlexTwoColumnWithFloat
                         label={"Khối lượng thực tế"}
-                        amount={9500}
+                        amount={weight}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"Khối lượng quy đổi"}
-                        amount={9500}
+                        amount={weight}
                       ></RowFlexTwoColumnWithFloat>
                     </td>
                   </tr>
@@ -380,15 +405,15 @@ const Invoice = () => {
                       </div>
                       <RowFlexTwoColumnWithFloat
                         label={"COD"}
-                        amount={9500}
+                        amount={receiver_total_payment}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"Thu khác"}
-                        amount={9500}
+                        amount={0}
                       ></RowFlexTwoColumnWithFloat>
                       <RowFlexTwoColumnWithFloat
                         label={"Tổng thu"}
-                        amount={9500}
+                        amount={receiver_total_payment}
                       ></RowFlexTwoColumnWithFloat>
                     </td>
                   </tr>

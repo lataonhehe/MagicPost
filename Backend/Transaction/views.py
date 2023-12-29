@@ -43,9 +43,10 @@ def create_shipment(request):
     if serializer.is_valid():
         # Save the serialized data as a new Shipment instance
         serializer.save()
-        return Response(
+        print(serializer.data)
+        return JsonResponse(
             status=status.HTTP_201_CREATED,
-            data={"message": "Shipment is created successfully."}
+            data={"message": "Shipment is created successfully.","DHcode": serializer.data["DHCode"]}
         )
     # Return a response indicating a bad request if the JSON data is not valid
     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": serializer.errors})

@@ -38,12 +38,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import styles from "./AddNew.module.scss";
 
 import { useLayoutEffect } from "react";
-import {
-  DatePicker,
-  DateTimePicker,
-  LocalizationProvider,
-} from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
 const cx = classNames.bind(styles);
 const ColorButton = styled(Button)(({ theme }) => ({
@@ -77,6 +75,7 @@ export function InputAdornments({ fetchData }) {
   });
 
   const handleResetForm = () => {
+    setAlertNew("");
     setValues({
       des: "",
       shipment_name: "",
@@ -117,7 +116,9 @@ export function InputAdornments({ fetchData }) {
   const [departmentID, setDepartmentID] = useState([]);
   const [alertNew, setAlertNew] = useState();
   const [success, setSuccess] = useState(false);
-  const newShipment = async () => {
+  const count = useRef(0);
+  const navigate = useNavigate();
+  const newShipment = async (formattedDate) => {
     try {
       const token = localStorage.getItem("Token");
       const addResponse = await fetch(
@@ -143,7 +144,7 @@ export function InputAdornments({ fetchData }) {
             receiver_name: values.receiver_name,
             receiver_phone: values.receiver_phone,
             receiver_total_payment: values.receiver_total_payment,
-            receiving_date: values.receiving_date,
+            receiving_date: formattedDate,
             good_type: values.good_type,
             special_service: values.special_service,
             weight: values.weight,
@@ -153,9 +154,11 @@ export function InputAdornments({ fetchData }) {
       if (!addResponse.ok) {
         setSuccess(false);
         window.alert("Thông tin không hợp lệ!");
-        console.log("response data:", addResponse);
+
         throw new Error(addResponse);
       } else {
+        console.log("response data:", addResponse.json().DHcode);
+        // localStorage.setItem("DHcode", addResponse.json());
         setSuccess(true);
       }
     } catch (error) {
@@ -399,24 +402,16 @@ export function InputAdornments({ fetchData }) {
 
   const onButtonClick = () => {
     setAlertNew("");
-    console.log("des :", values.des);
-    console.log("shipment name:", values.shipment_name);
-    console.log("sender name:", values.sender_name);
-    console.log("sender address:", values.sender_address);
-    console.log("sender_address_detail:", values.sender_address_detail);
-    console.log("sender_total_payment:", values.sender_total_payment);
-    console.log("sender_postal_code:", values.sender_postal_code);
-    console.log("receiver_name:", values.receiver_name);
-    console.log("receiver_address :", values.receiver_address);
-    console.log("receiver_address_detail :", values.receiver_address_detail);
-    console.log("receiver_phone:", values.receiver_phone);
-    console.log("receiver_postal_code:", values.receiver_postal_code);
-    console.log("receiver_total_payment:", values.receiver_total_payment);
-    console.log("receiving_date:", values.receiving_date.$d);
-    console.log("good_type:", values.good_type);
-    console.log("special_service:", values.special_service);
-    console.log("weight:", values.weight);
-    handleChange("receving_date", values.receiving_date.$d);
+    const dateString = values.receiving_date;
+    const dateObject = new Date(dateString);
+
+    const year = dateObject.getFullYear();
+    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObject.getDate()).padStart(2, "0");
+
+    const formattedDate = `${year}-${month}-${day}`;
+    localStorage.setItem("des", values.des);
+
     handleChange("receiver_postal_code", districtIDReceiver.DistrictID);
     handleChange("sender_postal_code", districtIDSender.DistrictID);
     handleChange("des", departmentID.id);
@@ -432,7 +427,29 @@ export function InputAdornments({ fetchData }) {
       "receiver_total_payment",
       parseInt(total_payment.total) - parseInt(values.sender_total_payment)
     );
+    console.log("des :", values.des);
+    console.log("shipment name:", values.shipment_name);
+    console.log("sender name:", values.sender_name);
+    console.log("sender address:", values.sender_address);
+    console.log("sender_address_detail:", values.sender_address_detail);
+    console.log("sender_total_payment:", values.sender_total_payment);
+    console.log("sender_postal_code:", values.sender_postal_code);
+    console.log("receiver_name:", values.receiver_name);
+    console.log("receiver_address :", values.receiver_address);
+    console.log("receiver_address_detail :", values.receiver_address_detail);
+    console.log("receiver_phone:", values.receiver_phone);
+    console.log("receiver_postal_code:", values.receiver_postal_code);
+    console.log("receiver_total_payment:", values.receiver_total_payment);
+    console.log("receiving_date:", formattedDate);
+    console.log("receiving_date: values", values.receiving_date);
+    console.log("good_type:", values.good_type);
+    console.log("special_service:", values.special_service);
+    console.log("weight:", values.weight);
     console.log("total_payment:", total_payment.total);
+    if (count.current == 0) {
+      count.current = 2;
+      return;
+    }
     if (values.sender_name === "") {
       setAlertNew("Hãy nhập họ và tên người gửi!");
       return;
@@ -484,7 +501,33 @@ export function InputAdornments({ fetchData }) {
       return;
     }
 
-    newShipment();
+    localStorage.setItem("des", values.des);
+    localStorage.setItem("shipment_name", values.shipment_name);
+    localStorage.setItem("sender_name", values.sender_name);
+    localStorage.setItem("sender_address", values.sender_address);
+    localStorage.setItem("sender_address_detail", values.sender_address_detail);
+    localStorage.setItem("sender_postal_code", values.sender_postal_code);
+    localStorage.setItem("sender_total_payment", values.sender_total_payment);
+    localStorage.setItem("sender_phone", values.sender_phone);
+    localStorage.setItem("receiver_address", values.receiver_address);
+    localStorage.setItem(
+      "receiver_address_detail",
+      values.receiver_address_detail
+    );
+    localStorage.setItem("receiver_postal_code", values.receiver_postal_code);
+    localStorage.setItem("receiver_name", values.receiver_name);
+    localStorage.setItem("receiver_phone", values.receiver_phone);
+    localStorage.setItem(
+      "receiver_total_payment",
+      values.receiver_total_payment
+    );
+    localStorage.setItem("receiving_date", formattedDate);
+    localStorage.setItem("good_type", values.good_type);
+    localStorage.setItem("special_service", values.special_service);
+    localStorage.setItem("weight", values.weight);
+    localStorage.setItem("total_payment", total_payment.total);
+
+    newShipment(formattedDate);
   };
   useEffect(() => {
     if (success) {
@@ -1064,6 +1107,19 @@ export function InputAdornments({ fetchData }) {
           </div>
 
           <div style={{ alignSelf: "end" }}>
+            <ColorButton
+              variant="contained"
+              onClick={() => {
+                navigate("/invoice");
+              }}
+              sx={{
+                fontSize: "16px",
+                margin: "32px",
+                alignSelf: "start",
+              }}
+            >
+              In giấy biên nhận
+            </ColorButton>
             <ColorButton
               variant="contained"
               onClick={onButtonClick}

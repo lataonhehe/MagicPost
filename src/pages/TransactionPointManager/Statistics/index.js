@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableContainer,
+  TablePagination,
+} from "@mui/material";
 import EnhancedTableToolbar from "~/hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { statisticCells } from "~/components/UI/TableCell";
 import { getComparator, stableSort } from "~/hooks/Table/TableUtils";
 import EnhancedTableHead from "~/hooks/Table/EnhancedTableHead";
 import EnhancedTableBody from "~/hooks/Table/EnhancedTableBody";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import ListAltIcon from "@mui/icons-material/ListAlt";
+import { BarChart, axisClasses } from "@mui/x-charts";
+import SendIcon from "@mui/icons-material/Send";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import InventoryIcon from "@mui/icons-material/Inventory";
 
-export default function TransManagerStatics() {
+export default function ConsolManagerStatics() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
@@ -97,7 +105,10 @@ export default function TransManagerStatics() {
     } else if (selectedIndex === selected.length - 1) {
       newSelected = selected.slice(0, -1);
     } else if (selectedIndex > 0) {
-      newSelected = [...selected.slice(0, selectedIndex), ...selected.slice(selectedIndex + 1)];
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
     }
 
     setSelected(newSelected);
@@ -119,17 +130,25 @@ export default function TransManagerStatics() {
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(() => {
-    return stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return stableSort(rows, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   return (
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
+        <Box sx={{ display: "flex", flex: "row", marginTop: "16px" }}>
+          <BarsDataset />
+          <BarsDataset2 />
+        </Box>
         <ColorButton
-          startIcon={<AddBoxIcon />}
+          startIcon={<SendIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -141,7 +160,7 @@ export default function TransManagerStatics() {
           Hàng đã gửi
         </ColorButton>
         <ColorButton
-          startIcon={<ListAltIcon />}
+          startIcon={<InventoryIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -153,7 +172,7 @@ export default function TransManagerStatics() {
           Hàng đã nhận
         </ColorButton>
         <ColorButton
-          startIcon={<ListAltIcon />}
+          startIcon={<LocalShippingIcon />}
           variant="contained"
           sx={{
             fontSize: "18px",
@@ -165,9 +184,17 @@ export default function TransManagerStatics() {
           Hàng đang vận chuyển
         </ColorButton>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} tableName={tableName} tableType={"view"} />
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            tableName={tableName}
+            tableType={"view"}
+          />
           <TableContainer>
-            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -178,7 +205,14 @@ export default function TransManagerStatics() {
                 hasCheckbox={hasCheckbox}
                 headCells={cells}
               />
-              <EnhancedTableBody visibleRows={visibleRows} isSelected={isSelected} handleClick={handleClick} emptyRows={emptyRows} hasCheckbox={hasCheckbox} headCells={cells} />
+              <EnhancedTableBody
+                visibleRows={visibleRows}
+                isSelected={isSelected}
+                handleClick={handleClick}
+                emptyRows={emptyRows}
+                hasCheckbox={hasCheckbox}
+                headCells={cells}
+              />
             </Table>
           </TableContainer>
           <TablePagination
@@ -195,5 +229,112 @@ export default function TransManagerStatics() {
         </Paper>
       </Box>
     </>
+  );
+}
+
+const chartSetting = {
+  yAxis: [
+    {
+      label: "Số lượng (đơn)",
+    },
+  ],
+  width: 550,
+  height: 300,
+  sx: {
+    [`.${axisClasses.left} .${axisClasses.label}`]: {
+      transform: "translate(-20px, 0)",
+    },
+    padding: "6px",
+    marginLeft: "60px",
+    alignSelf: "center",
+  },
+};
+const dataset = [
+  {
+    pending: 13,
+    outgoing: 12,
+    incoming: 17,
+    month: "Dec",
+  },
+];
+
+const valueFormatter = (value) => `${value} đơn`;
+
+function BarsDataset() {
+  return (
+    <BarChart
+      dataset={dataset}
+      xAxis={[{ scaleType: "band", dataKey: "month" }]}
+      series={[
+        {
+          dataKey: "pending",
+          label: "Đang vận chuyển",
+          valueFormatter,
+          color: "#ff9800",
+        },
+        {
+          dataKey: "outgoing",
+          label: "Đã gửi",
+          valueFormatter,
+          color: "#4caf50",
+        },
+        {
+          dataKey: "incoming",
+          label: "Đã nhận",
+          valueFormatter,
+          color: "#03a9f4",
+        },
+      ]}
+      {...chartSetting}
+    />
+  );
+}
+
+const chartSetting2 = {
+  yAxis: [
+    {
+      label: "Số lượng (đơn)",
+    },
+  ],
+  width: 550,
+  height: 300,
+  sx: {
+    [`.${axisClasses.left} .${axisClasses.label}`]: {
+      transform: "translate(-20px, 0)",
+    },
+    padding: "6px",
+    marginLeft: "60px",
+    alignSelf: "center",
+  },
+};
+const dataset2 = [
+  {
+    success: 59,
+    failed: 57,
+    month: "Tháng này",
+  },
+];
+
+function BarsDataset2() {
+  return (
+    <BarChart
+      dataset={dataset2}
+      xAxis={[{ scaleType: "band", dataKey: "month" }]}
+      series={[
+        {
+          dataKey: "failed",
+          label: "Thất bại",
+          valueFormatter,
+          color: "#d32f2f",
+        },
+        {
+          dataKey: "success",
+          label: "Thành công",
+          valueFormatter,
+          color: "#4caf50",
+        },
+      ]}
+      {...chartSetting2}
+    />
   );
 }

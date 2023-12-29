@@ -15,7 +15,7 @@ import NewUserForm from "~/hooks/Form/NewUserForm";
 import EnhancedTableHead from "~/hooks/Table/EnhancedTableHead";
 import EnhancedTableBody from "~/hooks/Table/EnhancedTableBody";
 
-function TransManagerManageAccounts() {
+function ConsolManagerManageAccounts() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("id");
   const [selected, setSelected] = useState([]);
@@ -227,4 +227,4 @@ function TransManagerManageAccounts() {
   );
 }
 
-export default TransManagerManageAccounts;
+export default ConsolManagerManageAccounts;

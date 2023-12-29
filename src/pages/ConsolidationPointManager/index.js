@@ -1,5 +1,7 @@
+import ConsolManagerStatics from "./Statistics";
+
 function ConsolidationManager() {
-    return ( <p>hello manager </p> );
+  return <ConsolManagerStatics />;
 }
 
 export default ConsolidationManager;

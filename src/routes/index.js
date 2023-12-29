@@ -116,7 +116,7 @@ const privateRoutes = [
   },
 
   //Chức năng nhân viên giao dịch
-  { path: "/invoice", component: Invoice, layout: null },
+  { path: "/invoice", component: Invoice, layout: TransStaffLayout },
   {
     path: "/transstaff/statistics",
     component: TransStaffStatistics,

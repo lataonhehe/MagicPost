@@ -1,12 +1,7 @@
-import GetData from "~/components/GetData";
+import DichVu from "../DichVu";
 
 function Home() {
-  return (
-    <h2>
-      Home
-      <GetData />
-    </h2>
-  );
+  return <DichVu />;
 }
 
 export default Home;

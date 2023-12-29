@@ -35,7 +35,7 @@ const Login = () => {
       }, 1500);
       if (role === "2")
         setTimeout(() => {
-          navigate(`/leader`);
+          navigate(`/leader/statistic`);
         }, 2000);
       else
         setTimeout(() => {

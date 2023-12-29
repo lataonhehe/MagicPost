@@ -1,5 +1,7 @@
+import ConsolStaffAddTransaction from "~/pages/ConsolidationPointStaff/Accept/ConsolidationPoint";
+
 function ConsolidationStaff() {
-    return (<p>hello staff</p> );
+  return <ConsolStaffAddTransaction />;
 }
 
 export default ConsolidationStaff;
