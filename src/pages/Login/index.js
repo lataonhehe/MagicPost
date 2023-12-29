@@ -167,20 +167,19 @@ const Login = () => {
       {
         <Fade in={chora} timeout={1000}>
           <Alert
+            variant="filled"
             severity="success"
             sx={{
-              transition: "ease",
-              opacity: 0.9,
               position: "fixed",
-              fontSize: "1.5rem",
+              fontSize: "1.0rem",
               left: "48px",
               bottom: "48px",
               zIndex: 100,
               width: "45%",
             }}
           >
-            <AlertTitle sx={{ fontSize: "1.5rem", fontWeight: "Bold" }}>
-              Success
+            <AlertTitle sx={{ fontSize: "1.2rem", fontWeight: "Bold" }}>
+              Thành công
             </AlertTitle>
             Đăng nhập thành công!
           </Alert>

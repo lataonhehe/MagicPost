@@ -1,8 +1,11 @@
 import {
+  Alert,
+  AlertTitle,
   Autocomplete,
   Button,
   Collapse,
   Divider,
+  Fade,
   FormControl,
   Grid,
   InputAdornment,
@@ -31,10 +34,16 @@ import { useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import OutlinedInput from "@mui/material/OutlinedInput";
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import styles from "./AddNew.module.scss";
 
 import { useLayoutEffect } from "react";
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 
 const cx = classNames.bind(styles);
 const ColorButton = styled(Button)(({ theme }) => ({
@@ -61,31 +70,12 @@ export function InputAdornments({ fetchData }) {
     receiver_name: "",
     receiver_phone: "",
     receiver_total_payment: "",
-    receiving_date: "",
+    receiving_date: dayjs("2023-12-22"),
     good_type: "",
     special_service: "",
     weight: "",
   });
-  const [error, setError] = useState({
-    des: "",
-    shipment_name: "",
-    sender_name: "",
-    sender_address: "",
-    sender_address_detail: "",
-    sender_postal_code: "",
-    sender_total_payment: "",
-    sender_phone: "",
-    receiver_address: "",
-    receiver_address_detail: "",
-    receiver_postal_code: "",
-    receiver_name: "",
-    receiver_phone: "",
-    receiver_total_payment: "",
-    receiving_date: "",
-    good_type: "",
-    special_service: "",
-    weight: "",
-  });
+
   const handleResetForm = () => {
     setValues({
       des: "",
@@ -109,28 +99,6 @@ export function InputAdornments({ fetchData }) {
     });
   };
 
-  const handleResetError = () => {
-    setError({
-      des: "",
-      shipment_name: "",
-      sender_name: "",
-      sender_address: "",
-      sender_address_detail: "",
-      sender_postal_code: "",
-      sender_total_payment: "",
-      sender_phone: "",
-      receiver_address: "",
-      receiver_address_detail: "",
-      receiver_postal_code: "",
-      receiver_name: "",
-      receiver_phone: "",
-      receiver_total_payment: "",
-      receiving_date: "",
-      good_type: "",
-      special_service: "",
-      weight: "",
-    });
-  };
   const [department, setDepartment] = useState([]);
   const [province, setProvince] = useState([]);
   const [districtSender, setDistrictSender] = useState([]);
@@ -147,7 +115,8 @@ export function InputAdornments({ fetchData }) {
   const [serviceID, setServiceID] = useState([]);
   const [total_payment, setTotal_payment] = useState([]);
   const [departmentID, setDepartmentID] = useState([]);
-
+  const [alertNew, setAlertNew] = useState();
+  const [success, setSuccess] = useState(false);
   const newShipment = async () => {
     try {
       const token = localStorage.getItem("Token");
@@ -182,9 +151,12 @@ export function InputAdornments({ fetchData }) {
         }
       );
       if (!addResponse.ok) {
+        setSuccess(false);
         window.alert("Thông tin không hợp lệ!");
         console.log("response data:", addResponse);
         throw new Error(addResponse);
+      } else {
+        setSuccess(true);
       }
     } catch (error) {
       console.error("Error add new shipment:", error.message);
@@ -424,15 +396,9 @@ export function InputAdornments({ fetchData }) {
       [field]: value,
     }));
   };
-  const handleChangeError = (field, value) => {
-    setError((prevValues) => ({
-      ...prevValues,
-      [field]: value,
-    }));
-  };
 
   const onButtonClick = () => {
-    handleResetError();
+    setAlertNew("");
     console.log("des :", values.des);
     console.log("shipment name:", values.shipment_name);
     console.log("sender name:", values.sender_name);
@@ -446,10 +412,11 @@ export function InputAdornments({ fetchData }) {
     console.log("receiver_phone:", values.receiver_phone);
     console.log("receiver_postal_code:", values.receiver_postal_code);
     console.log("receiver_total_payment:", values.receiver_total_payment);
-    console.log("receiving_date:", values.receiving_date);
+    console.log("receiving_date:", values.receiving_date.$d);
     console.log("good_type:", values.good_type);
     console.log("special_service:", values.special_service);
     console.log("weight:", values.weight);
+    handleChange("receving_date", values.receiving_date.$d);
     handleChange("receiver_postal_code", districtIDReceiver.DistrictID);
     handleChange("sender_postal_code", districtIDSender.DistrictID);
     handleChange("des", departmentID.id);
@@ -467,57 +434,67 @@ export function InputAdornments({ fetchData }) {
     );
     console.log("total_payment:", total_payment.total);
     if (values.sender_name === "") {
-      handleChangeError("sender_name", "Hãy nhập họ và tên!");
+      setAlertNew("Hãy nhập họ và tên người gửi!");
       return;
     }
     if (values.receiver_name === "") {
-      handleChangeError("receiver_name", "Hãy nhập họ và tên!");
+      setAlertNew("Hãy nhập họ và tên người nhận!");
       return;
     }
 
-    if (values.sender_address === "" || districtIDSender.DistrictID === "") {
-      handleChangeError("sender_address", "Hãy nhập địa chỉ!");
+    if (values.sender_address === "" || values.sender_postal_code === "") {
+      setAlertNew("Hãy nhập địa chỉ người gửi!");
       return;
     }
+    console.log("ward:", wardReceiverName);
     if (
-      values.receiver_address === "" ||
-      (districtIDReceiver.DistrictID === "" && wardReceiverName === "")
+      values.receiver_address === null ||
+      values.receiver_postal_code === null ||
+      wardReceiverName === null
     ) {
-      handleChangeError("receiver_address", "Hãy nhập địa chỉ!");
+      setAlertNew("Hãy nhập địa chỉ người nhận!");
       return;
     }
     if (values.sender_phone === "") {
-      handleChangeError("sender_phone", "Hãy nhập số điện thoại!");
+      setAlertNew("Hãy nhập số điện thoại người gửi!");
       return;
     }
     if (values.receiver_phone === "") {
-      handleChangeError("receiver_phone", "Hãy nhập số điện thoại!");
+      setAlertNew("Hãy nhập số điện thoại người nhận!");
       return;
     }
     if (values.shipment_name === "") {
-      handleChangeError("shipement_name", "Hãy nhập tên hàng!");
+      setAlertNew("Hãy nhập tên hàng!");
       return;
     }
     if (values.good_type === "") {
-      handleChangeError("good_type", "Hãy nhập loại hàng!");
+      setAlertNew("Hãy nhập loại hàng!");
       return;
     }
     if (values.weight === "") {
-      handleChangeError("weight", "Hãy nhập khối lượng hàng!");
+      setAlertNew("Hãy nhập khối lượng hàng!");
       return;
     }
     if (values.special_service === "") {
-      handleChangeError("special_service", "Hãy nhập gói dịch vụ!");
+      setAlertNew("Hãy nhập gói dịch vụ!");
       return;
     }
     if (values.sender_total_payment === "") {
-      handleChangeError("sender_total_payment", "Hãy nhập số tiền!");
+      setAlertNew("Hãy nhập số tiền cước người gửi!");
       return;
     }
 
     newShipment();
   };
-
+  useEffect(() => {
+    if (success) {
+      // console.log('chora true');
+      setTimeout(() => {
+        // console.log('chora false');
+        setSuccess(false);
+      }, 1500);
+    }
+  }, [success]);
   return (
     <Box sx={{ margin: "auto" }}>
       <div
@@ -529,7 +506,13 @@ export function InputAdornments({ fetchData }) {
         }}
       >
         <FormControl sx={{ m: 1, fontSize: "24px" }} variant="outlined">
-          <h3 style={{ marginLeft: "16px", marginTop: "16px" }}>
+          <h3
+            style={{
+              padding: "32px",
+              backgroundColor: "#f38600",
+              color: "white",
+            }}
+          >
             Ghi nhận đơn hàng mới
           </h3>
           <div style={{ display: "flex", flexDirection: "row" }}>
@@ -564,8 +547,7 @@ export function InputAdornments({ fetchData }) {
                 inputProps={{
                   "aria-label": "sender_name",
                 }}
-              />
-              <label className={cx("errorLabel")}>{error.sender_name}</label>
+              ></TextField>
               <label
                 style={{
                   fontSize: "18px",
@@ -604,7 +586,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Tỉnh, thành phố" />
                 )}
               />
-              <label className={cx("errorLabel")}>{error.sender_address}</label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="sender_address_district"
@@ -679,7 +660,6 @@ export function InputAdornments({ fetchData }) {
                 value={values.sender_phone}
                 onChange={(e) => handleChange("sender_phone", e.target.value)}
               />
-              <label className={cx("errorLabel")}>{error.sender_phone}</label>
             </div>
             <Grid item style={{ alignSelf: "center", height: "600px" }}>
               <Divider orientation="vertical" variant="middle" />
@@ -714,7 +694,6 @@ export function InputAdornments({ fetchData }) {
                 value={values.receiver_name}
                 onChange={(e) => handleChange("receiver_name", e.target.value)}
               />
-              <label className={cx("errorLabel")}>{error.receiver_name}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -752,9 +731,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Tỉnh, thành phố" />
                 )}
               />
-              <label className={cx("errorLabel")}>
-                {error.receiver_address}
-              </label>
               <Autocomplete
                 sx={{ m: 1, width: "25ch" }}
                 id="receiver_address_district"
@@ -830,7 +806,6 @@ export function InputAdornments({ fetchData }) {
                 value={values.receiver_phone}
                 onChange={(e) => handleChange("receiver_phone", e.target.value)}
               />
-              <label className={cx("errorLabel")}>{error.receiver_phone}</label>
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "row" }}>
@@ -863,7 +838,6 @@ export function InputAdornments({ fetchData }) {
                 value={values.shipment_name}
                 onChange={(e) => handleChange("shipment_name", e.target.value)}
               />
-              <label className={cx("errorLabel")}>{error.shipment_name}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -891,7 +865,6 @@ export function InputAdornments({ fetchData }) {
                   Tài liệu
                 </MenuItem>
               </TextField>
-              <label className={cx("errorLabel")}>{error.good_type}</label>
 
               <label
                 style={{
@@ -915,7 +888,6 @@ export function InputAdornments({ fetchData }) {
                   <InputAdornment position="end">gram</InputAdornment>
                 }
               />
-              <label className={cx("errorLabel")}>{error.weight}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -961,9 +933,7 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Các dịch vụ hiện có" />
                 )}
               />
-              <label className={cx("errorLabel")}>
-                {error.special_service}
-              </label>
+
               <label
                 style={{
                   fontSize: "18px",
@@ -1001,7 +971,6 @@ export function InputAdornments({ fetchData }) {
                   <TextField {...params} label="Department" />
                 )}
               />
-              <label className={cx("errorLabel")}>{error.des}</label>
               <label
                 style={{
                   fontSize: "18px",
@@ -1013,15 +982,16 @@ export function InputAdornments({ fetchData }) {
               >
                 Ngày nhận
               </label>
-              <TextField
-                fullWidth
-                sx={{ m: 1 }}
-                id="receiving_date"
-                placeholder="2023-11-20"
-                value={values.receiving_date}
-                onChange={(e) => handleChange("receiving_date", e.target.value)}
-              />
-              <label className={cx("errorLabel")}>{error.receiving_date}</label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  sx={{ marginLeft: "8px", borderColor: "black" }}
+                  value={values.receiving_date}
+                  id="receiving_date"
+                  onChange={(newValue) =>
+                    handleChange("receiving_date", newValue)
+                  }
+                />
+              </LocalizationProvider>
               <label
                 style={{
                   fontSize: "18px",
@@ -1067,9 +1037,7 @@ export function InputAdornments({ fetchData }) {
                     handleChange("sender_total_payment", e.target.value);
                   }}
                 ></TextField>
-                <label className={cx("errorLabel")}>
-                  {error.sender_total_payment}
-                </label>
+
                 <label
                   style={{
                     fontSize: "18px",
@@ -1123,22 +1091,54 @@ export function InputAdornments({ fetchData }) {
           </div>
         </FormControl>
       </div>
+      <Fade in={alertNew}>
+        <Alert
+          variant="filled"
+          severity="error"
+          sx={{
+            position: "fixed",
+            fontSize: "1.0rem",
+            left: "48px",
+            bottom: "48px",
+            zIndex: 100,
+            width: "45%",
+          }}
+        >
+          <AlertTitle sx={{ fontSize: "1.2rem", fontWeight: "Bold" }}>
+            Lỗi
+          </AlertTitle>
+          {alertNew}
+        </Alert>
+      </Fade>
+      <Fade in={success} timeout={1000}>
+        <Alert
+          variant="filled"
+          severity="success"
+          sx={{
+            position: "fixed",
+            fontSize: "1.0rem",
+            left: "48px",
+            bottom: "48px",
+            zIndex: 100,
+            width: "45%",
+          }}
+        >
+          <AlertTitle sx={{ fontSize: "1.2rem", fontWeight: "Bold" }}>
+            Thành công
+          </AlertTitle>
+          Tạo đơn hàng thành công!
+        </Alert>
+      </Fade>
     </Box>
   );
 }
 
 export default function NewTransaction() {
-  const [alertNew, setAlertNew] = useState(false);
-
-  function handleAddNew() {
-    setAlertNew(true);
-  }
-
   return (
     <Box sx={{ width: "1000px", margin: "auto" }}>
       <Paper sx={{ width: "100%", mb: 2, marginTop: "48px" }} elevation={5}>
         {/* <Collapse in={true} timeout="auto"> */}
-        <InputAdornments handleAddNew={handleAddNew} />
+        <InputAdornments />
         {/* </Collapse> */}
       </Paper>
     </Box>
