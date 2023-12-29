@@ -163,7 +163,8 @@ class CustomerTransaction(models.Model):
     # Convert CustomerTransaction instance to a JSON-like dictionary
     def to_json(self):
         return {
-            'shipment': self.shipment.to_json(),
+            'customer_transaction_id': self.pk,
+            **self.shipment.to_json(),
             'status': self.status,
             'created_at': self.created_at
         }
