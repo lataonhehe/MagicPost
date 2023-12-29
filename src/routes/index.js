@@ -1,7 +1,8 @@
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Leader from "../pages/Leader";
-import Invoice from "../pages/Invoice/Invoice";
+import DichVu from "~/pages/DichVu";
+import TinTuc from "~/pages/TinTuc";
 
 //import 5 pages, 5 vai trò
 import ConsolidationManager from "../pages/ConsolidationPointManager";
@@ -37,13 +38,13 @@ import ConsolStaffAddConsolidation from "~/pages/ConsolidationPointStaff/Add/Con
 import ConsolStaffAddTransaction from "~/pages/ConsolidationPointStaff/Add/TransactionPoint";
 
 //Chức năng nhân viên giao dịch
+import Invoice from "../pages/Invoice/Invoice";
 import TransStaffStatistics from "~/pages/TransactionPointStaff/Statistics";
 import FinishedTransaction from "~/pages/TransactionPointStaff/Add/Finished";
 import NewTransaction from "~/pages/TransactionPointStaff/Add/New";
 import TransStaffAcceptSolidation from "~/pages/TransactionPointStaff/Accept/ConsolidationPoint";
 import TransStaffAcceptFinish from "~/pages/TransactionPointStaff/Accept/Finished/";
 import TransStaffAddConsol from "~/pages/TransactionPointStaff/Add/Consolidation";
-import DichVu from "~/pages/DichVu";
 
 //Chức năng nhân viên giao dịch
 
@@ -51,6 +52,7 @@ import DichVu from "~/pages/DichVu";
 const publicRoutes = [
   { path: "/", component: Home },
   { path: "/dichvu", component: DichVu },
+  { path: "/tintuc", component: TinTuc },
   { path: "/login", component: Login, layout: null },
   { path: "/transactiontable", component: TransactionTable },
 ];
