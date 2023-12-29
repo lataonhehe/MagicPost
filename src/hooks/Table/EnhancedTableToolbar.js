@@ -5,10 +5,10 @@ import { Toolbar, Typography, Tooltip, Button } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 
-function EnhancedTableToolbar({ numSelected, handleAccept, tableName, tableType }) {
+function EnhancedTableToolbar({ numSelected, handleAccept, handleNewButton, tableName, tableType }) {
   let type = "tạo";
-  if(tableType === "delete") type = "xóa";
-  if(tableType === "confirm") type = "chọn";
+  if (tableType === "delete") type = "xóa";
+  if (tableType === "confirm") type = "chọn";
 
   return (
     <Toolbar
@@ -33,11 +33,21 @@ function EnhancedTableToolbar({ numSelected, handleAccept, tableName, tableType 
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title={`Xác nhận ${type}`}>
-          <Button sx={{ fontSize: "14px", marginRight: "16px" }} variant="contained" startIcon={<AddBoxIcon sx={{ fontSize: "24px" }} />} onClick={handleAccept}>
-            Xác nhận
-          </Button>
-        </Tooltip>
+        <>
+          <Tooltip title={`Xác nhận ${type}`}>
+            <Button sx={{ fontSize: "14px", marginRight: "16px" }} variant="contained" startIcon={<AddBoxIcon sx={{ fontSize: "24px" }} />} onClick={handleAccept}>
+              Xác nhận
+            </Button>
+          </Tooltip>
+          {/* Conditional rendering of the "Thất bại" button */}
+          {handleNewButton && (
+            <Tooltip title="Your Tooltip Title">
+              <Button sx={{ fontSize: "14px", marginRight: "16px" }} variant="contained" startIcon={<AddBoxIcon sx={{ fontSize: "24px" }} />} onClick={handleNewButton}>
+                Thất bại
+              </Button>
+            </Tooltip>
+          )}
+        </>
       ) : (
         <></>
       )}
@@ -48,6 +58,7 @@ function EnhancedTableToolbar({ numSelected, handleAccept, tableName, tableType 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
   // handleAccept: PropTypes.func.isRequired,
+  handleNewButton: PropTypes.func, // Making handleNewButton optional
   tableName: PropTypes.string.isRequired,
   tableType: PropTypes.string.isRequired,
 };

@@ -26,7 +26,7 @@ function TransStaffAcceptFinish() {
     //Change id to key id
     if (Array.isArray(data)) {
       const updatedData = data.map((point) => {
-        return { ...point, id: point.transaction_id };
+        return { ...point, id: point.customer_transaction_id };
       });
 
       setRows(updatedData);
@@ -51,7 +51,7 @@ function TransStaffAcceptFinish() {
       }
 
       const data = await response.json();
-      updateRows(data.consolidation_point);
+      updateRows(data.inprogress_customer_transaction_list);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
@@ -71,7 +71,32 @@ function TransStaffAcceptFinish() {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ transaction_id: selected }),
+        body: JSON.stringify({ customer_transaction_id: selected }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      fetchData();
+      setSelected([]);
+    } catch (error) {}
+  };
+
+  const handleFailed = async () => {
+    try {
+      const token = localStorage.getItem("Token");
+
+      const response = await fetch("http://127.0.0.1:8000/Transaction/transaction_employee/confirm_failed_shipment_and_send_back", {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ customer_transaction_id: selected }),
       });
 
       const data = await response.json();
@@ -135,7 +160,7 @@ function TransStaffAcceptFinish() {
     <>
       <Box sx={{ width: "94%", margin: "auto" }}>
         <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
-          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} tableName={tableName} tableType={tableType} />
+          <EnhancedTableToolbar numSelected={selected.length} handleAccept={handleAccept} handleNewButton={handleFailed} tableName={tableName} tableType={tableType} />
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
               <EnhancedTableHead
