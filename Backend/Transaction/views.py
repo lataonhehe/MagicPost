@@ -870,7 +870,7 @@ def shipment_statistic(request):
 
     # Initialize response_data dictionary with department names as keys
     for i in department_list:
-        response_data[i.call_name()] = {
+        response_data[i.department_id] = {
             'coming_shipment': [],
             'sending_shipment': [],
             'pending_shipment': []
@@ -884,8 +884,8 @@ def shipment_statistic(request):
 
     # Populate response_data with pending shipments
     for x in pending_shipment:
-        department_name = x.current_pos.call_name()
-        response_data[department_name]['pending_shipment'].append(x.to_json())
+        department_id = x.current_pos.department_id
+        response_data[department_id]['pending_shipment'].append(x.to_json())
 
     # Populate response_data with incoming and outgoing shipments
     for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):
