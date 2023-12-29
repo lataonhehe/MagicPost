@@ -167,11 +167,11 @@ Authorization: Token 93139181e2eae9a2f92cc6454a30591a94078ccf
 ## Khách hàng
 
 ### search_shipment
-GET http://127.0.0.1:8000/Transaction/search_shipment
+GET http://127.0.0.1:8000/Transaction/search_shipment?code=0fde1d37f25b417
 Content-Type: application/json
 
 {
-    "code": "662be96f9aa34d1"
+   
 }
 
 ## Truong diem giao dich, tap ket
@@ -197,3 +197,8 @@ Authorization: Token 62db23a728621431acd7df44ba712bbb677af26a
 GET http://127.0.0.1:8000/Transaction/shipment_statistic
 Content-Type: application/json
 Authorization: Token 62db23a728621431acd7df44ba712bbb677af26a
+
+### get department shipment list
+GET http://127.0.0.1:8000/Transaction/employee/get_shipment_list
+Content-Type: application/json
+Authorization: Token ab62739a6390cdf62c0b9c471be780a64be3f8aa

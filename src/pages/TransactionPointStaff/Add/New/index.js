@@ -3,13 +3,11 @@ import {
   AlertTitle,
   Autocomplete,
   Button,
-  Collapse,
   Divider,
   Fade,
   FormControl,
   Grid,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
   styled,
@@ -18,30 +16,19 @@ import classNames from "classnames/bind";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { visuallyHidden } from "@mui/utils";
 import { blue } from "@mui/material/colors";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import styles from "./AddNew.module.scss";
 
 import { useLayoutEffect } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 
-const cx = classNames.bind(styles);
 const ColorButton = styled(Button)(({ theme }) => ({
   color: theme.palette.getContrastText(blue[500]),
   backgroundColor: theme.palette.primary,
@@ -117,51 +104,54 @@ export function InputAdornments({ fetchData }) {
   const count = useRef(0);
   const navigate = useNavigate();
   const newShipment = async (formattedDate) => {
-    try {
-      const token = localStorage.getItem("Token");
-      const addResponse = await fetch(
-        "http://127.0.0.1:8000/Transaction/create_shipment",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            des: values.des,
-            shipment_name: values.shipment_name,
-            sender_name: values.sender_name,
-            sender_address: values.sender_address,
-            sender_address_detail: values.sender_address_detail,
-            sender_postal_code: values.sender_postal_code,
-            sender_total_payment: values.sender_total_payment,
-            sender_phone: values.sender_phone,
-            receiver_address: values.receiver_address,
-            receiver_address_detail: values.receiver_address_detail,
-            receiver_postal_code: values.receiver_postal_code,
-            receiver_name: values.receiver_name,
-            receiver_phone: values.receiver_phone,
-            receiver_total_payment: values.receiver_total_payment,
-            receiving_date: formattedDate,
-            good_type: values.good_type,
-            special_service: values.special_service,
-            weight: values.weight,
-          }),
+    const token = localStorage.getItem("Token");
+    await fetch("http://127.0.0.1:8000/Transaction/create_shipment", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        des: values.des,
+        shipment_name: values.shipment_name,
+        sender_name: values.sender_name,
+        sender_address: values.sender_address,
+        sender_address_detail: values.sender_address_detail,
+        sender_postal_code: values.sender_postal_code,
+        sender_total_payment: values.sender_total_payment,
+        sender_phone: values.sender_phone,
+        receiver_address: values.receiver_address,
+        receiver_address_detail: values.receiver_address_detail,
+        receiver_postal_code: values.receiver_postal_code,
+        receiver_name: values.receiver_name,
+        receiver_phone: values.receiver_phone,
+        receiver_total_payment: values.receiver_total_payment,
+        receiving_date: formattedDate,
+        good_type: values.good_type,
+        special_service: values.special_service,
+        weight: values.weight,
+      }),
+    })
+      .then((addResponse) => {
+        if (addResponse.ok) {
+          setSuccess(true);
+          return addResponse.json();
+        } else {
+          window.alert("Thông tin không hợp lệ!");
+          setSuccess(false);
+          return NaN;
         }
-      );
-      if (!addResponse.ok) {
-        setSuccess(false);
-        window.alert("Thông tin không hợp lệ!");
-
-        throw new Error(addResponse);
-      } else {
+      })
+      .then((addResponse) => {
+        console.log(addResponse.DHcode);
+        localStorage.setItem("DHcode", addResponse.DHcode);
         console.log("response data:", addResponse.json().DHcode);
-        // localStorage.setItem("DHcode", addResponse.json());
         setSuccess(true);
-      }
-    } catch (error) {
-      console.error("Error add new shipment:", error.message);
-    }
+      })
+
+      .catch((error) => {
+        console.error("Error logging in:", error);
+      });
   };
 
   const fetchDepartmentData = async () => {
@@ -400,6 +390,7 @@ export function InputAdornments({ fetchData }) {
 
   const onButtonClick = () => {
     setAlertNew("");
+    setSuccess(false);
     const dateString = values.receiving_date;
     const dateObject = new Date(dateString);
 

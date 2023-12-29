@@ -127,7 +127,7 @@ function TransactionTable() {
       }
 
       const data = await response.json();
-
+      console.log(data.transaction_list);
       setTableData(data.transaction_list);
       setShipmentStatus(data.shipment_status);
       setShipmentDes(data.shipment_pos);
@@ -226,7 +226,9 @@ function TransactionTable() {
           </div>
           <div className={cx("infor-container-right")}>
             <div className={cx("header-i-container")}>Khối lượng</div>
-            <p className={cx("infor-p")}>{weight}</p>
+            <p className={cx("infor-p")}>
+              {weight} <p> gram</p>
+            </p>
           </div>
         </Box>
         <Box
@@ -258,7 +260,8 @@ function TransactionTable() {
             <Table aria-label="simple table" className={cx("table")}>
               <TableHead className={cx("thead")}>
                 <TableCell className={cx("head-cell")}>Ngày</TableCell>
-                <TableCell className={cx("head-cell")}>Vị trí</TableCell>
+                <TableCell className={cx("head-cell")}>Vị trí gửi</TableCell>
+                <TableCell className={cx("head-cell")}>Vị trí nhận</TableCell>
                 <TableCell className={cx("head-cell")}>Trạng thái</TableCell>
               </TableHead>
               <TableBody className={cx("tbody")}>
@@ -268,6 +271,7 @@ function TransactionTable() {
                       {formatDateTime(row.date)}
                     </TableCell>
                     <TableCell className={cx("cell")}>{row.pos}</TableCell>
+                    <TableCell className={cx("cell")}>{row.des}</TableCell>
                     <TableCell className={cx("cell")}>
                       {getStatus(row.status)}
                     </TableCell>

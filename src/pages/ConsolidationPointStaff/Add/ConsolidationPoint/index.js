@@ -1,6 +1,12 @@
 // ConsolStaffAddTransaction.js
 import React, { useEffect, useState } from "react";
-import { Box, Paper, Table, TableContainer, TablePagination } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableContainer,
+  TablePagination,
+} from "@mui/material";
 import EnhancedTableToolbar from "../../../../hooks/Table/EnhancedTableToolbar";
 import { ColorButton } from "~/components/UI/TableStyles";
 import { createCells, viewCells } from "~/components/UI/TableCell";
@@ -36,7 +42,10 @@ export default function ConsolStaffAddTransaction() {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Token");
-      const apiUrl = activeButton === "create" ? "http://127.0.0.1:8000/Transaction/employee/get_shipment_list" : "http://127.0.0.1:8000/Transaction/employee/get_transaction";
+      const apiUrl =
+        activeButton === "create"
+          ? "http://127.0.0.1:8000/Transaction/employee/get_shipment_list"
+          : "http://127.0.0.1:8000/Transaction/employee/get_transaction";
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -64,14 +73,17 @@ export default function ConsolStaffAddTransaction() {
   const handleAccept = async () => {
     try {
       const token = localStorage.getItem("Token");
-      const response = await fetch("http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_consolidation", {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ shipment_id: selected }),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/Transaction/consolidation_employee/shipment_to_consolidation",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ shipment_id: selected }),
+        }
+      );
 
       const data = await response.json();
       console.log(data);
@@ -117,7 +129,10 @@ export default function ConsolStaffAddTransaction() {
     } else if (selectedIndex === selected.length - 1) {
       newSelected = selected.slice(0, -1);
     } else if (selectedIndex > 0) {
-      newSelected = [...selected.slice(0, selectedIndex), ...selected.slice(selectedIndex + 1)];
+      newSelected = [
+        ...selected.slice(0, selectedIndex),
+        ...selected.slice(selectedIndex + 1),
+      ];
     }
 
     setSelected(newSelected);
@@ -139,10 +154,14 @@ export default function ConsolStaffAddTransaction() {
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(() => {
-    return stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return stableSort(rows, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   return (
@@ -153,8 +172,8 @@ export default function ConsolStaffAddTransaction() {
           variant="contained"
           sx={{
             fontSize: "18px",
-            marginTop: "30px",
-            backgroundColor: activeButton === "create" ? "#2196f3" : "#ffffff",
+            margin: "32px",
+            backgroundColor: activeButton === "create" ? "#4caf50" : "#2196f3",
           }}
           onClick={() => handleButtonClick("create")}
         >
@@ -165,22 +184,30 @@ export default function ConsolStaffAddTransaction() {
           variant="contained"
           sx={{
             fontSize: "18px",
-            marginTop: "30px",
-            backgroundColor: activeButton === "view" ? "#2196f3" : "#ffffff",
+            margin: "32px",
+            backgroundColor: activeButton === "view" ? "#4caf50" : "#2196f3",
           }}
           onClick={() => handleButtonClick("view")}
         >
           Đơn đã tạo
         </ColorButton>
-        <Paper sx={{ width: "100%", mb: 2 }} elevation={3}>
+        <Paper sx={{ width: "100%", mb: 2, marginTop: "20px" }} elevation={3}>
           <EnhancedTableToolbar
             numSelected={selected.length}
             handleAccept={handleAccept}
-            tableName={activeButton === "create" ? "Tạo đơn hàng tới điểm tập kết" : "Đơn hàng đã tạo"}
+            tableName={
+              activeButton === "create"
+                ? "Tạo đơn hàng tới điểm tập kết"
+                : "Đơn hàng đã tạo"
+            }
             tableType={"create"}
           />
           <TableContainer>
-            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? "small" : "medium"}
+            >
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}

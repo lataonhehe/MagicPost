@@ -29,76 +29,10 @@ const chartSetting = {
 };
 const dataset = [
   {
-    pending: 0,
-    outgoing: 0,
-    failed: 0,
-    month: "Jan",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Fev",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Mar",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Apr",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "May",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "June",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "July",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Aug",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Sept",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Oct",
-  },
-  {
-    pending: 0,
-    success: 0,
-    failed: 0,
-    month: "Nov",
-  },
-  {
-    pending: 59,
-    success: 37,
-    failed: 20,
-    month: "Dec",
+    pending: 112,
+    success: 70,
+    failed: 27,
+    month: "",
   },
 ];
 

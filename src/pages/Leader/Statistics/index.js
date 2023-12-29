@@ -60,10 +60,10 @@ function Statistics() {
       }
 
       const resData = await response.json();
-      console.log(departmentID);
       const data = resData[departmentID];
-      if (activeButton === "sent") updateRows(data.outgoing_shipment);
-      if (activeButton === "coming") updateRows(data.coming_shipment);
+      if (activeButton === "coming") updateRows(data.sending_shipment);
+      console.log(rows);
+      if (activeButton === "sent") updateRows(data.coming_shipment);
       if (activeButton === "pending") updateRows(data.pending_shipment);
       console.log(data);
     } catch (error) {
@@ -175,19 +175,22 @@ function Statistics() {
       <Leader />
       <Box sx={{ width: "94%", margin: "auto" }}>
         <Autocomplete
-          options={department}
-          getOptionLabel={(option) => option.department_name}
-          getOptionSelected={(option, value) =>
-            option.department_id === value.department_id
-          }
+          fullWidth
+          disablePortal
+          sx={{ marginLeft: "8px" }}
+          readOnly={department.length <= 0}
+          options={department.map((value) => value.department_name)}
+          value={department.find((item) => item.department_id === departmentID)}
+          getOptionSelected={(option, value) => option.id === value.id}
+          onChange={(e, newValue) => {
+            if (newValue != null) {
+              setDepartmentID(newValue);
+              console.log("departmentID:", departmentID);
+            }
+          }}
           renderInput={(params) => (
             <TextField {...params} label="Department" variant="outlined" />
           )}
-          value={departmentID}
-          onChange={(event, newValue) => {
-            setDepartmentID(newValue ? newValue.department_id : null);
-            fetchData(newValue ? newValue.department_id : null);
-          }}
         />
 
         <ColorButton

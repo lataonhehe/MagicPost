@@ -43,8 +43,7 @@ def create_shipment(request):
     if serializer.is_valid():
         # Save the serialized data as a new Shipment instance
         serializer.save()
-        print(serializer.data)
-        return JsonResponse(
+        return Response(
             status=status.HTTP_201_CREATED,
             data={"message": "Shipment is created successfully.","DHcode": serializer.data["DHCode"]}
         )
@@ -725,6 +724,7 @@ def search_shipment(request):
 
     # Get shipment code
     shipment_code = request.GET.get('code', '')
+    print(shipment_code)
 
     # Check shipment code exists
     if shipment_code is not None:
@@ -732,7 +732,7 @@ def search_shipment(request):
             # Get shipment vid shipment code
             shipment = Shipment.objects.get(DHCode=shipment_code)
             transactions = list(Transaction.objects.filter(shipment=shipment).order_by('created_at'))
-
+    
             # Prepare data to send
             response_data = {
                 'transaction_list': [{
@@ -743,11 +743,22 @@ def search_shipment(request):
                 } for x in transactions
                 ],
                 'shipment_status': shipment.status,
-                'shipment_pos': shipment.sender_address,
-                'shipment_des': shipment.receiver_address,
+                'shipment_pos': shipment.sender_address_detail,
+                'shipment_des': shipment.receiver_address_detail,
                 'shipment_type': shipment.good_type,
                 'shipment_weight': shipment.weight
             }
+            customer_transaction = list(CustomerTransaction.objects.filter(shipment=shipment))
+            if len(customer_transaction) > 0:
+                customer_shipment = customer_transaction[0].shipment
+                data = {
+                    'pos': customer_shipment.des.call_name(),
+                    'des': customer_shipment.receiver_address_detail,
+                    'status': customer_transaction[0].status,
+                    'date': customer_transaction[0].created_at
+                }
+                response_data['transaction_list'].append(data)
+
             return JsonResponse(response_data, status = status.HTTP_200_OK) 
         except Exception as e: 
             # Return response if shipment does not exist
@@ -870,7 +881,7 @@ def shipment_statistic(request):
 
     # Initialize response_data dictionary with department names as keys
     for i in department_list:
-        response_data[i.department_id] = {
+        response_data[i.call_name()] = {
             'coming_shipment': [],
             'sending_shipment': [],
             'pending_shipment': []
@@ -884,8 +895,8 @@ def shipment_statistic(request):
 
     # Populate response_data with pending shipments
     for x in pending_shipment:
-        department_id = x.current_pos.department_id
-        response_data[department_id]['pending_shipment'].append(x.to_json())
+        department_name = x.current_pos.call_name()
+        response_data[department_name]['pending_shipment'].append(x.to_json())
 
     # Populate response_data with incoming and outgoing shipments
     for trans, _shipment in zip(inprogress_transaction, inprogress_shipment):

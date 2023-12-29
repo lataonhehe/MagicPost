@@ -74,18 +74,14 @@ const Invoice = () => {
   const sender_name = localStorage.getItem("sender_name");
   const receiver_name = localStorage.getItem("receiver_name");
   const sender_postal_code = localStorage.getItem("sender_postal_code");
-  const sender_address = localStorage.getItem("sender_address");
   const sender_phone = localStorage.getItem("sender_phone");
   const special_service = localStorage.getItem("special_service");
-  const sender_total_payment = localStorage.getItem("sender_total_payment");
-  const receiver_postal_code = localStorage.getItem("receiver_postal_code");
   const sender_address_detail = localStorage.getItem("sender_address_detail");
   const receiver_total_payment = localStorage.getItem("receiver_total_payment");
   const weight = localStorage.getItem("weight");
-  const receiver_address = localStorage.getItem("receiver_address");
   const receiver_phone = localStorage.getItem("receiver_phone");
-  const good_type = localStorage.getItem("good_type");
   const total_payment = localStorage.getItem("total_payment");
+  const DHcode = localStorage.getItem("DHcode");
 
   const [isLoading, setIsLoading] = useState(false);
   const exportPDF = async () => {
@@ -230,9 +226,7 @@ const Invoice = () => {
                             flex: "1",
                           }}
                         >
-                          <p className={cx(styles.bold)}>
-                            Mã ĐH:38597c1f944b45a
-                          </p>
+                          <p className={cx(styles.bold)}>Mã ĐH: {DHcode}</p>
                         </div>
                         <div
                           style={{
@@ -447,8 +441,12 @@ const Invoice = () => {
                     </td>
 
                     <td className={cx(styles.td)}>
-                      <div className={cx(styles.title)}>14. Ngày giờ nhận</div>
-                      <p className={cx(styles.bold)}>29/05/2003 20h35p</p>
+                      <div className={cx(styles.title)}>
+                        <p className={cx(styles.bold)}>
+                          14. Ngày nhận: {receiving_date}
+                        </p>
+                      </div>
+
                       <div className={cx(styles.textCenter)}>
                         <p>Người nhận/ Người được uỷ quyền</p>
                         <p>(Ký, ghi rõ họ tên)</p>
